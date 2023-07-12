@@ -38,48 +38,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AnankeTheme {
-                val modifier = Modifier.padding(8.dp)
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Scaffold(
-                        modifier = modifier,
-                        bottomBar = {
-                            AnankeBottomBar(modifier = modifier) {
-                                AnankeNavigationItem(modifier = modifier) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Create,
-                                        contentDescription = null
-                                    )
-                                }
-                                AnankeNavigationItem(modifier = modifier) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AccountBox,
-                                        contentDescription = null
-                                    )
-                                }
-                                AnankeNavigationItem(modifier = modifier) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Call,
-                                        contentDescription = null
-                                    )
-                                }
-                            }
-                        }
-                    ) { padding ->
-                        Column(modifier = modifier.padding(padding)) {
-                            AnankeRow(modifier = modifier) {
-                                AnankeText(text = "Ananke", modifier = modifier)
-                            }
-                            AnankeRow(modifier = modifier) {
-                                AnankeText(text = "The pain of UI begins!", modifier = modifier)
-                            }
-                        }
-                    }
-
-                }
+                AnankeApp()
             }
         }
     }
@@ -92,45 +51,4 @@ fun AnankeText(text: String, modifier: Modifier = Modifier) {
         textAlign = TextAlign.Center,
         modifier = modifier.fillMaxWidth()
     )
-}
-
-@Composable
-fun AnankeRow(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .background(Color.Cyan)
-            .fillMaxWidth(),
-        content = content
-    )
-}
-
-@Composable
-fun AnankeBottomBar(modifier: Modifier, content: @Composable RowScope.() -> Unit) {
-    NavigationBar(
-        modifier = modifier,
-        containerColor = Color.Green,
-        content = content
-    )
-}
-
-@Composable
-fun RowScope.AnankeNavigationItem(modifier: Modifier, icon: @Composable () -> Unit) {
-    NavigationBarItem(
-        modifier = modifier,
-        icon = icon,
-        onClick = {},
-        selected = false
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BeginnerPreview() {
-    AnankeTheme {
-        val modifier = Modifier.padding(8.dp)
-        AnankeRow(modifier = modifier) {
-            AnankeText(text = "Ananke", modifier = modifier)
-        }
-    }
 }
