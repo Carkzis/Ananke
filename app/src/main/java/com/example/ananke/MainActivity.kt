@@ -10,18 +10,28 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ananke.ui.theme.AnankeTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,14 +43,24 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column(modifier = modifier) {
-                        AnankeRow(modifier = modifier) {
-                            AnankeText(text = "Ananke", modifier = modifier)
+                    Scaffold(
+                        modifier = modifier,
+                        bottomBar = {
+                            AnankeBottomNavigation(modifier = modifier) {
+                                AnankeBottomNavigationItem(modifier = modifier)
+                            }
                         }
-                        AnankeRow(modifier = modifier) {
-                            AnankeText(text = "The pain of UI begins!", modifier = modifier)
+                    ) { padding ->
+                        Column(modifier = modifier.padding(padding)) {
+                            AnankeRow(modifier = modifier) {
+                                AnankeText(text = "Ananke", modifier = modifier)
+                            }
+                            AnankeRow(modifier = modifier) {
+                                AnankeText(text = "The pain of UI begins!", modifier = modifier)
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -64,6 +84,30 @@ fun AnankeRow(modifier: Modifier = Modifier, content: @Composable RowScope.() ->
             .background(Color.Cyan)
             .fillMaxWidth(),
         content = content
+    )
+}
+
+@Composable
+fun AnankeBottomNavigation(modifier: Modifier, content: @Composable RowScope.() -> Unit) {
+    NavigationBar(
+        modifier = modifier,
+        containerColor = Color.Green,
+        content = content
+    )
+}
+
+@Composable
+fun RowScope.AnankeBottomNavigationItem(modifier: Modifier) {
+    NavigationBarItem(
+        modifier = modifier,
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.Add,
+                contentDescription = null
+            )
+        },
+        onClick = {},
+        selected = false
     )
 }
 
