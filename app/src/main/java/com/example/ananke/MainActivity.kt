@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.material.icons.rounded.Call
+import androidx.compose.material.icons.rounded.Create
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,8 +47,25 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         modifier = modifier,
                         bottomBar = {
-                            AnankeBottomNavigation(modifier = modifier) {
-                                AnankeBottomNavigationItem(modifier = modifier)
+                            AnankeBottomBar(modifier = modifier) {
+                                AnankeNavigationItem(modifier = modifier) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Create,
+                                        contentDescription = null
+                                    )
+                                }
+                                AnankeNavigationItem(modifier = modifier) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.AccountBox,
+                                        contentDescription = null
+                                    )
+                                }
+                                AnankeNavigationItem(modifier = modifier) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Call,
+                                        contentDescription = null
+                                    )
+                                }
                             }
                         }
                     ) { padding ->
@@ -88,7 +106,7 @@ fun AnankeRow(modifier: Modifier = Modifier, content: @Composable RowScope.() ->
 }
 
 @Composable
-fun AnankeBottomNavigation(modifier: Modifier, content: @Composable RowScope.() -> Unit) {
+fun AnankeBottomBar(modifier: Modifier, content: @Composable RowScope.() -> Unit) {
     NavigationBar(
         modifier = modifier,
         containerColor = Color.Green,
@@ -97,15 +115,10 @@ fun AnankeBottomNavigation(modifier: Modifier, content: @Composable RowScope.() 
 }
 
 @Composable
-fun RowScope.AnankeBottomNavigationItem(modifier: Modifier) {
+fun RowScope.AnankeNavigationItem(modifier: Modifier, icon: @Composable () -> Unit) {
     NavigationBarItem(
         modifier = modifier,
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = null
-            )
-        },
+        icon = icon,
         onClick = {},
         selected = false
     )
