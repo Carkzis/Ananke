@@ -6,6 +6,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 
 class AnankeAppState(
     val navController: NavHostController
@@ -14,7 +15,11 @@ class AnankeAppState(
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination
 
-    val destinations = AnankeDestinations.values().toList()
+    val destinations = AnankeDestination.values().toList()
+
+    fun navigateToDestination(destination: AnankeDestination) {
+        navController.navigate(destination.toString())
+    }
 }
 
 @Composable

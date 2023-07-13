@@ -5,12 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBox
-import androidx.compose.material.icons.rounded.Call
-import androidx.compose.material.icons.rounded.Create
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +25,7 @@ fun AnankeApp(
                 AnankeBottomBar(modifier = Modifier,
                     destinations = appState.destinations,
                     currentDestination = appState.currentDestination,
-                    onNavigate = {}
+                    onNavigate = appState::navigateToDestination
                 )
             }
         ) { padding ->

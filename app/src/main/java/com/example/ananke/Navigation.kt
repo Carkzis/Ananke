@@ -10,14 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
 
 @Composable
 fun AnankeBottomBar(
     modifier: Modifier,
-    destinations: List<AnankeDestinations>,
+    destinations: List<AnankeDestination>,
     currentDestination: NavDestination?,
-    onNavigate: (AnankeDestinations) -> Unit
+    onNavigate: (AnankeDestination) -> Unit
 ) {
     NavigationBar(
         modifier = modifier,
@@ -26,6 +25,7 @@ fun AnankeBottomBar(
         destinations.forEach { destination ->
             val isCurrentlySelected = currentDestination?.route?.contains(destination.name, false) ?: false
             AnankeNavigationItem(selected = isCurrentlySelected,
+                onClick = { onNavigate(destination) },
                 selectedIcon = { Icon(imageVector = Icons.Rounded.ArrowDropDown, contentDescription = null) },
                 icon = { Icon(imageVector = destination.icon, contentDescription = null) },
                 modifier = modifier)
@@ -34,11 +34,16 @@ fun AnankeBottomBar(
 }
 
 @Composable
-fun RowScope.AnankeNavigationItem(selected: Boolean, modifier: Modifier, selectedIcon: @Composable () -> Unit, icon: @Composable () -> Unit) {
+fun RowScope.AnankeNavigationItem(
+    selected: Boolean,
+    modifier: Modifier,
+    onClick: () -> Unit,
+    selectedIcon: @Composable () -> Unit,
+    icon: @Composable () -> Unit) {
     NavigationBarItem(
         selected = selected,
         modifier = modifier,
         icon = if (selected) selectedIcon else icon,
-        onClick = {}
+        onClick = onClick
     )
 }

@@ -6,10 +6,10 @@ import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Create
 import androidx.compose.ui.graphics.vector.ImageVector
 
-enum class AnankeDestinations(
+enum class AnankeDestination(
     val icon: ImageVector
 ) {
-    CREATE(icon = Icons.Rounded.Create),
-    ACCOUNT(icon = Icons.Rounded.AccountBox),
-    CALL(icon = Icons.Rounded.Call)
+    SCREEN_ONE(icon = Icons.Rounded.Create),
+    SCREEN_TWO(icon = Icons.Rounded.AccountBox),
+    SCREEN_THREE(icon = Icons.Rounded.Call)
 }

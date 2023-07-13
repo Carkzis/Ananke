@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 fun AnankeNavHost(
     modifier: Modifier = Modifier,
     appState: AnankeAppState,
-    startDestination: String = AnankeDestinations.CREATE.toString()
+    startDestination: String = AnankeDestination.SCREEN_ONE.toString()
 ) {
     val navController = appState.navController
     NavHost(
@@ -17,8 +17,14 @@ fun AnankeNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable(startDestination) {
-            CreateScreen()
+        composable(route = startDestination) {
+            AnankeText(text = "Screen 1")
+        }
+        composable(route = AnankeDestination.SCREEN_TWO.toString()) {
+            AnankeText(text = "Screen 2")
+        }
+        composable(route = AnankeDestination.SCREEN_THREE.toString()) {
+            AnankeText(text = "Screen 3")
         }
     }
 }
