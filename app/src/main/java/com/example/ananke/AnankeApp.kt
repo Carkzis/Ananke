@@ -53,6 +53,7 @@ fun AnankeApp(
                 ) {
                     AnankeText(text = "The pain of UI begins!", modifier = Modifier.padding(8.dp))
                 }
+                AnankeNavHost(appState = appState)
             }
         }
     }
