@@ -1,15 +1,16 @@
 package com.example.ananke
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBox
-import androidx.compose.material.icons.rounded.Call
-import androidx.compose.material.icons.rounded.Create
+import androidx.compose.material.icons.filled.Games
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class AnankeDestination(
-    val icon: ImageVector
+    val unselectedIcon: ImageVector,
+    val selectedIcon: ImageVector
 ) {
-    SCREEN_ONE(icon = Icons.Rounded.Create),
-    SCREEN_TWO(icon = Icons.Rounded.AccountBox),
-    SCREEN_THREE(icon = Icons.Rounded.Call)
+    GAME(unselectedIcon = Icons.Filled.Games, selectedIcon = Icons.Filled.Games),
+    TEAM(unselectedIcon = Icons.Filled.Groups, selectedIcon = Icons.Filled.Groups),
+    YOU(unselectedIcon = Icons.Filled.Person, selectedIcon = Icons.Filled.Person)
 }

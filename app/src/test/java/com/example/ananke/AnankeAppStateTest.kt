@@ -45,7 +45,7 @@ class AnankeAppStateTest {
 
     @Test
     fun `anankeAppState has the expected default initial destination`() {
-        val expectedInitialDestination = AnankeDestination.SCREEN_ONE.toString()
+        val expectedInitialDestination = AnankeDestination.GAME.toString()
 
         var actualInitialDestination: String? =  null
         composeTestRule.setContent {
@@ -59,7 +59,7 @@ class AnankeAppStateTest {
 
     @Test
     fun `anankeAppState has the expected new destination`() {
-        val expectedInitialDestination = AnankeDestination.SCREEN_TWO.toString()
+        val expectedInitialDestination = AnankeDestination.TEAM.toString()
 
         var actualInitialDestination: String? =  null
         composeTestRule.setContent {
@@ -82,7 +82,7 @@ fun rememberTestNavController() : TestNavHostController {
     return remember {
         TestNavHostController(context = context).apply {
             navigatorProvider.addNavigator(ComposeNavigator())
-            graph = createGraph(startDestination = AnankeDestination.SCREEN_ONE.toString()) {
+            graph = createGraph(startDestination = AnankeDestination.GAME.toString()) {
                 AnankeDestination.values().forEach { destination ->
                     composable(destination.toString()) {}
                 }

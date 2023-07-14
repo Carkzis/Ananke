@@ -30,26 +30,31 @@ fun AnankeApp(
             }
         ) { padding ->
             Column(modifier = Modifier.padding(padding)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .background(Color.Cyan)
-                        .fillMaxWidth(),
-                ) {
-                    AnankeText(text = "Ananke", modifier = Modifier.padding(8.dp))
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .background(Color.Cyan)
-                        .fillMaxWidth(),
-                ) {
-                    AnankeText(text = "The pain of UI begins!", modifier = Modifier.padding(8.dp))
-                }
+                DummyHeader()
                 AnankeNavHost(appState = appState)
             }
         }
+    }
+}
+
+@Composable
+private fun DummyHeader() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(8.dp)
+            .background(Color.Cyan)
+            .fillMaxWidth(),
+    ) {
+        AnankeText(text = "Ananke", modifier = Modifier.padding(8.dp))
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(8.dp)
+            .background(Color.Cyan)
+            .fillMaxWidth(),
+    ) {
+        AnankeText(text = "The pain of UI begins!", modifier = Modifier.padding(8.dp))
     }
 }

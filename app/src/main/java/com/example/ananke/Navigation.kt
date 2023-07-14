@@ -1,8 +1,6 @@
 package com.example.ananke
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -26,8 +24,8 @@ fun AnankeBottomBar(
             val isCurrentlySelected = currentDestination?.route?.contains(destination.name, false) ?: false
             AnankeNavigationItem(selected = isCurrentlySelected,
                 onClick = { onNavigate(destination) },
-                selectedIcon = { Icon(imageVector = Icons.Rounded.ArrowDropDown, contentDescription = null) },
-                icon = { Icon(imageVector = destination.icon, contentDescription = null) },
+                selectedIcon = { Icon(imageVector = destination.selectedIcon, contentDescription = null) },
+                icon = { Icon(imageVector = destination.unselectedIcon, contentDescription = null) },
                 modifier = modifier)
         }
     }
