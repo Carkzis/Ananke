@@ -18,13 +18,13 @@ fun AnankeNavHost(
         modifier = modifier
     ) {
         composable(route = startDestination) {
-            AnankeText(text = "Screen 1")
+            GameScreen()
         }
         composable(route = AnankeDestination.TEAM.toString()) {
-            AnankeText(text = "Screen 2")
+            TeamScreen()
         }
         composable(route = AnankeDestination.YOU.toString()) {
-            AnankeText(text = "Screen 3")
+            YouScreen()
         }
     }
 }
