@@ -5,8 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +28,9 @@ fun AnankeApp(
     AnankeBackground {
         Scaffold(
             modifier = Modifier,
+            topBar = {
+                     AnankeTopBar()
+            },
             bottomBar = {
                 AnankeBottomBar(modifier = Modifier,
                     destinations = appState.destinations,
@@ -30,31 +40,20 @@ fun AnankeApp(
             }
         ) { padding ->
             Column(modifier = Modifier.padding(padding)) {
-                DummyHeader()
                 AnankeNavHost(appState = appState)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DummyHeader() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+fun AnankeTopBar() {
+    CenterAlignedTopAppBar(
+        title = { AnankeText(text = "Ananke", modifier = Modifier.padding(8.dp)) },
+        navigationIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null, modifier = Modifier.padding(16.dp)) },
+        actions = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null, modifier = Modifier.padding(16.dp)) },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Cyan),
         modifier = Modifier
-            .padding(8.dp)
-            .background(Color.Cyan)
-            .fillMaxWidth(),
-    ) {
-        AnankeText(text = "Ananke", modifier = Modifier.padding(8.dp))
-    }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(8.dp)
-            .background(Color.Cyan)
-            .fillMaxWidth(),
-    ) {
-        AnankeText(text = "The pain of UI begins!", modifier = Modifier.padding(8.dp))
-    }
+    )
 }
