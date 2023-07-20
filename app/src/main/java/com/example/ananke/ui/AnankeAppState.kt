@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.example.ananke.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -6,7 +6,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
+import com.example.ananke.navigation.AnankeDestination
 
 class AnankeAppState(
     val navController: NavHostController

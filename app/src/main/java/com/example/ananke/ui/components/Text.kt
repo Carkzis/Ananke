@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.example.ananke.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text

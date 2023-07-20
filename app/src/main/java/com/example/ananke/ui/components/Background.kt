@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.example.ananke.ui.components
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
