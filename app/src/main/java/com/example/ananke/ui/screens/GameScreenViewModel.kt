@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GameScreenViewModel @Inject constructor() : ViewModel() {
+
     val gamesList: StateFlow<List<String>> = flowOf(listOf<String>()).stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
