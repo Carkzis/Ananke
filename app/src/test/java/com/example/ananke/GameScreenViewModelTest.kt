@@ -1,7 +1,11 @@
 package com.example.ananke
 
+import com.example.ananke.data.DefaultGameRepository
+import com.example.ananke.data.dummyGameData
 import com.example.ananke.ui.screens.GameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -18,12 +22,16 @@ class GameScreenViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = GameScreenViewModel()
+        viewModel = GameScreenViewModel(DefaultGameRepository())
     }
 
     @Test
     fun `view model displays expected list of games`() = runTest {
-        assertEquals(listOf("Game 1"), viewModel.gamesList.value)
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+        assertEquals(dummyGameData(), viewModel.gameList.value)
+        collection.cancel()
     }
 
 }
