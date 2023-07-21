@@ -20,25 +20,22 @@ import androidx.core.view.WindowCompat
 
 @VisibleForTesting
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    primary = Blue80,
+    secondary = Purple80,
+    tertiary = Red80,
 )
 
 @VisibleForTesting
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-
-    /* Other default colors to override
+    primary = Blue40,
+    secondary = Purple40,
+    tertiary = Red40,
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
