@@ -1,10 +1,10 @@
 package com.example.ananke
 
 import com.example.ananke.data.DefaultGameRepository
+import com.example.ananke.data.GameDao
 import com.example.ananke.data.GameRepository
 import com.example.ananke.data.dummyGameData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -18,6 +18,7 @@ class GameRepositoryTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var gameRepository: GameRepository
+    private lateinit var gameDao: GameDao
 
     @Before
     fun setUp() {
@@ -30,5 +31,10 @@ class GameRepositoryTest {
         games.forEachIndexed { index, game ->
             assertEquals(game, gameRepository.gamesData.first()[index])
         }
+    }
+
+    @Test
+    fun `repository can add new game`() = runTest {
+
     }
 }
