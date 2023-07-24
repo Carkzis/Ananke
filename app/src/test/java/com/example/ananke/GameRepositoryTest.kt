@@ -44,7 +44,7 @@ class GameRepositoryTest {
         gameRepository.addGame(newGame)
         assertTrue(getGamesEntitiesAsDomainObjects().contains(newGame))
     }
-    
+
     private suspend fun getGamesEntitiesAsDomainObjects() =
         gameDao.getGames()
             .first()

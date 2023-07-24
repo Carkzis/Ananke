@@ -15,7 +15,7 @@ class DummyGameDao : GameDao {
         games.update { previousValues ->
             (previousValues + gameEntities)
                 .distinctBy(GameEntity::id)
-                .sortedWith(compareBy(GameEntity::id).reversed())
+                .sortedWith(idDescending())
         }
     }
 
@@ -23,10 +23,13 @@ class DummyGameDao : GameDao {
         games.update { previousValues ->
             (previousValues + game)
                 .distinctBy(GameEntity::id)
-                .sortedWith(compareBy(GameEntity::id).reversed())
+                .sortedWith(idDescending())
         }
     }
+
+    private fun idDescending() = compareBy(GameEntity::id).reversed()
 }
+
 
 val dummyGameEntities = listOf(
     GameEntity("1", "My First Game", "It is the first one."),
