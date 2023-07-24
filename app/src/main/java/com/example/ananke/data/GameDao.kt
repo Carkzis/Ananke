@@ -1,6 +1,7 @@
 package com.example.ananke.data
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -13,4 +14,7 @@ interface GameDao {
 
     @Upsert
     suspend fun upsertGames(gameEntities: List<GameEntity>)
+
+    @Insert
+    suspend fun insertGame(game: GameEntity)
 }

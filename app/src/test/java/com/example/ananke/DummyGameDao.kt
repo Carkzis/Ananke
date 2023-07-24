@@ -13,6 +13,10 @@ class DummyGameDao : GameDao {
     override suspend fun upsertGames(gameEntities: List<GameEntity>) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun insertGame(game: GameEntity) {
+        TODO("Not yet implemented")
+    }
 }
 
 val dummyGameEntities = listOf(

@@ -9,8 +9,10 @@ import com.example.ananke.data.GameEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,10 +40,17 @@ class GameDaoTest {
     }
 
     @Test
-    fun `gameDao fetches items in id order`() = runTest {
+    fun `gameDao fetches games in id order`() = runTest {
         gameDao.upsertGames(dummyGameEntities.shuffled())
         val gamesInDatabase = gameDao.getGames().first()
         assertEquals(dummyGameEntities.asReversed(), gamesInDatabase)
+    }
+
+    @Test
+    fun `gameDao inserts new game entity`() = runTest {
+        val newGame = GameEntity("anID", "aName", "aDescription")
+        gameDao.insertGame(newGame)
+        assertTrue(gameDao.getGames().first().contains(newGame))
     }
 
 }
