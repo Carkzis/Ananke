@@ -22,7 +22,7 @@ class GameScreenViewModelTest {
 
     @Before
     fun setUp() {
-        viewModel = GameScreenViewModel(DefaultGameRepository())
+        viewModel = GameScreenViewModel(DummyGameRepository())
     }
 
     @Test

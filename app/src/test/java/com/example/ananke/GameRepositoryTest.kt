@@ -2,8 +2,10 @@ package com.example.ananke
 
 import com.example.ananke.data.DefaultGameRepository
 import com.example.ananke.data.GameDao
+import com.example.ananke.data.GameEntity
 import com.example.ananke.data.GameRepository
 import com.example.ananke.data.dummyGames
+import com.example.ananke.data.toDomain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -22,15 +24,14 @@ class GameRepositoryTest {
 
     @Before
     fun setUp() {
-        gameRepository = DefaultGameRepository()
+        gameDao = DummyGameDao()
+        gameRepository = DefaultGameRepository(gameDao)
     }
 
     @Test
     fun `repository provides expected list of games`() = runTest {
-        val games = dummyGames()
-        games.forEachIndexed { index, game ->
-            assertEquals(game, gameRepository.games.first()[index])
-        }
+        val expectedGames = dummyGameEntities.map(GameEntity::toDomain)
+        val actualGames = gameDao.getGames().first().map(GameEntity::toDomain)
+        assertEquals(expectedGames, actualGames)
     }
-
 }

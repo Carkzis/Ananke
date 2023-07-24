@@ -3,10 +3,6 @@ package com.example.ananke.di
 import android.content.Context
 import androidx.room.Room
 import com.example.ananke.data.AnankeDatabase
-import com.example.ananke.data.DefaultGameRepository
-import com.example.ananke.data.GameDao
-import com.example.ananke.data.GameRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +12,9 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface DataModule {
-    @Binds
-    fun bindsGameRepository(gameRepository: DefaultGameRepository): GameRepository
+object DatabaseModule {
+    @Provides
+    @Singleton
+    fun providesAnankeDatabase(@ApplicationContext context: Context): AnankeDatabase =
+        Room.databaseBuilder(context, AnankeDatabase::class.java, "ananke-database").build()
 }

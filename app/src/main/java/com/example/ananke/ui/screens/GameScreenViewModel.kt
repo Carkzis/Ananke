@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(gameRepository: GameRepository) : ViewModel() {
 
-    val gameList: StateFlow<List<Game>> = gameRepository.games.stateIn(
+    val gameList: StateFlow<List<Game>> = gameRepository.getGames().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
         listOf()
