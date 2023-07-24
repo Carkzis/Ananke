@@ -8,14 +8,21 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GameScreenViewModel @Inject constructor(gameRepository: GameRepository) : ViewModel() {
+class GameScreenViewModel @Inject constructor(private val gameRepository: GameRepository) : ViewModel() {
 
     val gameList: StateFlow<List<Game>> = gameRepository.getGames().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
         listOf()
     )
+
+    fun addGame(game: Game) {
+        viewModelScope.launch {
+            gameRepository.addGame(game)
+        }
+    }
 }
