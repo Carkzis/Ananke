@@ -6,6 +6,12 @@ data class Game(
     val description: String
 )
 
+fun Game.toEntity() = GameEntity(
+    id = id,
+    name = name,
+    description = description
+)
+
 /**
  * TODO: This needs removing once the real database has been implemented.
  */

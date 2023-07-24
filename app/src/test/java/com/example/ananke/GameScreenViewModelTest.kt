@@ -1,7 +1,7 @@
 package com.example.ananke
 
-import com.example.ananke.data.DefaultGameRepository
 import com.example.ananke.data.dummyGames
+import com.example.ananke.testdoubles.DummyGameRepository
 import com.example.ananke.ui.screens.GameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch

@@ -6,10 +6,10 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.ananke.data.AnankeDatabase
 import com.example.ananke.data.GameDao
 import com.example.ananke.data.GameEntity
+import com.example.ananke.testdoubles.dummyGameEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

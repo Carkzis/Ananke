@@ -1,9 +1,10 @@
-package com.example.ananke
+package com.example.ananke.testdoubles
 
 import com.example.ananke.data.GameDao
 import com.example.ananke.data.GameEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class DummyGameDao : GameDao {
     private var games = MutableStateFlow(dummyGameEntities)
@@ -11,11 +12,19 @@ class DummyGameDao : GameDao {
     override fun getGames(): Flow<List<GameEntity>> = games
 
     override suspend fun upsertGames(gameEntities: List<GameEntity>) {
-        TODO("Not yet implemented")
+        games.update { previousValues ->
+            (previousValues + gameEntities)
+                .distinctBy(GameEntity::id)
+                .sortedWith(compareBy(GameEntity::id).reversed())
+        }
     }
 
     override suspend fun insertGame(game: GameEntity) {
-        TODO("Not yet implemented")
+        games.update { previousValues ->
+            (previousValues + game)
+                .distinctBy(GameEntity::id)
+                .sortedWith(compareBy(GameEntity::id).reversed())
+        }
     }
 }
 

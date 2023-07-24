@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.example.ananke.testdoubles
 
 import com.example.ananke.data.Game
 import com.example.ananke.data.GameRepository
@@ -10,4 +10,8 @@ class DummyGameRepository : GameRepository {
     private val games = MutableStateFlow(dummyGames())
 
     override fun getGames(): Flow<List<Game>> = games
+
+    override suspend fun addGame(game: Game) {
+        TODO("Not yet implemented")
+    }
 }
