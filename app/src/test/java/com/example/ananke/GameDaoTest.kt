@@ -5,9 +5,12 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.ananke.data.AnankeDatabase
 import com.example.ananke.data.GameDao
-import com.example.ananke.data.dummyGames
+import com.example.ananke.data.GameEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,9 +32,21 @@ class GameDaoTest {
         gameDao = database.gameDao()
     }
 
+    @After
+    fun tearDown() {
+        database.close()
+    }
+
     @Test
     fun `gameDao fetches items in id order`() = runTest {
-        val dummyGames = dummyGames()
-        // gameDao.insertGames()
+        gameDao.upsertGames(dummyGameEntities.shuffled())
+        val gamesInDatabase = gameDao.getGames().first()
+        assertEquals(dummyGameEntities.asReversed(), gamesInDatabase)
     }
+
+    private val dummyGameEntities = listOf(
+        GameEntity("1", "My First Game", "It is the first one."),
+        GameEntity("2", "My Second Game", "It is the second one."),
+        GameEntity("3", "My Third Game", "It is the third one.")
+    )
 }
