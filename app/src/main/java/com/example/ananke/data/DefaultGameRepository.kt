@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
 class DefaultGameRepository @Inject constructor() : GameRepository {
-    override val gamesData: Flow<List<GameData>>
-        get() = flowOf(dummyGameData())
+    override val games: Flow<List<Game>>
+        get() = flowOf(dummyGames())
 }

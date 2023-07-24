@@ -1,7 +1,7 @@
 package com.example.ananke
 
 import com.example.ananke.data.DefaultGameRepository
-import com.example.ananke.data.dummyGameData
+import com.example.ananke.data.dummyGames
 import com.example.ananke.ui.screens.GameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -30,7 +30,7 @@ class GameScreenViewModelTest {
         val collection = launch(UnconfinedTestDispatcher()) {
             viewModel.gameList.collect {}
         }
-        assertEquals(dummyGameData(), viewModel.gameList.value)
+        assertEquals(dummyGames(), viewModel.gameList.value)
         collection.cancel()
     }
 

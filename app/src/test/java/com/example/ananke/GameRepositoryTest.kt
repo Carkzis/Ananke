@@ -3,7 +3,7 @@ package com.example.ananke
 import com.example.ananke.data.DefaultGameRepository
 import com.example.ananke.data.GameDao
 import com.example.ananke.data.GameRepository
-import com.example.ananke.data.dummyGameData
+import com.example.ananke.data.dummyGames
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -27,14 +27,10 @@ class GameRepositoryTest {
 
     @Test
     fun `repository provides expected list of games`() = runTest {
-        val games = dummyGameData()
+        val games = dummyGames()
         games.forEachIndexed { index, game ->
-            assertEquals(game, gameRepository.gamesData.first()[index])
+            assertEquals(game, gameRepository.games.first()[index])
         }
     }
 
-    @Test
-    fun `repository can add new game`() = runTest {
-
-    }
 }

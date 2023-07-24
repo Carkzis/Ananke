@@ -1,7 +1,6 @@
 package com.example.ananke.ui.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -10,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.ananke.data.GameData
+import com.example.ananke.data.Game
 import com.example.ananke.ui.components.AnankeButton
 import com.example.ananke.ui.components.AnankeText
 
@@ -42,7 +41,7 @@ fun GameScreen(modifier: Modifier = Modifier, viewModel: GameScreenViewModel = h
 @Composable
 private fun GameItem(
     modifier: Modifier,
-    game: GameData
+    game: Game
 ) {
     Column(modifier = modifier.padding(8.dp)) {
         AnankeText(text = "Game: ${game.name}")
