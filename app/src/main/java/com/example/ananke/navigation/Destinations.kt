@@ -14,3 +14,8 @@ enum class AnankeDestination(
     TEAM(unselectedIcon = Icons.Filled.Groups, selectedIcon = Icons.Filled.Groups),
     YOU(unselectedIcon = Icons.Filled.Person, selectedIcon = Icons.Filled.Person)
 }
+
+enum class GameDestination {
+    HOME,
+    NEW
+}

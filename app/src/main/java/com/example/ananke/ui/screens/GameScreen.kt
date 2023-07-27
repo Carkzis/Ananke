@@ -14,7 +14,11 @@ import com.example.ananke.ui.components.AnankeButton
 import com.example.ananke.ui.components.AnankeText
 
 @Composable
-fun GameScreen(modifier: Modifier = Modifier, viewModel: GameScreenViewModel = hiltViewModel()) {
+fun GameScreen(
+    modifier: Modifier = Modifier,
+    onNewGameClick: () -> Unit = {},
+    viewModel: GameScreenViewModel = hiltViewModel()
+) {
     val games = viewModel.gameList.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
 
@@ -28,7 +32,7 @@ fun GameScreen(modifier: Modifier = Modifier, viewModel: GameScreenViewModel = h
         }
 
         item {
-            AnankeButton(onClick = {}) {
+            AnankeButton(onClick = onNewGameClick) {
                 AnankeText(
                     text = "Add New Game",
                     modifier = modifier.padding(8.dp)
