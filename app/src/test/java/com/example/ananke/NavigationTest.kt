@@ -61,7 +61,12 @@ class NavigationTest {
                 .assertIsDisplayed()
                 .performClick()
 
-            assertScreenSelected(AnankeDestination.GAME)
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.NEW}-title")
+                .assertIsDisplayed()
+            
+            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
+            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
         }
     }
 
@@ -70,7 +75,7 @@ class NavigationTest {
         composeTestRule.apply {
             onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
                 .performClick()
-            
+
             onNodeWithTag("${GameDestination.NEW}-title")
                 .assertIsDisplayed()
 
