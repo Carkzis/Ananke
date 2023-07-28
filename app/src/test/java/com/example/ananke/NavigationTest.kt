@@ -33,43 +33,24 @@ class NavigationTest {
     @Test
     fun `first screen is the game screen`() {
         composeTestRule.apply {
-            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
-            onNodeWithTag("${GameDestination.HOME}-title")
-                .assertIsDisplayed()
-
-            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
-            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+            assertScreenSelected(AnankeDestination.GAME)
         }
     }
 
     @Test
     fun `navigates to from game screen to team screen and you screens`() {
         composeTestRule.apply {
-            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
-            onNodeWithTag("${GameDestination.HOME}-title")
-                .assertIsDisplayed()
-
-            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
-            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+            assertScreenSelected(AnankeDestination.GAME)
 
             onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()
 
-            assertNavigationItemSelected("${AnankeDestination.TEAM}-navigation-item")
-            onNodeWithTag("${AnankeDestination.TEAM}-title")
-                .assertIsDisplayed()
-
-            assertNavigationItemNotSelected("${AnankeDestination.GAME}-navigation-item")
-            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+            assertScreenSelected(AnankeDestination.TEAM)
 
             onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
                 .performClick()
 
-            assertNavigationItemSelected("${AnankeDestination.YOU}-navigation-item")
-            onNodeWithTag("${AnankeDestination.YOU}-title")
-                .assertIsDisplayed()
-            assertNavigationItemNotSelected("${AnankeDestination.GAME}-navigation-item")
-            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
+            assertScreenSelected(AnankeDestination.YOU)
         }
     }
 
@@ -80,12 +61,7 @@ class NavigationTest {
                 .assertIsDisplayed()
                 .performClick()
 
-            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
-            onNodeWithTag("${GameDestination.NEW}-title")
-                .assertIsDisplayed()
-
-            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
-            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+            assertScreenSelected(AnankeDestination.GAME)
         }
     }
 
@@ -94,6 +70,7 @@ class NavigationTest {
         composeTestRule.apply {
             onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
                 .performClick()
+            
             onNodeWithTag("${GameDestination.NEW}-title")
                 .assertIsDisplayed()
 
@@ -121,6 +98,22 @@ class NavigationTest {
             assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
             onNodeWithTag("${GameDestination.HOME}-title")
                 .assertIsDisplayed()
+        }
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.assertScreenSelected(destination: AnankeDestination) {
+        val expectedTitle = if (destination == AnankeDestination.GAME) "${GameDestination.HOME}-title" else "$destination-title"
+        val expectedDestination = "$destination-navigation-item"
+        val expectedUnselectedNavigationItems = AnankeDestination.values().filter {
+            it != destination
+        }
+
+        assertNavigationItemSelected(expectedDestination)
+        onNodeWithTag(expectedTitle)
+            .assertIsDisplayed()
+
+        expectedUnselectedNavigationItems.forEach {
+            assertNavigationItemNotSelected("$it-navigation-item")
         }
     }
 
