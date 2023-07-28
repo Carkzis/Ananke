@@ -43,9 +43,40 @@ class NavigationTest {
     }
 
     @Test
+    fun `navigates to from game screen to team screen and you screens`() {
+        composeTestRule.apply {
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.HOME}-title")
+                .assertIsDisplayed()
+
+            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
+            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
+                .performClick()
+
+            assertNavigationItemSelected("${AnankeDestination.TEAM}-navigation-item")
+            onNodeWithTag("${AnankeDestination.TEAM}-title")
+                .assertIsDisplayed()
+
+            assertNavigationItemNotSelected("${AnankeDestination.GAME}-navigation-item")
+            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+
+            onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
+                .performClick()
+
+            assertNavigationItemSelected("${AnankeDestination.YOU}-navigation-item")
+            onNodeWithTag("${AnankeDestination.YOU}-title")
+                .assertIsDisplayed()
+            assertNavigationItemNotSelected("${AnankeDestination.GAME}-navigation-item")
+            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
+        }
+    }
+
+    @Test
     fun `navigates from game screen to the new game screen with expected navigation states`() {
         composeTestRule.apply {
-            onNodeWithTag(testTag = "${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
+            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
                 .assertIsDisplayed()
                 .performClick()
 
@@ -61,7 +92,7 @@ class NavigationTest {
     @Test
     fun `navigates from new game screen back to game screen when back selected with expected navigation states`() {
         composeTestRule.apply {
-            onNodeWithTag(testTag = "${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
+            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
                 .performClick()
             onNodeWithTag("${GameDestination.NEW}-title")
                 .assertIsDisplayed()
@@ -78,9 +109,9 @@ class NavigationTest {
     @Test
     fun `screen prior to top level screens will always be games`() {
         composeTestRule.apply {
-            onNodeWithTag(testTag = "${AnankeDestination.TEAM}-navigation-item")
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()
-            onNodeWithTag(testTag = "${AnankeDestination.YOU}-navigation-item")
+            onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
                 .performClick()
 
             activityRule.scenario.onActivity {
