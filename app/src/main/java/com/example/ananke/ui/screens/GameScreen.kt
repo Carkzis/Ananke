@@ -38,7 +38,7 @@ fun GameScreen(
             AnankeButton(onClick = onNewGameClick) {
                 AnankeText(
                     text = "Add New Game",
-                    modifier = modifier.padding(8.dp)
+                    modifier = modifier.padding(8.dp).testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
                 )
             }
         }

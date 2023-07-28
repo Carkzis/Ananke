@@ -2,11 +2,11 @@ package com.example.ananke
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
-import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.example.ananke.navigation.AnankeDestination
@@ -40,6 +40,40 @@ class NavigationTest {
 
             assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
             assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+        }
+    }
+
+    @Test
+    fun `navigates from game screen to the new game screen with expected navigation states`() {
+        composeTestRule.apply {
+            onNodeWithTag(testTag = "${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
+                .assertIsDisplayed()
+                .performClick()
+
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.NEW}-title")
+                .assertIsDisplayed()
+
+            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
+            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
+        }
+    }
+
+    @Test
+    fun `navigates from new game screen back to game screen when back selected with expected navigation states`() {
+        composeTestRule.apply {
+            onNodeWithTag(testTag = "${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
+                .performClick()
+            onNodeWithTag("${GameDestination.NEW}-title")
+                .assertIsDisplayed()
+
+            activityRule.scenario.onActivity {
+                it.onBackPressedDispatcher.onBackPressed()
+            }
+
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.HOME}-title")
+                .assertIsDisplayed()
         }
     }
 
