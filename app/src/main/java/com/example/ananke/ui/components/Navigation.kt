@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
 import com.example.ananke.navigation.AnankeDestination
@@ -45,7 +46,7 @@ fun AnankeBottomBar(
                         contentDescription = null
                     )
                 },
-                modifier = modifier
+                modifier = modifier.testTag(tag = "$destination-navigation-item")
             )
         }
     }
