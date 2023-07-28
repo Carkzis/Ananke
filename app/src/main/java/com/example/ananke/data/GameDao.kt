@@ -1,4 +1,4 @@
-package com.example.ananke.data
+package com.carkzis.ananke.data
 
 import androidx.room.Dao
 import androidx.room.Insert

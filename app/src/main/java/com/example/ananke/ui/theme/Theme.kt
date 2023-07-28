@@ -1,4 +1,4 @@
-package com.example.ananke.ui.theme
+package com.carkzis.ananke.ui.theme
 
 import android.app.Activity
 import android.os.Build

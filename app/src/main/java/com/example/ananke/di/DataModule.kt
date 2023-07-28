@@ -1,11 +1,11 @@
-package com.example.ananke.di
+package com.carkzis.ananke.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.ananke.data.AnankeDatabase
-import com.example.ananke.data.DefaultGameRepository
-import com.example.ananke.data.GameDao
-import com.example.ananke.data.GameRepository
+import com.carkzis.ananke.data.AnankeDatabase
+import com.carkzis.ananke.data.DefaultGameRepository
+import com.carkzis.ananke.data.GameDao
+import com.carkzis.ananke.data.GameRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

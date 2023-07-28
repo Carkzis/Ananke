@@ -1,4 +1,4 @@
-package com.example.ananke.ui.theme
+package com.carkzis.ananke.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

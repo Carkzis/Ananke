@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.carkzis.ananke
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
@@ -8,8 +8,8 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.example.ananke.navigation.AnankeDestination
-import com.example.ananke.navigation.GameDestination
+import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.navigation.GameDestination
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication

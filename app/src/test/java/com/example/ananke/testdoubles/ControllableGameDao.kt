@@ -1,7 +1,7 @@
-package com.example.ananke.testdoubles
+package com.carkzis.ananke.testdoubles
 
-import com.example.ananke.data.GameDao
-import com.example.ananke.data.GameEntity
+import com.carkzis.ananke.data.GameDao
+import com.carkzis.ananke.data.GameEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update

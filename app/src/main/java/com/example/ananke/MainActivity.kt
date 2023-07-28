@@ -1,10 +1,10 @@
-package com.example.ananke
+package com.carkzis.ananke
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.ananke.ui.AnankeApp
-import com.example.ananke.ui.theme.AnankeTheme
+import com.carkzis.ananke.ui.AnankeApp
+import com.carkzis.ananke.ui.theme.AnankeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

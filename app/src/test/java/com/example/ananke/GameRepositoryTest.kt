@@ -1,13 +1,13 @@
-package com.example.ananke
+package com.carkzis.ananke
 
-import com.example.ananke.data.DefaultGameRepository
-import com.example.ananke.data.Game
-import com.example.ananke.data.GameDao
-import com.example.ananke.data.GameEntity
-import com.example.ananke.data.GameRepository
-import com.example.ananke.data.toDomain
-import com.example.ananke.testdoubles.ControllableGameDao
-import com.example.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.data.DefaultGameRepository
+import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.GameDao
+import com.carkzis.ananke.data.GameEntity
+import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.data.toDomain
+import com.carkzis.ananke.testdoubles.ControllableGameDao
+import com.carkzis.ananke.testdoubles.dummyGameEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

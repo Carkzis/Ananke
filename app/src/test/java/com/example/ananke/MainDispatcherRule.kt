@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.carkzis.ananke
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

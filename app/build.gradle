@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.ananke'
+    namespace 'com.carkzis.ananke'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.ananke"
+        applicationId 'com.carkzis.ananke'
         minSdk 24
         //noinspection OldTargetApi
         targetSdk 33
@@ -22,7 +22,7 @@ android {
         }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunner "com.example.ananke.AnankeTestRunner"
+        testInstrumentationRunner "com.carkzis.ananke.AnankeTestRunner"
 
     }
 

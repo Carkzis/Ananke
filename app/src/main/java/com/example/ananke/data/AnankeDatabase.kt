@@ -1,4 +1,4 @@
-package com.example.ananke.data
+package com.carkzis.ananke.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

@@ -1,9 +1,9 @@
-package com.example.ananke.ui.screens
+package com.carkzis.ananke.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ananke.data.Game
-import com.example.ananke.data.GameRepository
+import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.GameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

@@ -1,7 +1,7 @@
-package com.example.ananke.di
+package com.carkzis.ananke.di
 
-import com.example.ananke.data.AnankeDatabase
-import com.example.ananke.data.GameDao
+import com.carkzis.ananke.data.AnankeDatabase
+import com.carkzis.ananke.data.GameDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

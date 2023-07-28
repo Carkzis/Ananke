@@ -1,4 +1,4 @@
-package com.example.ananke.data
+package com.carkzis.ananke.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.carkzis.ananke
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,9 +9,9 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
 import androidx.navigation.testing.TestNavHostController
-import com.example.ananke.navigation.AnankeDestination
-import com.example.ananke.ui.AnankeAppState
-import com.example.ananke.ui.rememberAnankeAppState
+import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.ui.AnankeAppState
+import com.carkzis.ananke.ui.rememberAnankeAppState
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule

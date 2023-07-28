@@ -1,7 +1,7 @@
-package com.example.ananke.testdoubles
+package com.carkzis.ananke.testdoubles
 
-import com.example.ananke.data.Game
-import com.example.ananke.data.GameRepository
+import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.GameRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 

@@ -1,4 +1,4 @@
-package com.example.ananke.navigation
+package com.carkzis.ananke.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Games

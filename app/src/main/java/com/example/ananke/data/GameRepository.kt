@@ -1,4 +1,4 @@
-package com.example.ananke.data
+package com.carkzis.ananke.data
 
 import kotlinx.coroutines.flow.Flow
 

@@ -1,4 +1,4 @@
-package com.example.ananke.ui.components
+package com.carkzis.ananke.ui.components
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding

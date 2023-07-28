@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.carkzis.ananke
 
 import android.app.Application
 import android.content.Context

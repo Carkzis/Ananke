@@ -1,4 +1,4 @@
-package com.example.ananke.ui
+package com.carkzis.ananke.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -6,10 +6,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.ananke.ui.components.AnankeBottomBar
-import com.example.ananke.navigation.AnankeNavHost
-import com.example.ananke.ui.components.AnankeBackground
-import com.example.ananke.ui.components.AnankeTopBar
+import com.carkzis.ananke.ui.components.AnankeBottomBar
+import com.carkzis.ananke.navigation.AnankeNavHost
+import com.carkzis.ananke.ui.components.AnankeBackground
+import com.carkzis.ananke.ui.components.AnankeTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

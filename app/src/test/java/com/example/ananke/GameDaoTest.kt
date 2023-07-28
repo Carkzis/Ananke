@@ -1,12 +1,12 @@
-package com.example.ananke
+package com.carkzis.ananke
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.example.ananke.data.AnankeDatabase
-import com.example.ananke.data.GameDao
-import com.example.ananke.data.GameEntity
-import com.example.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.data.AnankeDatabase
+import com.carkzis.ananke.data.GameDao
+import com.carkzis.ananke.data.GameEntity
+import com.carkzis.ananke.testdoubles.dummyGameEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

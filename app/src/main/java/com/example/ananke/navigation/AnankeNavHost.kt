@@ -1,15 +1,15 @@
-package com.example.ananke.navigation
+package com.carkzis.ananke.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.example.ananke.ui.AnankeAppState
-import com.example.ananke.ui.screens.GameScreen
-import com.example.ananke.ui.screens.NewGameScreen
-import com.example.ananke.ui.screens.TeamScreen
-import com.example.ananke.ui.screens.YouScreen
+import com.carkzis.ananke.ui.AnankeAppState
+import com.carkzis.ananke.ui.screens.GameScreen
+import com.carkzis.ananke.ui.screens.NewGameScreen
+import com.carkzis.ananke.ui.screens.TeamScreen
+import com.carkzis.ananke.ui.screens.YouScreen
 
 @Composable
 fun AnankeNavHost(

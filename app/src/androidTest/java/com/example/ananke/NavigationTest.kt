@@ -1,4 +1,4 @@
-package com.example.ananke
+package com.carkzis.ananke
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.Espresso

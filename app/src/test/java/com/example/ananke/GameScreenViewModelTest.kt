@@ -1,9 +1,9 @@
-package com.example.ananke
+package com.carkzis.ananke
 
-import com.example.ananke.data.Game
-import com.example.ananke.data.dummyGames
-import com.example.ananke.testdoubles.ControllableGameRepository
-import com.example.ananke.ui.screens.GameScreenViewModel
+import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.dummyGames
+import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.ui.screens.GameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

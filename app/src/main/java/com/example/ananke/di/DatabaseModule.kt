@@ -1,8 +1,8 @@
-package com.example.ananke.di
+package com.carkzis.ananke.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.ananke.data.AnankeDatabase
+import com.carkzis.ananke.data.AnankeDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

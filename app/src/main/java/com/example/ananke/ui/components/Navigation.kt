@@ -1,4 +1,4 @@
-package com.example.ananke.ui.components
+package com.carkzis.ananke.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
-import com.example.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.navigation.AnankeDestination
 
 @Composable
 fun AnankeBottomBar(
