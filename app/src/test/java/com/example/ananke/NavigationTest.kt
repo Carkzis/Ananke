@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.example.ananke.navigation.AnankeDestination
@@ -66,6 +65,23 @@ class NavigationTest {
                 .performClick()
             onNodeWithTag("${GameDestination.NEW}-title")
                 .assertIsDisplayed()
+
+            activityRule.scenario.onActivity {
+                it.onBackPressedDispatcher.onBackPressed()
+            }
+
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.HOME}-title")
+                .assertIsDisplayed()
+        }
+    }
+    @Test
+    fun `screen prior to top level screens will always be games`() {
+        composeTestRule.apply {
+            onNodeWithTag(testTag = "${AnankeDestination.TEAM}-navigation-item")
+                .performClick()
+            onNodeWithTag(testTag = "${AnankeDestination.YOU}-navigation-item")
+                .performClick()
 
             activityRule.scenario.onActivity {
                 it.onBackPressedDispatcher.onBackPressed()

@@ -2,10 +2,14 @@ package com.example.ananke.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.core.os.trace
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavDestination
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.example.ananke.navigation.AnankeDestination
 
 class AnankeAppState(
@@ -18,8 +22,16 @@ class AnankeAppState(
     val destinations = AnankeDestination.values().toList()
 
     fun navigateToDestination(destination: AnankeDestination) {
-        navController.navigate(destination.toString())
+        navController.navigate(destination.toString(), navigationOptions())
     }
+
+    private fun navigationOptions(): NavOptionsBuilder.() -> Unit = {
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+        }
+        restoreState = true
+    }
+
 }
 
 @Composable
