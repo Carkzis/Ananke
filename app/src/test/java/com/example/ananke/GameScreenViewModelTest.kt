@@ -2,7 +2,7 @@ package com.example.ananke
 
 import com.example.ananke.data.Game
 import com.example.ananke.data.dummyGames
-import com.example.ananke.testdoubles.DummyGameRepository
+import com.example.ananke.testdoubles.ControllableGameRepository
 import com.example.ananke.ui.screens.GameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -21,11 +21,11 @@ class GameScreenViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: GameScreenViewModel
-    private lateinit var gameRepository: DummyGameRepository
+    private lateinit var gameRepository: ControllableGameRepository
 
     @Before
     fun setUp() {
-        gameRepository = DummyGameRepository()
+        gameRepository = ControllableGameRepository()
         viewModel = GameScreenViewModel(gameRepository)
     }
 

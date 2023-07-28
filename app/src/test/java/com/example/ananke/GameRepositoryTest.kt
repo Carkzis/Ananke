@@ -6,7 +6,7 @@ import com.example.ananke.data.GameDao
 import com.example.ananke.data.GameEntity
 import com.example.ananke.data.GameRepository
 import com.example.ananke.data.toDomain
-import com.example.ananke.testdoubles.DummyGameDao
+import com.example.ananke.testdoubles.ControllableGameDao
 import com.example.ananke.testdoubles.dummyGameEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -27,7 +27,7 @@ class GameRepositoryTest {
 
     @Before
     fun setUp() {
-        gameDao = DummyGameDao()
+        gameDao = ControllableGameDao()
         gameRepository = DefaultGameRepository(gameDao)
     }
 

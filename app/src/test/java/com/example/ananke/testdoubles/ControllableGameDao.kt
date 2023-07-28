@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-class DummyGameDao : GameDao {
+class ControllableGameDao : GameDao {
     private var games = MutableStateFlow(dummyGameEntities)
 
     override fun getGames(): Flow<List<GameEntity>> = games

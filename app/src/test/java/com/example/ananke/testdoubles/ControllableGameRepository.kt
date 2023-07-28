@@ -1,17 +1,11 @@
 package com.example.ananke.testdoubles
 
 import com.example.ananke.data.Game
-import com.example.ananke.data.GameEntity
 import com.example.ananke.data.GameRepository
-import com.example.ananke.data.dummyGames
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.replay
-import kotlinx.coroutines.flow.update
 
-class DummyGameRepository : GameRepository {
+class ControllableGameRepository : GameRepository {
 
     private val _games = MutableSharedFlow<List<Game>>(replay = 1)
 

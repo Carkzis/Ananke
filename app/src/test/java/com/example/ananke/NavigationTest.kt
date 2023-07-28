@@ -64,7 +64,7 @@ class NavigationTest {
             assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
             onNodeWithTag("${GameDestination.NEW}-title")
                 .assertIsDisplayed()
-            
+
             assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
             assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
         }
