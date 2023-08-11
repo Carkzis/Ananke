@@ -38,8 +38,8 @@ class NewGameScreenViewModelTest {
         val newGame = Game("anId", "aName", "aDescription")
         viewModel.addGame(newGame)
 
-        collection.cancel()
-
         assertTrue(games.contains(newGame))
+
+        collection.cancel()
     }
 }
