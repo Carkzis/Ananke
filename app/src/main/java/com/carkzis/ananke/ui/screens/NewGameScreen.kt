@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
@@ -26,7 +27,11 @@ fun NewGameScreen(
     )
 
     Column(modifier = Modifier) {
-        AnankeButton(onClick = onAddGameClick) {
+        AnankeButton(onClick = {
+            // TODO: This needs to be real, and testable.
+            viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable."))
+            onAddGameClick()
+        }) {
             AnankeText(
                 text = "Add Game",
                 modifier = modifier.padding(8.dp).testTag("${GameDestination.NEW}-addnewgame-button")
