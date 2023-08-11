@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GameScreenViewModel @Inject constructor(private val gameRepository: GameRepository) : ViewModel() {
+class GameScreenViewModel @Inject constructor(gameRepository: GameRepository) : ViewModel() {
 
     val gameList: StateFlow<List<Game>> = gameRepository.getGames().stateIn(
         viewModelScope,
@@ -20,9 +20,4 @@ class GameScreenViewModel @Inject constructor(private val gameRepository: GameRe
         listOf()
     )
 
-    fun addGame(game: Game) {
-        viewModelScope.launch {
-            gameRepository.addGame(game)
-        }
-    }
 }
