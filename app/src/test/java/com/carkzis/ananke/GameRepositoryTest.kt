@@ -5,6 +5,7 @@ import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
 import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameDao
 import com.carkzis.ananke.testdoubles.dummyGameEntities
@@ -40,13 +41,14 @@ class GameRepositoryTest {
 
     @Test
     fun `repository adds game to database`() = runTest {
-        val newGame = Game("anId", "aName", "aDescription")
-        gameRepository.addGame(newGame)
-        assertTrue(getGamesEntitiesAsDomainObjects().contains(newGame))
+        val newGame = NewGame("aName", "aDescription")
+        gameRepository.addNewGame(newGame)
+        assertTrue(getGamesEntitiesAsDomainObjects().contains(newGame.asGame()))
     }
 
     private suspend fun getGamesEntitiesAsDomainObjects() =
         gameDao.getGames()
             .first()
             .map(GameEntity::toDomain)
+
 }

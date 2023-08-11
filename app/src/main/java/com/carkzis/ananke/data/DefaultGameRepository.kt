@@ -10,7 +10,7 @@ class DefaultGameRepository @Inject constructor(private val gameDao: GameDao) : 
         it.map(GameEntity::toDomain)
     }
 
-    override suspend fun addGame(game: Game) {
-        gameDao.insertGame(game.toEntity())
+    override suspend fun addNewGame(newGame: NewGame) {
+        gameDao.insertGame(newGame.toEntity())
     }
 }

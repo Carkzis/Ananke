@@ -37,7 +37,7 @@ fun AnankeNavHost(
             composable(
                 route = "${AnankeDestination.GAME}/${GameDestination.NEW}"
             ) {
-                NewGameScreen()
+                NewGameScreen(onAddGameClick = {})
             }
         }
         composable(route = AnankeDestination.TEAM.toString()) {

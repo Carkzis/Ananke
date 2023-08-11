@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.AnankeDatabase
+import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
+import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -48,7 +50,7 @@ class GameDaoTest {
 
     @Test
     fun `gameDao inserts new game entity`() = runTest {
-        val newGame = GameEntity("anID", "aName", "aDescription")
+        val newGame = GameEntity(1L, "aName", "aDescription")
         gameDao.insertGame(newGame)
         assertTrue(gameDao.getGames().first().contains(newGame))
     }

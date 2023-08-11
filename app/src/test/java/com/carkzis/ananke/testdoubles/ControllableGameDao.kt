@@ -32,7 +32,7 @@ class ControllableGameDao : GameDao {
 
 
 val dummyGameEntities = listOf(
-    GameEntity("1", "My First Game", "It is the first one."),
-    GameEntity("2", "My Second Game", "It is the second one."),
-    GameEntity("3", "My Third Game", "It is the third one.")
+    GameEntity(1L, "My First Game", "It is the first one."),
+    GameEntity(2L, "My Second Game", "It is the second one."),
+    GameEntity(3L, "My Third Game", "It is the third one.")
 )

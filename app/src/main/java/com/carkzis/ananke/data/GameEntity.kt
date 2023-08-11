@@ -7,14 +7,14 @@ import androidx.room.PrimaryKey
     tableName = "games"
 )
 data class GameEntity(
-    @PrimaryKey
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
     val name: String,
     val description: String
 )
 
 fun GameEntity.toDomain() = Game(
-    id = id,
+    id = id.toString(),
     name = name,
     description = description
 )

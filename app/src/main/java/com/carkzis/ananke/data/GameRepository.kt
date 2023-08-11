@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 interface GameRepository {
     fun getGames(): Flow<List<Game>>
 
-    suspend fun addGame(game: Game)
+    suspend fun addNewGame(newGame: NewGame)
 }
