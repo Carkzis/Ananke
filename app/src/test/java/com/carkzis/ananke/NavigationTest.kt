@@ -88,6 +88,20 @@ class NavigationTest {
                 .assertIsDisplayed()
         }
     }
+
+    @Test
+    fun `navigates from new game screen back to game screen when new game added`() {
+        composeTestRule.apply {
+            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
+                .performClick()
+
+            onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
+                .performClick()
+
+            assertScreenSelected(AnankeDestination.GAME)
+        }
+    }
+
     @Test
     fun `screen prior to top level screens will always be games`() {
         composeTestRule.apply {
