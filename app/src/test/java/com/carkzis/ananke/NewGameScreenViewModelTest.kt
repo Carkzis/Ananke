@@ -3,7 +3,7 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.NewGameScreenMessages
+import com.carkzis.ananke.ui.screens.NewGameScreenMessage
 import com.carkzis.ananke.ui.screens.NewGameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -63,17 +63,17 @@ class NewGameScreenViewModelTest {
             viewModel.message.collect { message = it }
         }
 
-        val longGameTitle = "LONG".repeat(8)
+        val longGameTitle = "LONG".repeat(8) // 32 characters
         viewModel.setGameTitle(longGameTitle)
 
-        assertEquals(NewGameScreenMessages.GAME_TITLE_TOO_LONG.message, message)
+        assertEquals(NewGameScreenMessage.GAME_TITLE_TOO_LONG.message, message)
 
         collection.cancel()
     }
 
     @Test
     fun `view model does not sets new game title if too long`() = runTest {
-        val longGameTitle = "LONG".repeat(8)
+        val longGameTitle = "LONG".repeat(8) // 32 characters
         viewModel.setGameTitle(longGameTitle)
         assertEquals("", viewModel.gameTitle.value)
     }
@@ -87,7 +87,7 @@ class NewGameScreenViewModelTest {
 
         viewModel.setGameTitle("")
 
-        assertEquals(NewGameScreenMessages.GAME_TITLE_EMPTY.message, message)
+        assertEquals(NewGameScreenMessage.GAME_TITLE_EMPTY.message, message)
 
         collection.cancel()
     }
@@ -111,17 +111,17 @@ class NewGameScreenViewModelTest {
             viewModel.message.collect { message = it }
         }
 
-        val longGameDescription = "LONG".repeat(51)
+        val longGameDescription = "LONG".repeat(51) // 204 characters
         viewModel.setGameDescription(longGameDescription)
 
-        assertEquals(NewGameScreenMessages.GAME_DESCRIPTION_TOO_LONG.message, message)
+        assertEquals(NewGameScreenMessage.GAME_DESCRIPTION_TOO_LONG.message, message)
 
         collection.cancel()
     }
 
     @Test
     fun `view model does not sets new game description if too long`() = runTest {
-        val longGameTitle = "LONG".repeat(51)
+        val longGameTitle = "LONG".repeat(51) // 204 characters
         viewModel.setGameDescription(longGameTitle)
         assertEquals("", viewModel.gameDescription.value)
     }
