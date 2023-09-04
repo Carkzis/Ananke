@@ -1,9 +1,9 @@
 package com.carkzis.ananke
 
-import androidx.compose.runtime.collectAsState
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.ui.screens.NewGameScreenMessageConstants
 import com.carkzis.ananke.ui.screens.NewGameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -45,15 +45,32 @@ class NewGameScreenViewModelTest {
     }
 
     @Test
-    fun `view model holds empty string for gameTitle`() = runTest {
+    fun `view model holds empty string for game title`() = runTest {
         assertEquals("", viewModel.gameTitle.value)
     }
 
     @Test
-    fun `view model sets new gameTitle`() = runTest {
+    fun `view model sets new game title`() = runTest {
         val expectedGameTitle = "Super Ananke Bros."
         viewModel.setGameTitle(expectedGameTitle)
         assertEquals(expectedGameTitle, viewModel.gameTitle.value)
     }
+
+    @Test
+    fun `view model sends toast message when game title character length exceeded`() = runTest {
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        val longGameTitle = "LONGLONGLONGLONGLONGLONGLONGLONG"
+        viewModel.setGameTitle(longGameTitle)
+
+        assertEquals(NewGameScreenMessageConstants.GAME_TITLE_TOO_LONG.message, message)
+
+        collection.cancel()
+    }
+
+    // TODO: More validation of game title checks.
 
 }
