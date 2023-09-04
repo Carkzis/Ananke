@@ -1,5 +1,6 @@
 package com.carkzis.ananke
 
+import androidx.compose.runtime.collectAsState
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -8,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -40,6 +42,18 @@ class NewGameScreenViewModelTest {
         assertTrue(games.contains(newGame.asGame()))
 
         collection.cancel()
+    }
+
+    @Test
+    fun `view model holds empty string for gameTitle`() = runTest {
+        assertEquals("", viewModel.gameTitle.value)
+    }
+
+    @Test
+    fun `view model sets new gameTitle`() = runTest {
+        val expectedGameTitle = "Super Ananke Bros."
+        viewModel.setGameTitle(expectedGameTitle)
+        assertEquals(expectedGameTitle, viewModel.gameTitle.value)
     }
 
 }
