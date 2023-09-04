@@ -22,11 +22,16 @@ class NewGameScreenViewModel @Inject constructor(private val gameRepository: Gam
     val message = _message.asSharedFlow()
 
     fun setGameTitle(title: String) {
-        _gameTitle.value = title
         if (title.length > 30) {
             viewModelScope.launch {
                 _message.emit(NewGameScreenMessageConstants.GAME_TITLE_TOO_LONG.message)
             }
+        } else if (title.isEmpty()) {
+            viewModelScope.launch {
+                _message.emit(NewGameScreenMessageConstants.GAME_TITLE_EMPTY.message)
+            }
+        } else {
+            _gameTitle.value = title
         }
     }
 
@@ -38,5 +43,6 @@ class NewGameScreenViewModel @Inject constructor(private val gameRepository: Gam
 }
 
 enum class NewGameScreenMessageConstants(val message: String) {
-    GAME_TITLE_TOO_LONG("The game title must be no more than 30 characters.")
+    GAME_TITLE_TOO_LONG("The game title must be no more than 30 characters."),
+    GAME_TITLE_EMPTY("You must enter a game title.")
 }

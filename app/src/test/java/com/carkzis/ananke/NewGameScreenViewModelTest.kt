@@ -71,6 +71,25 @@ class NewGameScreenViewModelTest {
         collection.cancel()
     }
 
-    // TODO: More validation of game title checks.
+    @Test
+    fun `view model does not sets new game title if too long`() = runTest {
+        val longGameTitle = "LONGLONGLONGLONGLONGLONGLONGLONG"
+        viewModel.setGameTitle(longGameTitle)
+        assertEquals("", viewModel.gameTitle.value)
+    }
+
+    @Test
+    fun `view model sends toast message when game title empty`() = runTest {
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        viewModel.setGameTitle("")
+
+        assertEquals(NewGameScreenMessageConstants.GAME_TITLE_EMPTY.message, message)
+
+        collection.cancel()
+    }
 
 }
