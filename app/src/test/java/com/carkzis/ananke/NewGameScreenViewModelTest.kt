@@ -3,7 +3,7 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.NewGameScreenMessageConstants
+import com.carkzis.ananke.ui.screens.NewGameScreenValidatorResponses
 import com.carkzis.ananke.ui.screens.NewGameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -66,7 +66,7 @@ class NewGameScreenViewModelTest {
         val longGameTitle = "LONGLONGLONGLONGLONGLONGLONGLONG"
         viewModel.setGameTitle(longGameTitle)
 
-        assertEquals(NewGameScreenMessageConstants.GAME_TITLE_TOO_LONG.message, message)
+        assertEquals(NewGameScreenValidatorResponses.GAME_TITLE_TOO_LONG.message, message)
 
         collection.cancel()
     }
@@ -87,7 +87,7 @@ class NewGameScreenViewModelTest {
 
         viewModel.setGameTitle("")
 
-        assertEquals(NewGameScreenMessageConstants.GAME_TITLE_EMPTY.message, message)
+        assertEquals(NewGameScreenValidatorResponses.GAME_TITLE_EMPTY.message, message)
 
         collection.cancel()
     }
