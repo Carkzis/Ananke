@@ -1,5 +1,8 @@
 package com.carkzis.ananke.ui.screens
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.GameRepository
@@ -10,9 +13,7 @@ import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MINIMUM_GAME_DES
 import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MINIMUM_GAME_TITLE_LENGTH
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,31 +21,31 @@ import javax.inject.Inject
 class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
     ViewModel() {
 
-    private val _gameTitle = MutableStateFlow("")
-    val gameTitle = _gameTitle.asStateFlow()
+    var gameTitle by mutableStateOf("")
+        private set
 
-    private val _gameDescription = MutableStateFlow("")
-    val gameDescription = _gameDescription.asStateFlow()
+    var gameDescription by mutableStateOf("")
+        private set
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
 
-    fun setGameTitle(title: String) {
+    fun updateGameTitle(title: String) {
         val gameTitleValidator = NewGameTextValidator(
             minimumLength = MINIMUM_GAME_TITLE_LENGTH,
             maximumLength = MAXIMUM_GAME_TITLE_LENGTH
         )
-        setText(title, _gameTitle, gameTitleValidator, NewGameValidatorResponse::asTitleMessage)
+        setText(title, { gameTitle = it }, gameTitleValidator, NewGameValidatorResponse::asTitleMessage)
     }
 
-    fun setGameDescription(description: String) {
+    fun updateGameDescription(description: String) {
         val gameDescriptionValidator = NewGameTextValidator(
             minimumLength = MINIMUM_GAME_DESCRIPTION_LENGTH,
             maximumLength = MAXIMUM_GAME_DESCRIPTION_LENGTH
         )
         setText(
             description,
-            _gameDescription,
+            { gameDescription = it },
             gameDescriptionValidator,
             NewGameValidatorResponse::asDescriptionMessage
         )
@@ -58,7 +59,7 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
 
     private fun setText(
         text: String,
-        receiver: MutableStateFlow<String>,
+        receiver: (String) -> Unit,
         textValidator: NewGameTextValidator,
         messageForValidation: (NewGameValidatorResponse) -> String
     ) {
@@ -69,7 +70,7 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
                 _message.emit(messageForValidation(textValidation))
             }
         } else {
-            receiver.value = text
+            receiver(text)
         }
     }
 }

@@ -46,14 +46,14 @@ class NewGameViewModelTest {
 
     @Test
     fun `view model holds empty string for game title`() = runTest {
-        assertEquals("", viewModel.gameTitle.value)
+        assertEquals("", viewModel.gameTitle)
     }
 
     @Test
     fun `view model sets new game title`() = runTest {
         val expectedGameTitle = "Super Ananke Bros."
-        viewModel.setGameTitle(expectedGameTitle)
-        assertEquals(expectedGameTitle, viewModel.gameTitle.value)
+        viewModel.updateGameTitle(expectedGameTitle)
+        assertEquals(expectedGameTitle, viewModel.gameTitle)
     }
 
     @Test
@@ -64,7 +64,7 @@ class NewGameViewModelTest {
         }
 
         val longGameTitle = "LONG".repeat(8) // 32 characters
-        viewModel.setGameTitle(longGameTitle)
+        viewModel.updateGameTitle(longGameTitle)
 
         assertEquals(NewGameMessage.GAME_TITLE_TOO_LONG.message, message)
 
@@ -74,8 +74,8 @@ class NewGameViewModelTest {
     @Test
     fun `view model does not sets new game title if too long`() = runTest {
         val longGameTitle = "LONG".repeat(8) // 32 characters
-        viewModel.setGameTitle(longGameTitle)
-        assertEquals("", viewModel.gameTitle.value)
+        viewModel.updateGameTitle(longGameTitle)
+        assertEquals("", viewModel.gameTitle)
     }
 
     @Test
@@ -85,7 +85,7 @@ class NewGameViewModelTest {
             viewModel.message.collect { message = it }
         }
 
-        viewModel.setGameTitle("")
+        viewModel.updateGameTitle("")
 
         assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, message)
 
@@ -94,14 +94,14 @@ class NewGameViewModelTest {
 
     @Test
     fun `view model holds empty string for game description`() = runTest {
-        assertEquals("", viewModel.gameDescription.value)
+        assertEquals("", viewModel.gameDescription)
     }
 
     @Test
     fun `view model sets new game description`() = runTest {
         val expectedGameDescription = "There are things in this game."
-        viewModel.setGameDescription(expectedGameDescription)
-        assertEquals(expectedGameDescription, viewModel.gameDescription.value)
+        viewModel.updateGameDescription(expectedGameDescription)
+        assertEquals(expectedGameDescription, viewModel.gameDescription)
     }
 
     @Test
@@ -112,7 +112,7 @@ class NewGameViewModelTest {
         }
 
         val longGameDescription = "LONG".repeat(51) // 204 characters
-        viewModel.setGameDescription(longGameDescription)
+        viewModel.updateGameDescription(longGameDescription)
 
         assertEquals(NewGameMessage.GAME_DESCRIPTION_TOO_LONG.message, message)
 
@@ -122,7 +122,7 @@ class NewGameViewModelTest {
     @Test
     fun `view model does not sets new game description if too long`() = runTest {
         val longGameTitle = "LONG".repeat(51) // 204 characters
-        viewModel.setGameDescription(longGameTitle)
-        assertEquals("", viewModel.gameDescription.value)
+        viewModel.updateGameDescription(longGameTitle)
+        assertEquals("", viewModel.gameDescription)
     }
 }

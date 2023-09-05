@@ -2,6 +2,7 @@ package com.carkzis.ananke.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -26,6 +27,15 @@ fun NewGameScreen(
     )
 
     Column(modifier = Modifier) {
+
+        // TODO: Not dealing with 0 properly if just using the text box!
+        TextField(
+            value = viewModel.gameTitle,
+            onValueChange = viewModel::updateGameTitle,
+            modifier = modifier
+                .testTag("${GameDestination.NEW}-game-title")
+        )
+
         AnankeButton(onClick = {
             // TODO: This needs to be real, and testable.
             viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable."))
@@ -33,7 +43,9 @@ fun NewGameScreen(
         }) {
             AnankeText(
                 text = "Add Game",
-                modifier = modifier.padding(8.dp).testTag("${GameDestination.NEW}-addnewgame-button")
+                modifier = modifier
+                    .padding(8.dp)
+                    .testTag("${GameDestination.NEW}-addnewgame-button")
             )
         }
     }
