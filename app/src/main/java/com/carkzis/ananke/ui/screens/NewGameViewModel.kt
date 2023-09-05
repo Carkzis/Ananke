@@ -35,7 +35,12 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
             minimumLength = MINIMUM_GAME_TITLE_LENGTH,
             maximumLength = MAXIMUM_GAME_TITLE_LENGTH
         )
-        setText(title, { gameTitle = it }, gameTitleValidator, NewGameValidatorResponse::asTitleMessage)
+        setText(
+            title,
+            { gameTitle = it },
+            gameTitleValidator,
+            NewGameValidatorResponse::asTitleMessage
+        )
     }
 
     fun updateGameDescription(description: String) {
@@ -58,19 +63,19 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
     }
 
     private fun setText(
-        text: String,
-        receiver: (String) -> Unit,
+        updatedText: String,
+        onValidatedText: (String) -> Unit,
         textValidator: NewGameTextValidator,
         messageForValidation: (NewGameValidatorResponse) -> String
     ) {
-        val textValidation = textValidator.validateText(text)
+        val textValidation = textValidator.validateText(updatedText)
 
         if (textValidation != NewGameValidatorResponse.PASS) {
             viewModelScope.launch {
                 _message.emit(messageForValidation(textValidation))
             }
         } else {
-            receiver(text)
+            onValidatedText(updatedText)
         }
     }
 }

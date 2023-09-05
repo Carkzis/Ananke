@@ -78,19 +78,20 @@ class NewGameViewModelTest {
         assertEquals("", viewModel.gameTitle)
     }
 
-    @Test
-    fun `view model sends toast message when game title empty`() = runTest {
-        var message = ""
-        val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.message.collect { message = it }
-        }
-
-        viewModel.updateGameTitle("")
-
-        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, message)
-
-        collection.cancel()
-    }
+    // TODO: This will only apply when "Add Game" button pressed.
+//    @Test
+//    fun `view model sends toast message when game title empty`() = runTest {
+//        var message = ""
+//        val collection = launch(UnconfinedTestDispatcher()) {
+//            viewModel.message.collect { message = it }
+//        }
+//
+//        viewModel.updateGameTitle("")
+//
+//        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, message)
+//
+//        collection.cancel()
+//    }
 
     @Test
     fun `view model holds empty string for game description`() = runTest {

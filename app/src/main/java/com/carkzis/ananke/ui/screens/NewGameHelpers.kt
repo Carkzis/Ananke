@@ -5,7 +5,7 @@ import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MAXIMUM_GAME_TIT
 
 class NewGameConstants {
     companion object {
-        const val MINIMUM_GAME_TITLE_LENGTH = 1
+        const val MINIMUM_GAME_TITLE_LENGTH = 0
         const val MINIMUM_GAME_DESCRIPTION_LENGTH = 0
         const val MAXIMUM_GAME_TITLE_LENGTH = 30
         const val MAXIMUM_GAME_DESCRIPTION_LENGTH = 200
