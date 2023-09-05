@@ -3,8 +3,8 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.NewGameScreenMessage
-import com.carkzis.ananke.ui.screens.NewGameScreenViewModel
+import com.carkzis.ananke.ui.screens.NewGameMessage
+import com.carkzis.ananke.ui.screens.NewGameViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,17 +16,17 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class NewGameScreenViewModelTest {
+class NewGameViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: NewGameScreenViewModel
+    private lateinit var viewModel: NewGameViewModel
     private lateinit var gameRepository: ControllableGameRepository
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        viewModel = NewGameScreenViewModel(gameRepository)
+        viewModel = NewGameViewModel(gameRepository)
     }
 
     @Test
@@ -66,7 +66,7 @@ class NewGameScreenViewModelTest {
         val longGameTitle = "LONG".repeat(8) // 32 characters
         viewModel.setGameTitle(longGameTitle)
 
-        assertEquals(NewGameScreenMessage.GAME_TITLE_TOO_LONG.message, message)
+        assertEquals(NewGameMessage.GAME_TITLE_TOO_LONG.message, message)
 
         collection.cancel()
     }
@@ -87,7 +87,7 @@ class NewGameScreenViewModelTest {
 
         viewModel.setGameTitle("")
 
-        assertEquals(NewGameScreenMessage.GAME_TITLE_EMPTY.message, message)
+        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, message)
 
         collection.cancel()
     }
@@ -114,7 +114,7 @@ class NewGameScreenViewModelTest {
         val longGameDescription = "LONG".repeat(51) // 204 characters
         viewModel.setGameDescription(longGameDescription)
 
-        assertEquals(NewGameScreenMessage.GAME_DESCRIPTION_TOO_LONG.message, message)
+        assertEquals(NewGameMessage.GAME_DESCRIPTION_TOO_LONG.message, message)
 
         collection.cancel()
     }

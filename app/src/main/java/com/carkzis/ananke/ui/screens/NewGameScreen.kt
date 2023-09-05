@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.carkzis.ananke.data.NewGame
-import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
@@ -17,7 +16,7 @@ import com.carkzis.ananke.ui.components.AnankeText
 fun NewGameScreen(
     modifier: Modifier = Modifier,
     onAddGameClick: () -> Unit,
-    viewModel: NewGameScreenViewModel = hiltViewModel()
+    viewModel: NewGameViewModel = hiltViewModel()
 ) {
     AnankeText(
         text = "New Game",
