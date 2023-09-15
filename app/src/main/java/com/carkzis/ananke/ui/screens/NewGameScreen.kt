@@ -28,12 +28,18 @@ fun NewGameScreen(
 
     Column(modifier = Modifier) {
 
-        // TODO: Not dealing with 0 properly if just using the text box!
         TextField(
             value = viewModel.gameTitle,
             onValueChange = viewModel::updateGameTitle,
             modifier = modifier
                 .testTag("${GameDestination.NEW}-game-title")
+        )
+
+        TextField(
+            value = viewModel.gameDescription,
+            onValueChange = viewModel::updateGameDescription,
+            modifier = modifier
+                .testTag("${GameDestination.NEW}-game-description")
         )
 
         AnankeButton(onClick = {

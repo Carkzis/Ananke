@@ -1,8 +1,10 @@
 package com.carkzis.ananke
 
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.carkzis.ananke.navigation.GameDestination
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -31,8 +33,7 @@ class NewGameScreenTest {
             onNodeWithTag(
                 "${GameDestination.HOME}-to-${GameDestination.NEW}-button",
                 useUnmergedTree = true
-            )
-                .performClick()
+            ).performClick()
         }
     }
 
@@ -41,6 +42,20 @@ class NewGameScreenTest {
         composeTestRule.apply {
             onNodeWithTag("${GameDestination.NEW}-game-title")
                 .performClick()
+                .performTextInput("A Game Title")
+            onNodeWithTag("${GameDestination.NEW}-game-title")
+                .assertTextContains("A Game Title")
+        }
+    }
+
+    @Test
+    fun `text box for new game description takes in typed characters`() {
+        composeTestRule.apply {
+            onNodeWithTag("${GameDestination.NEW}-game-description")
+                .performClick()
+                .performTextInput("A Game Description")
+            onNodeWithTag("${GameDestination.NEW}-game-description")
+                .assertTextContains("A Game Description")
         }
     }
 

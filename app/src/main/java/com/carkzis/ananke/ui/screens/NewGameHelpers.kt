@@ -42,5 +42,5 @@ fun NewGameValidatorResponse.asTitleMessage() = when (this) {
 
 fun NewGameValidatorResponse.asDescriptionMessage() = when (this) {
     NewGameValidatorResponse.TOO_LONG -> NewGameMessage.GAME_DESCRIPTION_TOO_LONG.message
-    else -> throw IllegalStateException("There is only a title message if title is too long.")
+    else -> throw IllegalStateException("There is only a description message if title is too long.")
 }
