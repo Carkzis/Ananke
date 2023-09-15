@@ -80,7 +80,7 @@ class NewGameViewModelTest {
     }
 
     @Test
-    fun `view model sends toast message about game title only when game title and description invalid and game added`() = runTest {
+    fun `view model sends toast message about game title only when game title empty and description invalid and game added`() = runTest {
         val messages = mutableListOf<String>()
         val collection = launch(UnconfinedTestDispatcher()) {
             viewModel.message.collect { messages.add(it) }
@@ -89,6 +89,21 @@ class NewGameViewModelTest {
         viewModel.addNewGame(NewGame("", ""))
 
         assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message about game title game title too short and game added`() = runTest {
+        val messages = mutableListOf<String>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        viewModel.addNewGame(NewGame("Shor", ""))
+
+        assertEquals(NewGameMessage.GAME_TITLE_TOO_SHORT.message, messages.firstOrNull())
         assertEquals(1, messages.size)
 
         collection.cancel()

@@ -31,7 +31,7 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
     val message = _message.asSharedFlow()
 
     fun updateGameTitle(title: String) {
-        val titleValidator = NewGameTextValidator(listOf { text -> if (text.length > MAXIMUM_GAME_TITLE_LENGTH) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS })
+        val titleValidator = titleValidator(minLength = 0)
         setText(
             title,
             { gameTitle = it },
@@ -79,7 +79,7 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
         val descriptionValidator =
             NewGameTextValidator(listOf { text -> if (text.length > MAXIMUM_GAME_TITLE_LENGTH) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS })
 
-        val titleValidation = titleValidator(minLength = MINIMUM_GAME_TITLE_LENGTH + 1).validateText(newGame.name)
+        val titleValidation = titleValidator().validateText(newGame.name)
         val descriptionValidation = descriptionValidator.validateText(newGame.description)
 
         when {
@@ -97,6 +97,7 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
     }
 
     private fun titleValidator(minLength: Int = MINIMUM_GAME_TITLE_LENGTH, maxLength: Int = MAXIMUM_GAME_TITLE_LENGTH) = NewGameTextValidator(listOf(
+        { text -> if (text.isEmpty()) NewGameValidatorResponse.EMPTY else NewGameValidatorResponse.PASS },
         { text -> if (text.length < minLength) NewGameValidatorResponse.TOO_SHORT else NewGameValidatorResponse.PASS },
         { text -> if (text.length > maxLength) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS }
     ))
