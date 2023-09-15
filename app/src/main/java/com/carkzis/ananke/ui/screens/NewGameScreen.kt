@@ -43,8 +43,7 @@ fun NewGameScreen(
         )
 
         AnankeButton(onClick = {
-            // TODO: This needs to be real, and testable.
-            viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable."))
+            viewModel.addNewGame(NewGame(viewModel.gameTitle, viewModel.gameDescription))
             onAddGameClick()
         }) {
             AnankeText(
@@ -52,6 +51,19 @@ fun NewGameScreen(
                 modifier = modifier
                     .padding(8.dp)
                     .testTag("${GameDestination.NEW}-addnewgame-button")
+            )
+        }
+
+        // Test button.
+        AnankeButton(onClick = {
+            viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable."))
+            onAddGameClick()
+        }) {
+            AnankeText(
+                text = "Add Dummy Game",
+                modifier = modifier
+                    .padding(8.dp)
+                    .testTag("${GameDestination.NEW}-addnewgame-button-dummy")
             )
         }
     }
