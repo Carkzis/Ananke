@@ -25,12 +25,12 @@ fun GameScreen(
     val games = viewModel.gameList.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
 
-    LazyColumn(modifier = modifier, lazyListState) {
+    LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
         item { AnankeText(text = "Games", modifier = modifier.padding(8.dp).testTag("${GameDestination.HOME}-title")) }
 
         games.value.forEach { game ->
             item(key = game.id) {
-                GameItem(modifier, game)
+                GameItem(modifier.testTag("${GameDestination.HOME}-gameitem"), game)
             }
         }
 

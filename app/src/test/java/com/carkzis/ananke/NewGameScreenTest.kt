@@ -66,7 +66,7 @@ class NewGameScreenTest {
     }
 
     @Test
-    fun `add new game results in it being added to database`() {
+    fun `add new game results in redirect to game screen`() {
         composeTestRule.apply {
             onNodeWithTag("${GameDestination.NEW}-game-title")
                 .performClick()
@@ -78,8 +78,6 @@ class NewGameScreenTest {
                 .performClick()
 
             assertScreenSelected(AnankeDestination.GAME)
-
-            // TODO: Need to confirm new game added to screen.
         }
     }
 
