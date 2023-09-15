@@ -86,11 +86,25 @@ class NewGameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        viewModel.updateGameTitle("")
-        viewModel.updateGameDescription("")
         viewModel.addNewGame(NewGame("", ""))
 
-        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, messages.first())
+        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message about game description when invalid and game added but title is valid`() = runTest {
+        val messages = mutableListOf<String>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        val longGameDescription = "LONG".repeat(51) // 204 characters
+        viewModel.addNewGame(NewGame("A Game With No Description", longGameDescription))
+
+        assertEquals(NewGameMessage.GAME_DESCRIPTION_TOO_LONG.message, messages.firstOrNull())
         assertEquals(1, messages.size)
 
         collection.cancel()
