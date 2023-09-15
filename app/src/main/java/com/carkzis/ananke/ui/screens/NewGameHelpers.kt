@@ -18,17 +18,7 @@ enum class NewGameMessage(val message: String) {
     GAME_DESCRIPTION_TOO_LONG("The game description must be no more than $MAXIMUM_GAME_DESCRIPTION_LENGTH characters.");
 }
 
-class NewGameTextValidator(private val minimumLength: Int, private val maximumLength: Int) {
-    fun validateText(text: String): NewGameValidatorResponse {
-        return when {
-            text.length < minimumLength -> NewGameValidatorResponse.TOO_SHORT
-            text.length > maximumLength -> NewGameValidatorResponse.TOO_LONG
-            else -> NewGameValidatorResponse.PASS
-        }
-    }
-}
-
-class TextValidator(private val validations: MutableList<(String) -> NewGameValidatorResponse>) {
+class NewGameTextValidator(private val validations: List<(String) -> NewGameValidatorResponse>) {
     fun validateText(text: String) : NewGameValidatorResponse {
         validations.forEach { validation ->
             val validationResponse = validation(text)

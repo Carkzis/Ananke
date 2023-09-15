@@ -31,54 +31,28 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
     val message = _message.asSharedFlow()
 
     fun updateGameTitle(title: String) {
-        val gameTitleValidator = NewGameTextValidator(
-            minimumLength = MINIMUM_GAME_TITLE_LENGTH,
-            maximumLength = MAXIMUM_GAME_TITLE_LENGTH
-        )
+        val titleValidator = NewGameTextValidator(listOf { text -> if (text.length > MAXIMUM_GAME_TITLE_LENGTH) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS })
         setText(
             title,
             { gameTitle = it },
-            gameTitleValidator,
+            titleValidator,
             NewGameValidatorResponse::asTitleMessage
         )
     }
 
     fun updateGameDescription(description: String) {
-        val gameDescriptionValidator = NewGameTextValidator(
-            minimumLength = MINIMUM_GAME_DESCRIPTION_LENGTH,
-            maximumLength = MAXIMUM_GAME_DESCRIPTION_LENGTH
-        )
+        val descriptionValidator = NewGameTextValidator(listOf { text -> if (text.length > MAXIMUM_GAME_TITLE_LENGTH) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS })
         setText(
             description,
             { gameDescription = it },
-            gameDescriptionValidator,
+            descriptionValidator,
             NewGameValidatorResponse::asDescriptionMessage
         )
     }
 
     fun addNewGame(newGame: NewGame) {
         viewModelScope.launch {
-            val gameTitleValidator = NewGameTextValidator(
-                minimumLength = MINIMUM_GAME_TITLE_LENGTH + 1,
-                maximumLength = MAXIMUM_GAME_TITLE_LENGTH
-            )
-            val gameDescriptionValidator = NewGameTextValidator(
-                minimumLength = MINIMUM_GAME_DESCRIPTION_LENGTH,
-                maximumLength = MAXIMUM_GAME_DESCRIPTION_LENGTH
-            )
-            val textValidator = TextValidator(mutableListOf(
-                { text -> gameTitleValidator.validateText(text) },
-                { text -> gameDescriptionValidator.validateText(text) }
-            ))
-
-            val titleValidation = textValidator.validateText(newGame.name)
-            val descriptionValidation = gameDescriptionValidator.validateText(newGame.description)
-
-            if (titleValidation != NewGameValidatorResponse.PASS) {
-                _message.emit(titleValidation.asTitleMessage())
-            } else if (descriptionValidation != NewGameValidatorResponse.PASS) {
-                _message.emit(descriptionValidation.asDescriptionMessage())
-            } else {
+            if (validateGame(newGame)) {
                 gameRepository.addNewGame(newGame)
             }
         }
@@ -100,5 +74,31 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
             onValidatedText(updatedText)
         }
     }
+
+    private suspend fun validateGame(newGame: NewGame): Boolean {
+        val descriptionValidator =
+            NewGameTextValidator(listOf { text -> if (text.length > MAXIMUM_GAME_TITLE_LENGTH) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS })
+
+        val titleValidation = titleValidator(minLength = MINIMUM_GAME_TITLE_LENGTH + 1).validateText(newGame.name)
+        val descriptionValidation = descriptionValidator.validateText(newGame.description)
+
+        when {
+            titleValidation != NewGameValidatorResponse.PASS -> {
+                _message.emit(titleValidation.asTitleMessage())
+                return false
+            }
+            descriptionValidation != NewGameValidatorResponse.PASS -> {
+                _message.emit(descriptionValidation.asDescriptionMessage())
+                return false
+            }
+        }
+
+        return true
+    }
+
+    private fun titleValidator(minLength: Int = MINIMUM_GAME_TITLE_LENGTH, maxLength: Int = MAXIMUM_GAME_TITLE_LENGTH) = NewGameTextValidator(listOf(
+        { text -> if (text.length < minLength) NewGameValidatorResponse.TOO_SHORT else NewGameValidatorResponse.PASS },
+        { text -> if (text.length > maxLength) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS }
+    ))
 
 }
