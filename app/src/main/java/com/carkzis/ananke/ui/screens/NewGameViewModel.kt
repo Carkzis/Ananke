@@ -58,7 +58,16 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
 
     fun addNewGame(newGame: NewGame) {
         viewModelScope.launch {
-            gameRepository.addNewGame(newGame)
+            val gameTitleValidator = NewGameTextValidator(
+                minimumLength = MINIMUM_GAME_TITLE_LENGTH + 1,
+                maximumLength = MAXIMUM_GAME_TITLE_LENGTH
+            )
+            val textValidation = gameTitleValidator.validateText(gameTitle)
+            if (textValidation != NewGameValidatorResponse.PASS) {
+                _message.emit(textValidation.asTitleMessage())
+            } else {
+                // gameRepository.addNewGame(newGame)
+            }
         }
     }
 

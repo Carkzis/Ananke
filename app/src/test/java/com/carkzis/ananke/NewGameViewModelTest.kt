@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -78,20 +79,22 @@ class NewGameViewModelTest {
         assertEquals("", viewModel.gameTitle)
     }
 
-    // TODO: This will only apply when "Add Game" button pressed.
-//    @Test
-//    fun `view model sends toast message when game title empty`() = runTest {
-//        var message = ""
-//        val collection = launch(UnconfinedTestDispatcher()) {
-//            viewModel.message.collect { message = it }
-//        }
-//
-//        viewModel.updateGameTitle("")
-//
-//        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, message)
-//
-//        collection.cancel()
-//    }
+    @Test
+    fun `view model sends toast message about game title only when game title and description invalid and game added`() = runTest {
+        val messages = mutableListOf<String>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        viewModel.updateGameTitle("")
+        viewModel.updateGameDescription("")
+        viewModel.addNewGame(NewGame("", ""))
+
+        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, messages.first())
+        assertEquals(1, messages.size)
+
+        collection.cancel()
+    }
 
     @Test
     fun `view model holds empty string for game description`() = runTest {
