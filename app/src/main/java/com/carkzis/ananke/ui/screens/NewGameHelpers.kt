@@ -28,6 +28,30 @@ class NewGameTextValidator(private val minimumLength: Int, private val maximumLe
     }
 }
 
+class TextValidator(private val validations: MutableList<(String) -> NewGameValidatorResponse>) {
+    fun validateText(text: String) : NewGameValidatorResponse {
+        validations.forEach { validation ->
+            val validationResponse = validation(text)
+            if (validationResponse != NewGameValidatorResponse.PASS) {
+                return validationResponse
+            }
+        }
+        return NewGameValidatorResponse.PASS
+    }
+
+    fun validateTexts(texts: List<String>) : NewGameValidatorResponse {
+        texts.forEach { text ->
+            validations.forEach { validation ->
+                val validationResponse = validation(text)
+                if (validationResponse != NewGameValidatorResponse.PASS) {
+                    return validationResponse
+                }
+            }
+        }
+        return NewGameValidatorResponse.PASS
+    }
+}
+
 enum class NewGameValidatorResponse {
     TOO_LONG,
     TOO_SHORT,

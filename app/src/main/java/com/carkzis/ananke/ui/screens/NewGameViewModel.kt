@@ -62,18 +62,24 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
                 minimumLength = MINIMUM_GAME_TITLE_LENGTH + 1,
                 maximumLength = MAXIMUM_GAME_TITLE_LENGTH
             )
-            val titleValidation = gameTitleValidator.validateText(newGame.name)
             val gameDescriptionValidator = NewGameTextValidator(
                 minimumLength = MINIMUM_GAME_DESCRIPTION_LENGTH,
                 maximumLength = MAXIMUM_GAME_DESCRIPTION_LENGTH
             )
+            val textValidator = TextValidator(mutableListOf(
+                { text -> gameTitleValidator.validateText(text) },
+                { text -> gameDescriptionValidator.validateText(text) }
+            ))
+
+            val titleValidation = textValidator.validateText(newGame.name)
             val descriptionValidation = gameDescriptionValidator.validateText(newGame.description)
+
             if (titleValidation != NewGameValidatorResponse.PASS) {
                 _message.emit(titleValidation.asTitleMessage())
             } else if (descriptionValidation != NewGameValidatorResponse.PASS) {
                 _message.emit(descriptionValidation.asDescriptionMessage())
             } else {
-                // gameRepository.addNewGame(newGame)
+                gameRepository.addNewGame(newGame)
             }
         }
     }
@@ -94,4 +100,5 @@ class NewGameViewModel @Inject constructor(private val gameRepository: GameRepos
             onValidatedText(updatedText)
         }
     }
+
 }
