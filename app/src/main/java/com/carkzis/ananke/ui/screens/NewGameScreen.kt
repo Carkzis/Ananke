@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -12,12 +13,14 @@ import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun NewGameScreen(
     modifier: Modifier = Modifier,
     onAddGameClick: () -> Unit,
-    viewModel: NewGameViewModel = hiltViewModel()
+    viewModel: NewGameViewModel = hiltViewModel(),
+    onShowSnackbar: suspend (String) -> Boolean
 ) {
     AnankeText(
         text = "New Game",
@@ -25,6 +28,12 @@ fun NewGameScreen(
             .padding(8.dp)
             .testTag("${GameDestination.NEW}-title")
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.message.collect {
+            onShowSnackbar(it)
+        }
+    }
 
     Column(modifier = Modifier) {
 

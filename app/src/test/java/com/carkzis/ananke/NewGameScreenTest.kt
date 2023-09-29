@@ -1,17 +1,29 @@
 package com.carkzis.ananke
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.DummyNewGameViewModel
+import com.carkzis.ananke.ui.screens.NewGameMessage
 import com.carkzis.ananke.ui.screens.NewGameScreen
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,11 +42,22 @@ class NewGameScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
+    private lateinit var snackbarHostState: SnackbarHostState
+
     @Before
     fun setUp() {
         composeTestRule.apply {
             composeTestRule.setContent {
-                NewGameScreen(onAddGameClick = {}, viewModel = DummyNewGameViewModel())
+                snackbarHostState = remember { SnackbarHostState() }
+                NewGameScreen(
+                    onAddGameClick = {},
+                    viewModel = DummyNewGameViewModel(),
+                    onShowSnackbar = { message ->
+                        snackbarHostState.showSnackbar(
+                            message = message, duration = SnackbarDuration.Short
+                        ) == SnackbarResult.Dismissed
+                    }
+                )
             }
         }
     }
@@ -72,6 +95,25 @@ class NewGameScreenTest {
                 .performTextInput("A Game Description")
             onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
                 .performClick()
+        }
+    }
+
+    @Test
+    fun `add invalid new game does not result redirect to game screen`() {
+        // TODO
+    }
+
+    @Test
+    fun `snackbar displays when try to add game with invalid input`() {
+        composeTestRule.apply {
+            onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
+                .performClick()
+            runBlocking {
+                val actualSnackbarText = snapshotFlow { snackbarHostState.currentSnackbarData }
+                    .filterNotNull().first().visuals.message
+                val expectedSnackbarText = NewGameMessage.GAME_TITLE_EMPTY.message
+                assertEquals(expectedSnackbarText, actualSnackbarText)
+            }
         }
     }
 

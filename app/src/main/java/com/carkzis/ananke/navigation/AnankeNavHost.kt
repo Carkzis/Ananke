@@ -15,6 +15,7 @@ import com.carkzis.ananke.ui.screens.YouScreen
 fun AnankeNavHost(
     modifier: Modifier = Modifier,
     appState: AnankeAppState,
+    onShowSnackbar: suspend (String) -> Boolean,
     startDestination: String = AnankeDestination.GAME.toString()
 ) {
     val navController = appState.navController
@@ -39,7 +40,7 @@ fun AnankeNavHost(
             ) {
                 NewGameScreen(onAddGameClick = {
                     navController.popBackStack()
-                })
+                }, onShowSnackbar = onShowSnackbar)
             }
         }
         composable(route = AnankeDestination.TEAM.toString()) {
