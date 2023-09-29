@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,12 @@ fun NewGameScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.addGameSuccessEvent.collect { wasSuccessful ->
+            if (wasSuccessful) onAddGameClick()
+        }
+    }
+
     Column(modifier = Modifier) {
 
         TextField(
@@ -53,7 +60,6 @@ fun NewGameScreen(
 
         AnankeButton(onClick = {
             viewModel.addNewGame(NewGame(viewModel.gameTitle, viewModel.gameDescription))
-            onAddGameClick()
         }) {
             AnankeText(
                 text = "Add Game",

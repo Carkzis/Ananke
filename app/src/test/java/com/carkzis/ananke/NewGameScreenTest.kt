@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +45,7 @@ class NewGameScreenTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var snackbarHostState: SnackbarHostState
+    private var redirected = false
 
     @Before
     fun setUp() {
@@ -50,7 +53,7 @@ class NewGameScreenTest {
             composeTestRule.setContent {
                 snackbarHostState = remember { SnackbarHostState() }
                 NewGameScreen(
-                    onAddGameClick = {},
+                    onAddGameClick = { redirected = true },
                     viewModel = DummyNewGameViewModel(),
                     onShowSnackbar = { message ->
                         snackbarHostState.showSnackbar(
@@ -95,12 +98,17 @@ class NewGameScreenTest {
                 .performTextInput("A Game Description")
             onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
                 .performClick()
+            assertTrue(redirected)
         }
     }
 
     @Test
     fun `add invalid new game does not result redirect to game screen`() {
-        // TODO
+        composeTestRule.apply {
+            onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
+                .performClick()
+            assertFalse(redirected)
+        }
     }
 
     @Test
