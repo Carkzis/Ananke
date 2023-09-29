@@ -6,7 +6,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,6 +18,7 @@ import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
 import kotlinx.coroutines.flow.Flow
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NewGameScreen(
     modifier: Modifier = Modifier,
@@ -30,8 +33,10 @@ fun NewGameScreen(
             .testTag("${GameDestination.NEW}-title")
     )
 
+    val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(Unit) {
         viewModel.message.collect {
+            keyboardController?.hide()
             onShowSnackbar(it)
         }
     }
