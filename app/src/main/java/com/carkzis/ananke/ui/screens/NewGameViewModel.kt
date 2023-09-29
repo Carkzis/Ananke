@@ -103,7 +103,7 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
         minLength: Int = MINIMUM_GAME_TITLE_LENGTH,
         maxLength: Int = MAXIMUM_GAME_TITLE_LENGTH
     ) = NewGameTextValidator(listOf(
-        { text -> if (text.isEmpty()) NewGameValidatorResponse.EMPTY else NewGameValidatorResponse.PASS },
+        { text -> if (text.isEmpty() && minLength != 0) NewGameValidatorResponse.EMPTY else NewGameValidatorResponse.PASS },
         { text -> if (text.length < minLength) NewGameValidatorResponse.TOO_SHORT else NewGameValidatorResponse.PASS },
         { text -> if (text.length > maxLength) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS }
     ))

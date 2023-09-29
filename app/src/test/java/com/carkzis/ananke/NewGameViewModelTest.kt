@@ -103,6 +103,22 @@ class NewGameViewModelTest {
     }
 
     @Test
+    fun `view model does not send toast message when game title empty after previously not empty`() = runTest {
+        val messages = mutableListOf<String>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        val gameTitle = "Super Ananke Bros."
+        viewModel.updateGameTitle(gameTitle)
+        viewModel.updateGameTitle("")
+
+        assertTrue(messages.isEmpty())
+
+        collection.cancel()
+    }
+
+    @Test
     fun `view model does not sets new game title if too long`() = runTest {
         val longGameTitle = "LONG".repeat(8) // 32 characters
         viewModel.updateGameTitle(longGameTitle)
