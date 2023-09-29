@@ -30,6 +30,9 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
 
+    private val _addGameSuccessEvent = MutableSharedFlow<Boolean>()
+    val addGameSuccessEvent = _addGameSuccessEvent.asSharedFlow()
+
     fun updateGameTitle(title: String) {
         val titleValidator = titleValidator(minLength = 0)
         setText(
@@ -53,6 +56,9 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
         viewModelScope.launch {
             if (validateGame(newGame)) {
                 gameRepository.addNewGame(newGame)
+                _addGameSuccessEvent.emit(true)
+            } else {
+                _addGameSuccessEvent.emit(false)
             }
         }
     }

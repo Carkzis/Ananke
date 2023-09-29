@@ -46,6 +46,36 @@ class NewGameViewModelTest {
     }
 
     @Test
+    fun `view model sends success event if game added to repository`() = runTest {
+        var success = false
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.addGameSuccessEvent.collect { success = it }
+        }
+
+        val newGame = NewGame("aName", "aDescription")
+        viewModel.addNewGame(newGame)
+
+        assertTrue(success)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends failure event if game cannot be added to repository`() = runTest {
+        var success = true
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.addGameSuccessEvent.collect { success = it }
+        }
+
+        val invalidNewGame = NewGame("", "")
+        viewModel.addNewGame(invalidNewGame)
+
+        assertFalse(success)
+
+        collection.cancel()
+    }
+
+    @Test
     fun `view model holds empty string for game title`() = runTest {
         assertEquals("", viewModel.gameTitle)
     }
