@@ -112,7 +112,6 @@ fun NewGameScreen(
                 modifier = modifier.weight(1f).fillMaxHeight(),
                 onClick = {
                 viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable."))
-                onAddGameClick()
             }) {
                 AnankeText(
                     text = "Add Dummy Game",
