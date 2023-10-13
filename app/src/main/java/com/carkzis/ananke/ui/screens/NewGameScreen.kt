@@ -85,42 +85,56 @@ fun NewGameScreen(
             testTag = "${GameDestination.NEW}-game-description"
         )
 
-        Row(
+        NewGameScreenButtonRow(
+            modifier = modifier,
+            onAddNewGameClick = { viewModel.addNewGame(NewGame(viewModel.gameTitle, viewModel.gameDescription)) },
+            onAddDummyGameClick = { viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable.")) }
+        )
+    }
+}
+
+@Composable
+private fun NewGameScreenButtonRow(
+    modifier: Modifier,
+    onAddNewGameClick: () -> Unit,
+    onAddDummyGameClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        AnankeButton(
             modifier = modifier
-                .height(IntrinsicSize.Min),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            AnankeButton(
-                modifier = modifier.weight(1f).fillMaxHeight(),
-                onClick = {
-                viewModel.addNewGame(NewGame(viewModel.gameTitle, viewModel.gameDescription))
+                .weight(1f)
+                .fillMaxHeight(),
+            onClick = {
+                onAddNewGameClick()
             }) {
-                AnankeText(
-                    text = "Add Game",
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${GameDestination.NEW}-addnewgame-button")
-                )
-            }
-
-            Spacer(
-                modifier = Modifier.width(8.dp)
+            AnankeText(
+                text = "Add Game",
+                modifier = modifier
+                    .padding(8.dp)
+                    .testTag("${GameDestination.NEW}-addnewgame-button")
             )
-
-            // Test button.
-            AnankeButton(
-                modifier = modifier.weight(1f).fillMaxHeight(),
-                onClick = {
-                viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable."))
-            }) {
-                AnankeText(
-                    text = "Add Dummy Game",
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${GameDestination.NEW}-addnewgame-button-dummy")
-                )
-            }
         }
+        Spacer(modifier = Modifier.width(8.dp))
+        // Test button.
+        AnankeButton(
+            modifier = modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            onClick = {
+                onAddDummyGameClick()
+            }) {
+            AnankeText(
+                text = "Add Dummy Game",
+                modifier = modifier
+                    .padding(8.dp)
+                    .testTag("${GameDestination.NEW}-addnewgame-button-dummy")
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
     }
 }
 
@@ -181,26 +195,10 @@ private fun NewGameButtonPreview() {
 @Composable
 private fun NewGameButtonRowPreview() {
     AnankeTheme {
-        Row(
-            modifier = Modifier.width(IntrinsicSize.Min),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            AnankeButton(onClick = {}, Modifier.weight(1f)) {
-                AnankeText(
-                    text = "Button One",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .testTag("")
-                )
-            }
-            AnankeButton(onClick = {}, Modifier.weight(1f)) {
-                AnankeText(
-                    text = "Button Two",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .testTag("")
-                )
-            }
-        }
+        NewGameScreenButtonRow(
+            modifier = Modifier,
+            onAddNewGameClick = {},
+            onAddDummyGameClick = {}
+        )
     }
 }
