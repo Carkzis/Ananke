@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +16,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,11 +66,21 @@ fun NewGameScreen(
 
         Column(modifier = Modifier) {
 
+            AnankeText(
+                text = "Game Title",
+                textStyle = MaterialTheme.typography.titleMedium
+            )
+
             AnankeTextField(
                 modifier = modifier,
                 value = viewModel.gameTitle,
                 onValueChange = viewModel::updateGameTitle,
                 testTag = "${GameDestination.NEW}-game-title"
+            )
+
+            AnankeText(
+                text = "Game Description",
+                textStyle = MaterialTheme.typography.titleMedium
             )
 
             AnankeTextField(
@@ -126,11 +140,27 @@ private fun AnankeTextField(modifier: Modifier = Modifier, value: String, onValu
 @Preview
 @Composable
 private fun NewGameTitleTextViewPreview() {
-    AnankeTheme {"${GameDestination.NEW}-game-title"
+    AnankeTheme {
         AnankeTextField(
             value = "A Game Title",
             onValueChange = {},
-            testTag = "${GameDestination.NEW}-game-title"
+            testTag = ""
         )
+    }
+}
+
+@Preview
+@Composable
+private fun NewGameButtonPreview() {
+    AnankeTheme {
+        AnankeButton(
+            onClick = {}
+        ) {
+            AnankeText(
+                text = "Add Game",
+                modifier = Modifier
+                    .padding(8.dp)
+            )
+        }
     }
 }
