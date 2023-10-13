@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -26,7 +27,15 @@ fun GameScreen(
     val lazyListState = rememberLazyListState()
 
     LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
-        item { AnankeText(text = "Games", modifier = modifier.padding(8.dp).testTag("${GameDestination.HOME}-title")) }
+        item {
+            AnankeText(
+                text = "Games",
+                modifier = modifier
+                    .padding(8.dp)
+                    .testTag("${GameDestination.HOME}-title"),
+                textStyle = MaterialTheme.typography.headlineMedium
+            )
+        }
 
         games.value.forEach { game ->
             item(key = game.id) {
@@ -38,7 +47,9 @@ fun GameScreen(
             AnankeButton(onClick = onNewGameClick) {
                 AnankeText(
                     text = "Add New Game",
-                    modifier = modifier.padding(8.dp).testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
+                    modifier = modifier
+                        .padding(8.dp)
+                        .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
                 )
             }
         }

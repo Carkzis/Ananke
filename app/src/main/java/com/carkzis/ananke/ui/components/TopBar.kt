@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +19,13 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AnankeTopBar() {
     CenterAlignedTopAppBar(
-        title = { AnankeText(text = "Ananke", modifier = Modifier.padding(8.dp)) },
+        title = {
+            AnankeText(
+                text = "Ananke",
+                modifier = Modifier.padding(8.dp),
+                textStyle = MaterialTheme.typography.headlineLarge
+            )
+        },
         navigationIcon = {
             Icon(
                 imageVector = Icons.Filled.Search,

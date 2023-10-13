@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -40,7 +42,8 @@ fun NewGameScreen(
             text = "New Game",
             modifier = modifier
                 .padding(8.dp)
-                .testTag("${GameDestination.NEW}-title")
+                .testTag("${GameDestination.NEW}-title"),
+            textStyle = MaterialTheme.typography.headlineMedium
         )
 
         val keyboardController = LocalSoftwareKeyboardController.current
