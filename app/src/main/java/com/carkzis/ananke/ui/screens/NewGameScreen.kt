@@ -1,22 +1,21 @@
 package com.carkzis.ananke.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +29,6 @@ import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.theme.AnankeTheme
-import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -40,7 +38,6 @@ fun NewGameScreen(
     viewModel: NewGameViewModel = hiltViewModel(),
     onShowSnackbar: suspend (String) -> Boolean
 ) {
-
     Column {
         AnankeText(
             text = "New Game",
@@ -64,33 +61,38 @@ fun NewGameScreen(
             }
         }
 
-        Column(modifier = Modifier) {
+        AnankeText(
+            text = "Game Title",
+            textStyle = MaterialTheme.typography.titleMedium
+        )
 
-            AnankeText(
-                text = "Game Title",
-                textStyle = MaterialTheme.typography.titleMedium
-            )
+        AnankeTextField(
+            modifier = modifier,
+            value = viewModel.gameTitle,
+            onValueChange = viewModel::updateGameTitle,
+            testTag = "${GameDestination.NEW}-game-title"
+        )
 
-            AnankeTextField(
-                modifier = modifier,
-                value = viewModel.gameTitle,
-                onValueChange = viewModel::updateGameTitle,
-                testTag = "${GameDestination.NEW}-game-title"
-            )
+        AnankeText(
+            text = "Game Description",
+            textStyle = MaterialTheme.typography.titleMedium
+        )
 
-            AnankeText(
-                text = "Game Description",
-                textStyle = MaterialTheme.typography.titleMedium
-            )
+        AnankeTextField(
+            modifier = modifier,
+            value = viewModel.gameDescription,
+            onValueChange = viewModel::updateGameDescription,
+            testTag = "${GameDestination.NEW}-game-description"
+        )
 
-            AnankeTextField(
-                modifier = modifier,
-                value = viewModel.gameDescription,
-                onValueChange = viewModel::updateGameDescription,
-                testTag = "${GameDestination.NEW}-game-description"
-            )
-
-            AnankeButton(onClick = {
+        Row(
+            modifier = modifier
+                .height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            AnankeButton(
+                modifier = modifier.weight(1f).fillMaxHeight(),
+                onClick = {
                 viewModel.addNewGame(NewGame(viewModel.gameTitle, viewModel.gameDescription))
             }) {
                 AnankeText(
@@ -101,8 +103,14 @@ fun NewGameScreen(
                 )
             }
 
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
             // Test button.
-            AnankeButton(onClick = {
+            AnankeButton(
+                modifier = modifier.weight(1f).fillMaxHeight(),
+                onClick = {
                 viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable."))
                 onAddGameClick()
             }) {
@@ -118,7 +126,12 @@ fun NewGameScreen(
 }
 
 @Composable
-private fun AnankeTextField(modifier: Modifier = Modifier, value: String, onValueChange: (String) -> Unit, testTag: String) {
+private fun AnankeTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    testTag: String
+) {
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -161,6 +174,34 @@ private fun NewGameButtonPreview() {
                 modifier = Modifier
                     .padding(8.dp)
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun NewGameButtonRowPreview() {
+    AnankeTheme {
+        Row(
+            modifier = Modifier.width(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            AnankeButton(onClick = {}, Modifier.weight(1f)) {
+                AnankeText(
+                    text = "Button One",
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .testTag("")
+                )
+            }
+            AnankeButton(onClick = {}, Modifier.weight(1f)) {
+                AnankeText(
+                    text = "Button Two",
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .testTag("")
+                )
+            }
         }
     }
 }
