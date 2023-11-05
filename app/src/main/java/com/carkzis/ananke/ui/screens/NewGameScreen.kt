@@ -33,6 +33,7 @@ fun NewGameScreen(
     modifier: Modifier = Modifier,
     onAddGameClick: () -> Unit,
     gameTitle: String,
+    gameDescription: String,
     viewModel: NewGameViewModel = hiltViewModel(),
     onShowSnackbar: suspend (String) -> Boolean
 ) {
@@ -41,8 +42,8 @@ fun NewGameScreen(
     LazyColumn {
         newGameTitle(modifier)
         gameTitleTextField(modifier, viewModel, gameTitle)
-        gameDescriptionTextField(modifier, viewModel)
-        addGameButtonRow(modifier, viewModel, gameTitle)
+        gameDescriptionTextField(modifier, viewModel, gameDescription)
+        addGameButtonRow(modifier, viewModel, gameTitle, gameDescription)
     }
 }
 
@@ -75,14 +76,15 @@ private fun LazyListScope.gameTitleTextField(
 
 private fun LazyListScope.gameDescriptionTextField(
     modifier: Modifier,
-    viewModel: NewGameViewModel
+    viewModel: NewGameViewModel,
+    gameDescription: String
 ) {
     item {
         AnankeMediumTitleText(modifier = modifier, text = "Game Description")
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-description"),
             lines = 3,
-            value = viewModel.gameDescription,
+            value = gameDescription,
             onValueChange = viewModel::updateGameDescription
         )
     }
@@ -91,7 +93,8 @@ private fun LazyListScope.gameDescriptionTextField(
 private fun LazyListScope.addGameButtonRow(
     modifier: Modifier,
     viewModel: NewGameViewModel,
-    gameTitle: String
+    gameTitle: String,
+    gameDescription: String
 ) {
     item {
         Spacer(modifier = Modifier.height(8.dp))
@@ -101,7 +104,7 @@ private fun LazyListScope.addGameButtonRow(
                 viewModel.addNewGame(
                     NewGame(
                         gameTitle,
-                        viewModel.gameDescription
+                        gameDescription
                     )
                 )
             },

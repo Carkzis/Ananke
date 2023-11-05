@@ -26,11 +26,8 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
     private val _gameTitle = MutableStateFlow("")
     val gameTitle = _gameTitle.asStateFlow()
 
-//    var gameTitle by mutableStateOf("")
-//        private set
-
-    var gameDescription by mutableStateOf("")
-        private set
+    private val _gameDescription = MutableStateFlow("")
+    val gameDescription = _gameDescription.asStateFlow()
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
@@ -51,7 +48,7 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
     fun updateGameDescription(description: String) {
         setText(
             description,
-            { gameDescription = it },
+            { _gameDescription.value = it },
             descriptionValidator(),
             NewGameValidatorResponse::asDescriptionMessage
         )

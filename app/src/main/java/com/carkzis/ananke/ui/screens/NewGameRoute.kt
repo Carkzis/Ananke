@@ -14,11 +14,13 @@ fun NewGameRoute(
     onShowSnackbar: suspend (String) -> Boolean
 ) {
     val gameTitle by viewModel.gameTitle.collectAsStateWithLifecycle()
+    val gameDescription by viewModel.gameDescription.collectAsStateWithLifecycle()
 
     NewGameScreen(
         modifier = modifier,
         viewModel = viewModel,
         gameTitle = gameTitle,
+        gameDescription = gameDescription,
         onAddGameClick = onAddGameClick,
         onShowSnackbar = onShowSnackbar
     )
