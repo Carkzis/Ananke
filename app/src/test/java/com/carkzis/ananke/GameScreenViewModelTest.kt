@@ -1,7 +1,6 @@
 package com.carkzis.ananke
 
 import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.dummyGames
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.GameScreenViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -9,7 +8,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,4 +39,9 @@ class GameScreenViewModelTest {
         collection.cancel()
     }
 
+    fun dummyGames() = listOf(
+        Game("abc", "My First Game", "It is the first one."),
+        Game("def", "My Second Game", "It is the second one."),
+        Game("ghi", "My Third Game", "It is the third one.")
+    )
 }

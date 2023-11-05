@@ -166,7 +166,7 @@ private fun NewGameScreenButtonRow(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun NewGameTitleTextViewPreview() {
     AnankeTheme {
@@ -177,7 +177,19 @@ private fun NewGameTitleTextViewPreview() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
+@Composable
+private fun NewGameDescriptionTextViewPreview() {
+    AnankeTheme {
+        AnankeTextField(
+            value = "A Game Title",
+            lines = 3,
+            onValueChange = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
 @Composable
 private fun NewGameButtonPreview() {
     AnankeTheme {
@@ -193,7 +205,7 @@ private fun NewGameButtonPreview() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun NewGameButtonRowPreview() {
     AnankeTheme {
@@ -201,6 +213,23 @@ private fun NewGameButtonRowPreview() {
             modifier = Modifier,
             onAddNewGameClick = {},
             onAddDummyGameClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NewGameScreenPreview() {
+    AnankeTheme {
+        NewGameScreen(
+            gameTitle = "A Title",
+            gameDescription = "A Description",
+            onTitleValueChanged = {},
+            onDescriptionValueChanged = {},
+            onAddGameClick = {},
+            onAddDummyGameClick = {},
+            onAddGameSucceeds = {},
+            onShowSnackbar = {}
         )
     }
 }

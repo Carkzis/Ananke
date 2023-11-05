@@ -66,6 +66,32 @@ fun AnankeMediumTitleText(modifier: Modifier = Modifier, text: String) {
 
 @Preview(showBackground = true)
 @Composable
-fun Text() {
+fun AnankeTextPreview() {
     AnankeText(text = "Hello world!")
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnankeTextFieldOneLinePreview() {
+    AnankeTextField(
+        value = "Hello world!",
+        lines = 1,
+        onValueChange = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnankeTextFieldThreeLinePreview() {
+    AnankeTextField(
+        value = "Hello world!",
+        lines = 3,
+        onValueChange = {},
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnankeMediumTitleText() {
+    AnankeMediumTitleText(text = "Hello world!")
 }
