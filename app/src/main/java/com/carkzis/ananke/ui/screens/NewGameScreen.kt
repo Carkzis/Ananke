@@ -6,19 +6,14 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,10 +22,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
+import com.carkzis.ananke.ui.components.AnankeMediumTitleText
 import com.carkzis.ananke.ui.components.AnankeText
+import com.carkzis.ananke.ui.components.AnankeTextField
 import com.carkzis.ananke.ui.theme.AnankeTheme
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NewGameScreen(
     modifier: Modifier = Modifier,
@@ -38,6 +34,8 @@ fun NewGameScreen(
     viewModel: NewGameViewModel = hiltViewModel(),
     onShowSnackbar: suspend (String) -> Boolean
 ) {
+    NewGameLaunchedEffects(viewModel, onShowSnackbar, onAddGameClick)
+
     Column {
         AnankeText(
             text = "New Game",
@@ -47,49 +45,64 @@ fun NewGameScreen(
             textStyle = MaterialTheme.typography.headlineMedium
         )
 
-        val keyboardController = LocalSoftwareKeyboardController.current
-        LaunchedEffect(Unit) {
-            viewModel.message.collect {
-                keyboardController?.hide()
-                onShowSnackbar(it)
-            }
-        }
-
-        LaunchedEffect(Unit) {
-            viewModel.addGameSuccessEvent.collect { wasSuccessful ->
-                if (wasSuccessful) onAddGameClick()
-            }
-        }
-
-        AnankeText(
-            text = "Game Title",
-            textStyle = MaterialTheme.typography.titleMedium
-        )
-
+        // TODO: also increase size of description box
+        AnankeMediumTitleText(modifier = modifier, text = "Game Title")
         AnankeTextField(
-            modifier = modifier,
+            modifier = modifier.testTag("${GameDestination.NEW}-game-title"),
             value = viewModel.gameTitle,
-            onValueChange = viewModel::updateGameTitle,
-            testTag = "${GameDestination.NEW}-game-title"
+            onValueChange = viewModel::updateGameTitle
         )
 
-        AnankeText(
-            text = "Game Description",
-            textStyle = MaterialTheme.typography.titleMedium
-        )
-
+        AnankeMediumTitleText(modifier = modifier, text = "Game Description")
         AnankeTextField(
-            modifier = modifier,
+            modifier = modifier.testTag("${GameDestination.NEW}-game-description"),
             value = viewModel.gameDescription,
-            onValueChange = viewModel::updateGameDescription,
-            testTag = "${GameDestination.NEW}-game-description"
+            onValueChange = viewModel::updateGameDescription
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         NewGameScreenButtonRow(
             modifier = modifier,
-            onAddNewGameClick = { viewModel.addNewGame(NewGame(viewModel.gameTitle, viewModel.gameDescription)) },
-            onAddDummyGameClick = { viewModel.addNewGame(NewGame("Marc's Game", "It is indescribable.")) }
+            onAddNewGameClick = {
+                viewModel.addNewGame(
+                    NewGame(
+                        viewModel.gameTitle,
+                        viewModel.gameDescription
+                    )
+                )
+            },
+            onAddDummyGameClick = {
+                viewModel.addNewGame(
+                    NewGame(
+                        "Marc's Game",
+                        "It is indescribable."
+                    )
+                )
+            }
         )
+    }
+}
+
+@Composable
+@OptIn(ExperimentalComposeUiApi::class)
+private fun NewGameLaunchedEffects(
+    viewModel: NewGameViewModel,
+    onShowSnackbar: suspend (String) -> Boolean,
+    onAddGameClick: () -> Unit
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(Unit) {
+        viewModel.message.collect {
+            keyboardController?.hide()
+            onShowSnackbar(it)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.addGameSuccessEvent.collect { wasSuccessful ->
+            if (wasSuccessful) onAddGameClick()
+        }
     }
 }
 
@@ -104,6 +117,8 @@ private fun NewGameScreenButtonRow(
             .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.width(8.dp))
+
         AnankeButton(
             modifier = modifier
                 .weight(1f)
@@ -118,8 +133,10 @@ private fun NewGameScreenButtonRow(
                     .testTag("${GameDestination.NEW}-addnewgame-button")
             )
         }
+
         Spacer(modifier = Modifier.width(8.dp))
-        // Test button.
+
+        // TEST BUTTON
         AnankeButton(
             modifier = modifier
                 .weight(1f)
@@ -134,33 +151,9 @@ private fun NewGameScreenButtonRow(
                     .testTag("${GameDestination.NEW}-addnewgame-button-dummy")
             )
         }
+
         Spacer(modifier = Modifier.width(8.dp))
     }
-}
-
-@Composable
-private fun AnankeTextField(
-    modifier: Modifier = Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
-    testTag: String
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        shape = RoundedCornerShape(16.dp),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Green,
-            unfocusedContainerColor = Color.Green,
-            focusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .testTag(testTag)
-    )
 }
 
 @Preview
@@ -170,7 +163,6 @@ private fun NewGameTitleTextViewPreview() {
         AnankeTextField(
             value = "A Game Title",
             onValueChange = {},
-            testTag = ""
         )
     }
 }
