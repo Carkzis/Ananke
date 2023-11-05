@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.assertIsDisplayed
@@ -14,9 +15,11 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.DummyNewGameViewModel
 import com.carkzis.ananke.ui.screens.NewGameMessage
+import com.carkzis.ananke.ui.screens.NewGameRoute
 import com.carkzis.ananke.ui.screens.NewGameScreen
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -53,8 +56,11 @@ class NewGameScreenTest {
         composeTestRule.apply {
             composeTestRule.setContent {
                 snackbarHostState = remember { SnackbarHostState() }
-                NewGameScreen(
-                    onAddGameClick = { redirected = true },
+                /*
+                Using NewGameRoute to allow control of dynamically changing
+                the text in the text fields.
+                 */
+                NewGameRoute(onAddGameClick = { redirected = true },
                     viewModel = DummyNewGameViewModel(),
                     onShowSnackbar = { message ->
                         snackbarHostState.showSnackbar(

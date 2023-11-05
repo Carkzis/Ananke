@@ -32,6 +32,7 @@ import com.carkzis.ananke.ui.theme.AnankeTheme
 fun NewGameScreen(
     modifier: Modifier = Modifier,
     onAddGameClick: () -> Unit,
+    gameTitle: String,
     viewModel: NewGameViewModel = hiltViewModel(),
     onShowSnackbar: suspend (String) -> Boolean
 ) {
@@ -39,9 +40,9 @@ fun NewGameScreen(
 
     LazyColumn {
         newGameTitle(modifier)
-        gameTitleTextField(modifier, viewModel)
+        gameTitleTextField(modifier, viewModel, gameTitle)
         gameDescriptionTextField(modifier, viewModel)
-        addGameButtonRow(modifier, viewModel)
+        addGameButtonRow(modifier, viewModel, gameTitle)
     }
 }
 
@@ -59,13 +60,14 @@ private fun LazyListScope.newGameTitle(modifier: Modifier) {
 
 private fun LazyListScope.gameTitleTextField(
     modifier: Modifier,
-    viewModel: NewGameViewModel
+    viewModel: NewGameViewModel,
+    gameTitle: String
 ) {
     item {
         AnankeMediumTitleText(modifier = modifier, text = "Game Title")
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-title"),
-            value = viewModel.gameTitle,
+            value = gameTitle,
             onValueChange = viewModel::updateGameTitle
         )
     }
@@ -88,7 +90,8 @@ private fun LazyListScope.gameDescriptionTextField(
 
 private fun LazyListScope.addGameButtonRow(
     modifier: Modifier,
-    viewModel: NewGameViewModel
+    viewModel: NewGameViewModel,
+    gameTitle: String
 ) {
     item {
         Spacer(modifier = Modifier.height(8.dp))
@@ -97,7 +100,7 @@ private fun LazyListScope.addGameButtonRow(
             onAddNewGameClick = {
                 viewModel.addNewGame(
                     NewGame(
-                        viewModel.gameTitle,
+                        gameTitle,
                         viewModel.gameDescription
                     )
                 )

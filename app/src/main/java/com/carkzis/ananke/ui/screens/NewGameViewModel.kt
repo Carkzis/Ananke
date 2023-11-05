@@ -13,7 +13,9 @@ import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MINIMUM_GAME_DES
 import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MINIMUM_GAME_TITLE_LENGTH
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,8 +23,11 @@ import javax.inject.Inject
 open class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
     ViewModel() {
 
-    var gameTitle by mutableStateOf("")
-        private set
+    private val _gameTitle = MutableStateFlow("")
+    val gameTitle = _gameTitle.asStateFlow()
+
+//    var gameTitle by mutableStateOf("")
+//        private set
 
     var gameDescription by mutableStateOf("")
         private set
@@ -37,7 +42,7 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
         val titleValidator = titleValidator(minLength = 0)
         setText(
             title,
-            { gameTitle = it },
+            { _gameTitle.value = it },
             titleValidator,
             NewGameValidatorResponse::asTitleMessage
         )

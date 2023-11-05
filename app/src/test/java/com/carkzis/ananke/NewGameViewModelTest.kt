@@ -77,14 +77,14 @@ class NewGameViewModelTest {
 
     @Test
     fun `view model holds empty string for game title`() = runTest {
-        assertEquals("", viewModel.gameTitle)
+        assertEquals("", viewModel.gameTitle.value)
     }
 
     @Test
     fun `view model sets new game title`() = runTest {
         val expectedGameTitle = "Super Ananke Bros."
         viewModel.updateGameTitle(expectedGameTitle)
-        assertEquals(expectedGameTitle, viewModel.gameTitle)
+        assertEquals(expectedGameTitle, viewModel.gameTitle.value)
     }
 
     @Test
@@ -122,7 +122,7 @@ class NewGameViewModelTest {
     fun `view model does not sets new game title if too long`() = runTest {
         val longGameTitle = "LONG".repeat(8) // 32 characters
         viewModel.updateGameTitle(longGameTitle)
-        assertEquals("", viewModel.gameTitle)
+        assertEquals("", viewModel.gameTitle.value)
     }
 
     @Test
