@@ -1,7 +1,6 @@
 package com.carkzis.ananke.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +37,16 @@ fun NewGameScreen(
 ) {
     NewGameLaunchedEffects(viewModel, onShowSnackbar, onAddGameClick)
 
-    Column {
+    LazyColumn {
+        newGameTitle(modifier)
+        gameTitleTextField(modifier, viewModel)
+        gameDescriptionTextField(modifier, viewModel)
+        addGameButtonRow(modifier, viewModel)
+    }
+}
+
+private fun LazyListScope.newGameTitle(modifier: Modifier) {
+    item {
         AnankeText(
             text = "New Game",
             modifier = modifier
@@ -44,14 +54,28 @@ fun NewGameScreen(
                 .testTag("${GameDestination.NEW}-title"),
             textStyle = MaterialTheme.typography.headlineMedium
         )
+    }
+}
 
+private fun LazyListScope.gameTitleTextField(
+    modifier: Modifier,
+    viewModel: NewGameViewModel
+) {
+    item {
         AnankeMediumTitleText(modifier = modifier, text = "Game Title")
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-title"),
             value = viewModel.gameTitle,
             onValueChange = viewModel::updateGameTitle
         )
+    }
+}
 
+private fun LazyListScope.gameDescriptionTextField(
+    modifier: Modifier,
+    viewModel: NewGameViewModel
+) {
+    item {
         AnankeMediumTitleText(modifier = modifier, text = "Game Description")
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-description"),
@@ -59,9 +83,15 @@ fun NewGameScreen(
             value = viewModel.gameDescription,
             onValueChange = viewModel::updateGameDescription
         )
+    }
+}
 
+private fun LazyListScope.addGameButtonRow(
+    modifier: Modifier,
+    viewModel: NewGameViewModel
+) {
+    item {
         Spacer(modifier = Modifier.height(8.dp))
-
         NewGameScreenButtonRow(
             modifier = modifier,
             onAddNewGameClick = {
