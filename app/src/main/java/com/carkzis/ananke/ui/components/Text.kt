@@ -32,6 +32,7 @@ fun AnankeText(
 @Composable
 fun AnankeTextField(
     modifier: Modifier = Modifier,
+    lines: Int = 1,
     value: String,
     onValueChange: (String) -> Unit
 ) {
@@ -46,6 +47,8 @@ fun AnankeTextField(
             disabledIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         ),
+        minLines = lines,
+        maxLines = lines,
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)

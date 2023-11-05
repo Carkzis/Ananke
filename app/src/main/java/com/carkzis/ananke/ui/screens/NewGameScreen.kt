@@ -45,7 +45,6 @@ fun NewGameScreen(
             textStyle = MaterialTheme.typography.headlineMedium
         )
 
-        // TODO: also increase size of description box
         AnankeMediumTitleText(modifier = modifier, text = "Game Title")
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-title"),
@@ -56,6 +55,7 @@ fun NewGameScreen(
         AnankeMediumTitleText(modifier = modifier, text = "Game Description")
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-description"),
+            lines = 3,
             value = viewModel.gameDescription,
             onValueChange = viewModel::updateGameDescription
         )
