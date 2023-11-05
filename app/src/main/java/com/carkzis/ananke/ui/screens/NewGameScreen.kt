@@ -13,14 +13,10 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeMediumTitleText
@@ -31,19 +27,22 @@ import com.carkzis.ananke.ui.theme.AnankeTheme
 @Composable
 fun NewGameScreen(
     modifier: Modifier = Modifier,
-    onAddGameClick: () -> Unit,
     gameTitle: String,
     gameDescription: String,
-    viewModel: NewGameViewModel = hiltViewModel(),
-    onShowSnackbar: suspend (String) -> Boolean
+    onTitleValueChanged: (String) -> Unit,
+    onDescriptionValueChanged: (String) -> Unit,
+    onAddGameClick: () -> Unit,
+    onAddDummyGameClick: () -> Unit,
+    onAddGameSucceeds: suspend () -> Unit,
+    onShowSnackbar: suspend () -> Unit
 ) {
-    NewGameLaunchedEffects(viewModel, onShowSnackbar, onAddGameClick)
+    NewGameLaunchedEffects(onAddGameSucceeds, onShowSnackbar)
 
     LazyColumn {
         newGameTitle(modifier)
-        gameTitleTextField(modifier, viewModel, gameTitle)
-        gameDescriptionTextField(modifier, viewModel, gameDescription)
-        addGameButtonRow(modifier, viewModel, gameTitle, gameDescription)
+        gameTitleTextField(modifier, gameTitle, onTitleValueChanged)
+        gameDescriptionTextField(modifier, gameDescription, onDescriptionValueChanged)
+        addGameButtonRow(modifier, onAddGameClick, onAddDummyGameClick)
     }
 }
 
@@ -61,23 +60,23 @@ private fun LazyListScope.newGameTitle(modifier: Modifier) {
 
 private fun LazyListScope.gameTitleTextField(
     modifier: Modifier,
-    viewModel: NewGameViewModel,
-    gameTitle: String
+    gameTitle: String,
+    onTitleValueChanged: (String) -> Unit
 ) {
     item {
         AnankeMediumTitleText(modifier = modifier, text = "Game Title")
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-title"),
             value = gameTitle,
-            onValueChange = viewModel::updateGameTitle
+            onValueChange = onTitleValueChanged
         )
     }
 }
 
 private fun LazyListScope.gameDescriptionTextField(
     modifier: Modifier,
-    viewModel: NewGameViewModel,
-    gameDescription: String
+    gameDescription: String,
+    onDescriptionValueChanged: (String) -> Unit
 ) {
     item {
         AnankeMediumTitleText(modifier = modifier, text = "Game Description")
@@ -85,60 +84,37 @@ private fun LazyListScope.gameDescriptionTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-description"),
             lines = 3,
             value = gameDescription,
-            onValueChange = viewModel::updateGameDescription
+            onValueChange = onDescriptionValueChanged
         )
     }
 }
 
 private fun LazyListScope.addGameButtonRow(
     modifier: Modifier,
-    viewModel: NewGameViewModel,
-    gameTitle: String,
-    gameDescription: String
+    onAddGameClick: () -> Unit,
+    onAddDummyGameClick: () -> Unit
 ) {
     item {
         Spacer(modifier = Modifier.height(8.dp))
         NewGameScreenButtonRow(
             modifier = modifier,
-            onAddNewGameClick = {
-                viewModel.addNewGame(
-                    NewGame(
-                        gameTitle,
-                        gameDescription
-                    )
-                )
-            },
-            onAddDummyGameClick = {
-                viewModel.addNewGame(
-                    NewGame(
-                        "Marc's Game",
-                        "It is indescribable."
-                    )
-                )
-            }
+            onAddNewGameClick = onAddGameClick,
+            onAddDummyGameClick = onAddDummyGameClick
         )
     }
 }
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
 private fun NewGameLaunchedEffects(
-    viewModel: NewGameViewModel,
-    onShowSnackbar: suspend (String) -> Boolean,
-    onAddGameClick: () -> Unit
+    onAddGameSucceeds: suspend () -> Unit,
+    onShowSnackbar: suspend () -> Unit
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(Unit) {
-        viewModel.message.collect {
-            keyboardController?.hide()
-            onShowSnackbar(it)
-        }
+        onAddGameSucceeds()
     }
 
     LaunchedEffect(Unit) {
-        viewModel.addGameSuccessEvent.collect { wasSuccessful ->
-            if (wasSuccessful) onAddGameClick()
-        }
+        onShowSnackbar()
     }
 }
 
@@ -159,9 +135,8 @@ private fun NewGameScreenButtonRow(
             modifier = modifier
                 .weight(1f)
                 .fillMaxHeight(),
-            onClick = {
-                onAddNewGameClick()
-            }) {
+            onClick = onAddNewGameClick
+            ) {
             AnankeText(
                 text = "Add Game",
                 modifier = modifier
@@ -172,14 +147,13 @@ private fun NewGameScreenButtonRow(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // TEST BUTTON
+        // TEST BUTTON.
         AnankeButton(
             modifier = modifier
                 .weight(1f)
                 .fillMaxHeight(),
-            onClick = {
-                onAddDummyGameClick()
-            }) {
+            onClick = onAddDummyGameClick
+        ) {
             AnankeText(
                 text = "Add Dummy Game",
                 modifier = modifier
