@@ -1,16 +1,12 @@
-package com.carkzis.ananke.ui.screens
+package com.carkzis.ananke.ui.screens.nugame
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
-import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MAXIMUM_GAME_DESCRIPTION_LENGTH
-import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MAXIMUM_GAME_TITLE_LENGTH
-import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MINIMUM_GAME_DESCRIPTION_LENGTH
-import com.carkzis.ananke.ui.screens.NewGameConstants.Companion.MINIMUM_GAME_TITLE_LENGTH
+import com.carkzis.ananke.ui.screens.ValidatorResponse
+import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.descriptionValidator
+import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.titleValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,22 +90,5 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
 
         return true
     }
-
-    private fun titleValidator(
-        minLength: Int = MINIMUM_GAME_TITLE_LENGTH,
-        maxLength: Int = MAXIMUM_GAME_TITLE_LENGTH
-    ) = NewGameTextValidator(listOf(
-        { text -> if (text.isEmpty() && minLength != 0) NewGameValidatorResponse.TITLE_EMPTY else NewGameValidatorResponse.PASS },
-        { text -> if (text.length < minLength) NewGameValidatorResponse.TITLE_TOO_SHORT else NewGameValidatorResponse.PASS },
-        { text -> if (text.length > maxLength) NewGameValidatorResponse.TITLE_TOO_LONG else NewGameValidatorResponse.PASS }
-    ))
-
-    private fun descriptionValidator(
-        minLength: Int = MINIMUM_GAME_DESCRIPTION_LENGTH,
-        maxLength: Int = MAXIMUM_GAME_DESCRIPTION_LENGTH
-    ) =
-        NewGameTextValidator(listOf { text ->
-            if (text.length > maxLength) NewGameValidatorResponse.DESCRIPTION_TOO_LONG else NewGameValidatorResponse.PASS
-        })
 
 }

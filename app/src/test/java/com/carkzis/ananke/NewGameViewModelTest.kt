@@ -3,8 +3,8 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.NewGameMessage
-import com.carkzis.ananke.ui.screens.NewGameViewModel
+import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure
+import com.carkzis.ananke.ui.screens.nugame.NewGameViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -97,7 +97,7 @@ class NewGameViewModelTest {
         val longGameTitle = "LONG".repeat(8) // 32 characters
         viewModel.updateGameTitle(longGameTitle)
 
-        assertEquals(NewGameMessage.GAME_TITLE_TOO_LONG.message, message)
+        assertEquals(NewGameValidatorFailure.TITLE_TOO_LONG.message, message)
 
         collection.cancel()
     }
@@ -134,7 +134,7 @@ class NewGameViewModelTest {
 
         viewModel.addNewGame(NewGame("", ""))
 
-        assertEquals(NewGameMessage.GAME_TITLE_EMPTY.message, messages.firstOrNull())
+        assertEquals(NewGameValidatorFailure.TITLE_EMPTY.message, messages.firstOrNull())
         assertEquals(1, messages.size)
 
         collection.cancel()
@@ -149,7 +149,7 @@ class NewGameViewModelTest {
 
         viewModel.addNewGame(NewGame("Shor", ""))
 
-        assertEquals(NewGameMessage.GAME_TITLE_TOO_SHORT.message, messages.firstOrNull())
+        assertEquals(NewGameValidatorFailure.TITLE_TOO_SHORT.message, messages.firstOrNull())
         assertEquals(1, messages.size)
 
         collection.cancel()
@@ -165,7 +165,7 @@ class NewGameViewModelTest {
         val longGameDescription = "LONG".repeat(51) // 204 characters
         viewModel.addNewGame(NewGame("A Game With No Description", longGameDescription))
 
-        assertEquals(NewGameMessage.GAME_DESCRIPTION_TOO_LONG.message, messages.firstOrNull())
+        assertEquals(NewGameValidatorFailure.DESCRIPTION_TOO_LONG.message, messages.firstOrNull())
         assertEquals(1, messages.size)
 
         collection.cancel()
@@ -193,7 +193,7 @@ class NewGameViewModelTest {
         val longGameDescription = "LONG".repeat(51) // 204 characters
         viewModel.updateGameDescription(longGameDescription)
 
-        assertEquals(NewGameMessage.GAME_DESCRIPTION_TOO_LONG.message, message)
+        assertEquals(NewGameValidatorFailure.DESCRIPTION_TOO_LONG.message, message)
 
         collection.cancel()
     }

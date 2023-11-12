@@ -4,23 +4,17 @@ import androidx.activity.ComponentActivity
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.DummyNewGameViewModel
-import com.carkzis.ananke.ui.screens.NewGameMessage
-import com.carkzis.ananke.ui.screens.NewGameRoute
-import com.carkzis.ananke.ui.screens.NewGameScreen
+import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
+import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -126,7 +120,7 @@ class NewGameScreenTest {
             runBlocking {
                 val actualSnackbarText = snapshotFlow { snackbarHostState.currentSnackbarData }
                     .filterNotNull().first().visuals.message
-                val expectedSnackbarText = NewGameMessage.GAME_TITLE_EMPTY.message
+                val expectedSnackbarText = NewGameValidatorFailure.TITLE_EMPTY.message
                 assertEquals(expectedSnackbarText, actualSnackbarText)
             }
         }
