@@ -20,7 +20,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) : ViewModel() {
+open class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
+    ViewModel() {
 
     private val _gameTitle = MutableStateFlow("")
     val gameTitle = _gameTitle.asStateFlow()
@@ -35,12 +36,10 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
     val addGameSuccessEvent = _addGameSuccessEvent.asSharedFlow()
 
     fun updateGameTitle(title: String) {
-        val titleValidator = titleValidator(minLength = 0)
         setText(
             title,
             { _gameTitle.value = it },
-            titleValidator,
-            NewGameValidatorResponse::asTitleMessage
+            titleValidator(minLength = 0)
         )
     }
 
@@ -48,8 +47,7 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
         setText(
             description,
             { _gameDescription.value = it },
-            descriptionValidator(),
-            NewGameValidatorResponse::asDescriptionMessage
+            descriptionValidator()
         )
     }
 
@@ -67,14 +65,13 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
     private fun setText(
         updatedText: String,
         onValidatedText: (String) -> Unit,
-        textValidator: NewGameTextValidator,
-        messageForValidation: (NewGameValidatorResponse) -> String
+        textValidator: NewGameTextValidator
     ) {
         val textValidation = textValidator.validateText(updatedText)
 
-        if (textValidation != NewGameValidatorResponse.PASS) {
+        if (textValidation is ValidatorResponse.Fail) {
             viewModelScope.launch {
-                _message.emit(messageForValidation(textValidation))
+                _message.emit(textValidation.failureMessage)
             }
         } else {
             onValidatedText(updatedText)
@@ -85,16 +82,14 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
         val titleValidation = titleValidator().validateText(newGame.name)
         val descriptionValidation = descriptionValidator().validateText(newGame.description)
 
-        when {
-            titleValidation != NewGameValidatorResponse.PASS -> {
-                _message.emit(titleValidation.asTitleMessage())
-                return false
-            }
+        if (titleValidation is ValidatorResponse.Fail) {
+            _message.emit(titleValidation.failureMessage)
+            return false
+        }
 
-            descriptionValidation != NewGameValidatorResponse.PASS -> {
-                _message.emit(descriptionValidation.asDescriptionMessage())
-                return false
-            }
+        if (descriptionValidation is ValidatorResponse.Fail) {
+            _message.emit(descriptionValidation.failureMessage)
+            return false
         }
 
         return true
@@ -104,9 +99,9 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
         minLength: Int = MINIMUM_GAME_TITLE_LENGTH,
         maxLength: Int = MAXIMUM_GAME_TITLE_LENGTH
     ) = NewGameTextValidator(listOf(
-        { text -> if (text.isEmpty() && minLength != 0) NewGameValidatorResponse.EMPTY else NewGameValidatorResponse.PASS },
-        { text -> if (text.length < minLength) NewGameValidatorResponse.TOO_SHORT else NewGameValidatorResponse.PASS },
-        { text -> if (text.length > maxLength) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS }
+        { text -> if (text.isEmpty() && minLength != 0) NewGameValidatorResponse.TITLE_EMPTY else NewGameValidatorResponse.PASS },
+        { text -> if (text.length < minLength) NewGameValidatorResponse.TITLE_TOO_SHORT else NewGameValidatorResponse.PASS },
+        { text -> if (text.length > maxLength) NewGameValidatorResponse.TITLE_TOO_LONG else NewGameValidatorResponse.PASS }
     ))
 
     private fun descriptionValidator(
@@ -114,7 +109,7 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
         maxLength: Int = MAXIMUM_GAME_DESCRIPTION_LENGTH
     ) =
         NewGameTextValidator(listOf { text ->
-            if (text.length > maxLength) NewGameValidatorResponse.TOO_LONG else NewGameValidatorResponse.PASS
+            if (text.length > maxLength) NewGameValidatorResponse.DESCRIPTION_TOO_LONG else NewGameValidatorResponse.PASS
         })
 
 }
