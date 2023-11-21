@@ -1,6 +1,7 @@
 package com.carkzis.ananke
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.AnankeDatabase
@@ -52,6 +53,16 @@ class GameDaoTest {
     fun `gameDao inserts new game entity`() = runTest {
         val newGame = GameEntity(1L, "aName", "aDescription")
         gameDao.insertGame(newGame)
+        assertTrue(gameDao.getGames().first().contains(newGame))
+    }
+
+    @Test(expected = SQLiteConstraintException::class)
+    fun `gameDao cannot insert new game entity with existing name`() = runTest {
+        val newGame = GameEntity(1L, "aName", "aDescription")
+        val newGameSameName = GameEntity(2L, "aName", "aDescription")
+        gameDao.insertGame(newGame)
+        gameDao.insertGame(newGameSameName)
+
         assertTrue(gameDao.getGames().first().contains(newGame))
     }
 

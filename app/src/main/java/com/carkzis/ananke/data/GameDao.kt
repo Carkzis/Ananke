@@ -2,6 +2,7 @@ package com.carkzis.ananke.data
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,6 @@ interface GameDao {
     @Upsert
     suspend fun upsertGames(gameEntities: List<GameEntity>)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.ABORT) // TODO: Catch this exception.
     suspend fun insertGame(game: GameEntity)
 }
