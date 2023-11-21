@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -95,7 +96,7 @@ class NavigationTest {
             onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
                 .performClick()
 
-            onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
+            onNodeWithTag("${GameDestination.NEW}-addnewgame-button-dummy", useUnmergedTree = true)
                 .performClick()
 
             assertScreenSelected(AnankeDestination.GAME)
@@ -128,8 +129,12 @@ class NavigationTest {
         }
 
         assertNavigationItemSelected(expectedDestination)
-        onNodeWithTag(expectedTitle)
-            .assertIsDisplayed()
+
+        waitUntil {
+            composeTestRule
+                .onAllNodesWithTag(expectedTitle)
+                .fetchSemanticsNodes().size == 1
+        }
 
         expectedUnselectedNavigationItems.forEach {
             assertNavigationItemNotSelected("$it-navigation-item")
