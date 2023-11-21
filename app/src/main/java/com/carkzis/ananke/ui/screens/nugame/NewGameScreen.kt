@@ -38,7 +38,7 @@ fun NewGameScreen(
 ) {
     NewGameLaunchedEffects(onAddGameSucceeds, onShowSnackbar)
 
-    LazyColumn {
+    LazyColumn(modifier = modifier.testTag("${GameDestination.NEW}-addnewgame-lazycolumn")) {
         newGameTitle(modifier)
         gameTitleTextField(modifier, gameTitle, onTitleValueChanged)
         gameDescriptionTextField(modifier, gameDescription, onDescriptionValueChanged)
