@@ -102,7 +102,7 @@ class NavigationTest {
                 .performTouchInput {
                     swipeUp()
                 }
-            
+
             onNodeWithTag("${GameDestination.NEW}-addnewgame-button-dummy", useUnmergedTree = true)
                 .performClick()
 

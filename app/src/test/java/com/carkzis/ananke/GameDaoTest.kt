@@ -62,8 +62,6 @@ class GameDaoTest {
         val newGameSameName = GameEntity(2L, "aName", "aDescription")
         gameDao.insertGame(newGame)
         gameDao.insertGame(newGameSameName)
-
-        assertTrue(gameDao.getGames().first().contains(newGame))
     }
 
 }

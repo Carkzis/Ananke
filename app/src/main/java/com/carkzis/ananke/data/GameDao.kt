@@ -16,6 +16,6 @@ interface GameDao {
     @Upsert
     suspend fun upsertGames(gameEntities: List<GameEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.ABORT) // TODO: Catch this exception.
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertGame(game: GameEntity)
 }

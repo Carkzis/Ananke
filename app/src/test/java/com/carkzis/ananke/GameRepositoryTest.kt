@@ -1,5 +1,6 @@
 package com.carkzis.ananke
 
+import android.database.sqlite.SQLiteConstraintException
 import com.carkzis.ananke.data.DefaultGameRepository
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameDao
@@ -44,6 +45,14 @@ class GameRepositoryTest {
         val newGame = NewGame("aName", "aDescription")
         gameRepository.addNewGame(newGame)
         assertTrue(getGamesEntitiesAsDomainObjects().contains(newGame.asGame()))
+    }
+
+    @Test(expected = SQLiteConstraintException::class)
+    fun `repository does not add duplicate game with exception`() = runTest {
+        val newGame = NewGame("aName", "aDescription")
+        val newGameSameName = NewGame("aName", "aDescription")
+        gameRepository.addNewGame(newGame)
+        gameRepository.addNewGame(newGameSameName)
     }
 
     private suspend fun getGamesEntitiesAsDomainObjects() =

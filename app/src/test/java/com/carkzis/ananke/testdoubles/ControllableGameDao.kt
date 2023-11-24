@@ -1,5 +1,6 @@
 package com.carkzis.ananke.testdoubles
 
+import android.database.sqlite.SQLiteConstraintException
 import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
 import kotlinx.coroutines.flow.Flow
@@ -21,8 +22,12 @@ class ControllableGameDao : GameDao {
 
     override suspend fun insertGame(game: GameEntity) {
         games.update { previousValues ->
+            previousValues.forEach {
+                if (game.name == it.name || game.id == it.id) {
+                    throw SQLiteConstraintException()
+                }
+            }
             (previousValues + game)
-                .distinctBy(GameEntity::id)
                 .sortedWith(idDescending())
         }
     }
