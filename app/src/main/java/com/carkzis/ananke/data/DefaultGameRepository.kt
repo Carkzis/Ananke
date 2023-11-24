@@ -1,5 +1,7 @@
 package com.carkzis.ananke.data
 
+import android.database.sqlite.SQLiteConstraintException
+import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -11,6 +13,10 @@ class DefaultGameRepository @Inject constructor(private val gameDao: GameDao) : 
     }
 
     override suspend fun addNewGame(newGame: NewGame) {
-        gameDao.insertGame(newGame.toEntity())
+        try {
+            gameDao.insertGame(newGame.toEntity())
+        } catch (e: SQLiteConstraintException) {
+            throw GameAlreadyExistsException()
+        }
     }
 }

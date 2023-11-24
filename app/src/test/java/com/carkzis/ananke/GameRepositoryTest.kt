@@ -10,6 +10,7 @@ import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameDao
 import com.carkzis.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -47,7 +48,7 @@ class GameRepositoryTest {
         assertTrue(getGamesEntitiesAsDomainObjects().contains(newGame.asGame()))
     }
 
-    @Test(expected = SQLiteConstraintException::class)
+    @Test(expected = GameAlreadyExistsException::class)
     fun `repository does not add duplicate game with exception`() = runTest {
         val newGame = NewGame("aName", "aDescription")
         val newGameSameName = NewGame("aName", "aDescription")
