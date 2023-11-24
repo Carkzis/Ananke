@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.NewGame
+import java.util.UUID
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -37,9 +38,10 @@ fun NewGameRoute(
             )
         },
         onAddDummyGameClick = {
+            val shortDummyGameUUID = UUID.randomUUID().toString().substring(0, 10)
             viewModel.addNewGame(
                 NewGame(
-                    "Marc's Game",
+                    "Marc's Game #$shortDummyGameUUID",
                     "It is indescribable."
                 )
             )
