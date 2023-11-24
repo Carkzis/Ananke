@@ -3,6 +3,7 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure
 import com.carkzis.ananke.ui.screens.nugame.NewGameViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -166,6 +167,23 @@ class NewGameViewModelTest {
         viewModel.addNewGame(NewGame("A Game With No Description", longGameDescription))
 
         assertEquals(NewGameValidatorFailure.DESCRIPTION_TOO_LONG.message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message about when attempting to add game that already exists`() = runTest {
+        val messages = mutableListOf<String>()
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.gameExists = true
+        viewModel.addNewGame(NewGame("A Game That Already Exists", "It already exists."))
+
+        assertEquals(GameAlreadyExistsException().message, messages.firstOrNull())
         assertEquals(1, messages.size)
 
         collection.cancel()

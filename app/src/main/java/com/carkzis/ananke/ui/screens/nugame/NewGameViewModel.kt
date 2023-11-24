@@ -50,8 +50,12 @@ open class NewGameViewModel @Inject constructor(private val gameRepository: Game
     fun addNewGame(newGame: NewGame) {
         viewModelScope.launch {
             if (validateGame(newGame)) {
-                gameRepository.addNewGame(newGame)
-                _addGameSuccessEvent.emit(true)
+                try {
+                    gameRepository.addNewGame(newGame)
+                    _addGameSuccessEvent.emit(true)
+                } catch (exception: GameAlreadyExistsException) {
+                    _message.emit(exception.message)
+                }
             } else {
                 _addGameSuccessEvent.emit(false)
             }
