@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.carkzis.ananke.ui.AnankeAppState
 import com.carkzis.ananke.ui.screens.GameScreen
-import com.carkzis.ananke.ui.screens.NewGameScreen
+import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
 import com.carkzis.ananke.ui.screens.TeamScreen
 import com.carkzis.ananke.ui.screens.YouScreen
 
@@ -15,6 +15,7 @@ import com.carkzis.ananke.ui.screens.YouScreen
 fun AnankeNavHost(
     modifier: Modifier = Modifier,
     appState: AnankeAppState,
+    onShowSnackbar: suspend (String) -> Boolean,
     startDestination: String = AnankeDestination.GAME.toString()
 ) {
     val navController = appState.navController
@@ -37,9 +38,9 @@ fun AnankeNavHost(
             composable(
                 route = "${AnankeDestination.GAME}/${GameDestination.NEW}"
             ) {
-                NewGameScreen(onAddGameClick = {
+                NewGameRoute(onAddGameClick = {
                     navController.popBackStack()
-                })
+                }, onShowSnackbar = onShowSnackbar)
             }
         }
         composable(route = AnankeDestination.TEAM.toString()) {

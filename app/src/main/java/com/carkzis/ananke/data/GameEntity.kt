@@ -1,10 +1,12 @@
 package com.carkzis.ananke.data
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "games"
+    tableName = "games",
+    indices = [Index(value = ["name"], unique = true)]
 )
 data class GameEntity(
     @PrimaryKey(autoGenerate = true)
