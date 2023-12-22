@@ -4,11 +4,13 @@ import android.database.sqlite.SQLiteConstraintException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class DefaultGameRepository @Inject constructor(private val gameDao: GameDao) : GameRepository {
+class DefaultGameRepository @Inject constructor(
+    private val gameDao: GameDao,
+    private val anankeDataStore: AnankeDataStore? = null
+) : GameRepository {
     override fun getGames(): Flow<List<Game>> = gameDao.getGames().map {
         it.map(GameEntity::toDomain)
     }
@@ -21,5 +23,9 @@ class DefaultGameRepository @Inject constructor(private val gameDao: GameDao) : 
         }
     }
 
-    override fun getCurrentGame(): Flow<Game?> = flow { emit(null) }
+    override fun getCurrentGame(): Flow<CurrentGame> = flow { emit(CurrentGame("-1")) }
+
+    override suspend fun updateCurrentGame(currentGame: CurrentGame) {
+        anankeDataStore?.setCurrentGameId(currentGame.id)
+    }
 }

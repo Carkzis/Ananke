@@ -7,5 +7,7 @@ interface GameRepository {
 
     suspend fun addNewGame(newGame: NewGame)
 
-    fun getCurrentGame(): Flow<Game?>
+    fun getCurrentGame(): Flow<CurrentGame>
+
+    suspend fun updateCurrentGame(currentGame: CurrentGame)
 }

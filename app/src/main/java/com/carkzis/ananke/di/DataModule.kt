@@ -1,7 +1,10 @@
 package com.carkzis.ananke.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
+import com.carkzis.ananke.data.AnankeDataStore
 import com.carkzis.ananke.data.AnankeDatabase
 import com.carkzis.ananke.data.DefaultGameRepository
 import com.carkzis.ananke.data.GameDao

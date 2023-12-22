@@ -1,6 +1,7 @@
 package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.asGame
+import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
@@ -27,7 +28,8 @@ class ControllableGameRepository : GameRepository {
         }
     }
 
-    override fun getCurrentGame(): Flow<Game?> = flow { null }
+    override fun getCurrentGame(): Flow<CurrentGame> = flow {}
+    override suspend fun updateCurrentGame(currentGame: CurrentGame) {}
 
     fun emitGames(newGames: List<Game>) {
         _games.tryEmit(newGames)

@@ -1,38 +1,51 @@
 package com.carkzis.ananke
 
-import android.database.sqlite.SQLiteConstraintException
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.carkzis.ananke.data.AnankeDataStore
+import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.DefaultGameRepository
-import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
 import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameDao
-import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameRepositoryTest {
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    @get:Rule
+    val tmpFolder: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
+
     private lateinit var gameRepository: GameRepository
     private lateinit var gameDao: GameDao
+    private lateinit var anankeDataStore: AnankeDataStore
 
     @Before
     fun setUp() {
+        val testDataStore = PreferenceDataStoreFactory.create(
+            scope = testScope,
+            produceFile = { tmpFolder.newFile("test_data_store.preferences_pb") }
+        )
+        anankeDataStore = AnankeDataStore(testDataStore)
         gameDao = ControllableGameDao()
-        gameRepository = DefaultGameRepository(gameDao)
+        gameRepository = DefaultGameRepository(gameDao, anankeDataStore)
     }
 
     @Test
@@ -58,9 +71,18 @@ class GameRepositoryTest {
     }
 
     @Test
-    fun `repository does not provide game data if not in a game`() = runTest {
+    fun `repository does not provide game data if not in a current game`() = runTest {
         val currentGame = gameRepository.getCurrentGame().first()
-        assertNull(currentGame)
+        val noGameId = "-1"
+        assertEquals(noGameId, currentGame.id)
+    }
+
+    @Test
+    fun `repository adds current game to preferences`() = runTest {
+        val currentGame = CurrentGame("12345")
+        gameRepository.updateCurrentGame(currentGame)
+
+        assertEquals(currentGame.id, anankeDataStore.data.first())
     }
 
     private suspend fun getGamesEntitiesAsDomainObjects() =
