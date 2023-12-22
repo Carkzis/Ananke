@@ -15,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -36,8 +37,8 @@ class GameRepositoryTest {
 
     @Test
     fun `repository provides expected list of games`() = runTest {
-        val expectedGames = dummyGameEntities.map(GameEntity::toDomain)
-        val actualGames = getGamesEntitiesAsDomainObjects()
+        val expectedGames = getGamesEntitiesAsDomainObjects()
+        val actualGames = gameRepository.getGames().first()
         assertEquals(expectedGames, actualGames)
     }
 
@@ -54,6 +55,12 @@ class GameRepositoryTest {
         val newGameSameName = NewGame("aName", "aDescription")
         gameRepository.addNewGame(newGame)
         gameRepository.addNewGame(newGameSameName)
+    }
+
+    @Test
+    fun `repository does not provide game data if not in a game`() = runTest {
+        val currentGame = gameRepository.getCurrentGame().first()
+        assertNull(currentGame)
     }
 
     private suspend fun getGamesEntitiesAsDomainObjects() =

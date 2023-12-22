@@ -9,4 +9,5 @@ import kotlinx.coroutines.flow.flow
 class DummyGameRepository : GameRepository {
     override fun getGames(): Flow<List<Game>> = flow {}
     override suspend fun addNewGame(newGame: NewGame) {}
+    override fun getCurrentGame(): Flow<Game?> = flow {}
 }

@@ -7,6 +7,7 @@ import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 
 class ControllableGameRepository : GameRepository {
 
@@ -25,6 +26,8 @@ class ControllableGameRepository : GameRepository {
             _games.tryEmit(it + newGame.asGame())
         }
     }
+
+    override fun getCurrentGame(): Flow<Game?> = flow { null }
 
     fun emitGames(newGames: List<Game>) {
         _games.tryEmit(newGames)
