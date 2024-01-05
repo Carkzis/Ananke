@@ -13,6 +13,9 @@ interface GameDao {
     @Query(value = "SELECT * FROM games ORDER BY id DESC")
     fun getGames(): Flow<List<GameEntity>>
 
+    @Query(value = "SELECT * FROM games WHERE id = :gameId")
+    fun getGame(gameId: String): Flow<GameEntity>
+
     @Upsert
     suspend fun upsertGames(gameEntities: List<GameEntity>)
 

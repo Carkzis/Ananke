@@ -50,6 +50,17 @@ class GameDaoTest {
     }
 
     @Test
+    fun `gameDao fetches game for id`() = runTest {
+        gameDao.upsertGames(dummyGameEntities.shuffled())
+        val expectedGame = dummyGameEntities.first()
+        val id = expectedGame.id.toString()
+
+        val actualGame = gameDao.getGame(id).first()
+
+        assertEquals(expectedGame, actualGame)
+    }
+
+    @Test
     fun `gameDao inserts new game entity`() = runTest {
         val newGame = GameEntity(1L, "aName", "aDescription")
         gameDao.insertGame(newGame)
