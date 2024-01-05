@@ -1,7 +1,6 @@
 package com.carkzis.ananke.data
 
 import android.database.sqlite.SQLiteConstraintException
-import androidx.datastore.preferences.core.emptyPreferences
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -11,7 +10,7 @@ import javax.inject.Inject
 
 class DefaultGameRepository @Inject constructor(
     private val gameDao: GameDao,
-    private val anankeDataStore: DataStoreWrapper? = null
+    private val anankeDataStore: AnankeDataStore? = null
 ) : GameRepository {
     override fun getGames(): Flow<List<Game>> = gameDao.getGames().map {
         it.map(GameEntity::toDomain)

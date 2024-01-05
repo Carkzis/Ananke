@@ -2,6 +2,7 @@ package com.carkzis.ananke
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.carkzis.ananke.data.AnankeDataStore
+import com.carkzis.ananke.data.DefaultAnankeDataStore
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.DefaultGameRepository
 import com.carkzis.ananke.data.GameDao
@@ -10,7 +11,7 @@ import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameDao
-import com.carkzis.ananke.testdoubles.FailingDataStore
+import com.carkzis.ananke.testdoubles.FailingAnankeDataStore
 import com.carkzis.ananke.ui.screens.nugame.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,7 +46,7 @@ class GameRepositoryTest {
             scope = testScope,
             produceFile = { tmpFolder.newFile("test_data_store.preferences_pb") }
         )
-        anankeDataStore = AnankeDataStore(testDataStore)
+        anankeDataStore = DefaultAnankeDataStore(testDataStore)
         gameDao = ControllableGameDao()
         gameRepository = DefaultGameRepository(gameDao, anankeDataStore)
     }
@@ -97,7 +98,7 @@ class GameRepositoryTest {
 
     @Test(expected = EnterGameFailedException::class)
     fun `repository throws exception if adding current game to preference fails`() = runTest {
-        gameRepository = DefaultGameRepository(gameDao, FailingDataStore())
+        gameRepository = DefaultGameRepository(gameDao, FailingAnankeDataStore())
         val expectedCurrentGame = CurrentGame("12345")
         gameRepository.updateCurrentGame(expectedCurrentGame)
     }

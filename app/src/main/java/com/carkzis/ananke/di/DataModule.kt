@@ -1,7 +1,7 @@
 package com.carkzis.ananke.di
 
+import com.carkzis.ananke.data.DefaultAnankeDataStore
 import com.carkzis.ananke.data.AnankeDataStore
-import com.carkzis.ananke.data.DataStoreWrapper
 import com.carkzis.ananke.data.DefaultGameRepository
 import com.carkzis.ananke.data.GameRepository
 import dagger.Binds
@@ -16,5 +16,5 @@ interface DataModule {
     fun bindsGameRepository(gameRepository: DefaultGameRepository): GameRepository
 
     @Binds
-    fun bindsDataStoreWrapper(anankeDataStore: AnankeDataStore): DataStoreWrapper
+    fun bindsAnankeDataStore(anankeDataStore: DefaultAnankeDataStore): AnankeDataStore
 }
