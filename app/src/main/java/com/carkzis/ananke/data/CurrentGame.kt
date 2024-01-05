@@ -4,6 +4,6 @@ data class CurrentGame(
     val id: String
 ) {
     companion object {
-        val ABSENT = CurrentGame("-1")
+        val EMPTY = CurrentGame("-1")
     }
 }

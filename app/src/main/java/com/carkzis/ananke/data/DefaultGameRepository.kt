@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class DefaultGameRepository @Inject constructor(
     private val gameDao: GameDao,
-    private val anankeDataStore: AnankeDataStore? = null
+    private val anankeDataStore: DataStoreWrapper? = null
 ) : GameRepository {
     override fun getGames(): Flow<List<Game>> = gameDao.getGames().map {
         it.map(GameEntity::toDomain)
@@ -29,7 +29,7 @@ class DefaultGameRepository @Inject constructor(
         val currentGame = anankeDataStore?.data?.first()
         currentGame?.let { currentGameId ->
             emit(CurrentGame(currentGameId))
-        } ?: emit(CurrentGame.ABSENT)
+        } ?: emit(CurrentGame.EMPTY)
     }
 
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {
@@ -37,6 +37,6 @@ class DefaultGameRepository @Inject constructor(
     }
 
     override suspend fun removeCurrentGame(currentGame: CurrentGame) {
-        anankeDataStore?.setCurrentGameId(CurrentGame.ABSENT.id)
+        anankeDataStore?.setCurrentGameId(CurrentGame.EMPTY.id)
     }
 }

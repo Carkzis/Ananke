@@ -24,7 +24,7 @@ object DataStoreModule {
 
     @Provides
     @Singleton
-    fun providesAnankeDataStore(
+    fun providesDataStoreWrapper(
         @ApplicationContext context: Context
     ): DataStore<Preferences> =
         PreferenceDataStoreFactory.create(

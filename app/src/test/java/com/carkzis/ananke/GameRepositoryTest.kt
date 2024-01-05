@@ -10,6 +10,8 @@ import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameDao
+import com.carkzis.ananke.testdoubles.FailingDataStore
+import com.carkzis.ananke.ui.screens.nugame.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -91,6 +93,13 @@ class GameRepositoryTest {
         val actualCurrentGame = gameRepository.getCurrentGame().first()
         assertEquals(expectedCurrentGame.id, anankeDataStore.data.first())
         assertEquals(expectedCurrentGame.id, actualCurrentGame.id)
+    }
+
+    @Test(expected = EnterGameFailedException::class)
+    fun `repository throws exception if adding current game to preference fails`() = runTest {
+        gameRepository = DefaultGameRepository(gameDao, FailingDataStore())
+        val expectedCurrentGame = CurrentGame("12345")
+        gameRepository.updateCurrentGame(expectedCurrentGame)
     }
 
     @Test
