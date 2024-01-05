@@ -11,5 +11,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object DaoModule {
     @Provides
-    fun bindsGameDao(database: AnankeDatabase): GameDao = database.gameDao()
+    fun providesGameDao(database: AnankeDatabase): GameDao = database.gameDao()
 }

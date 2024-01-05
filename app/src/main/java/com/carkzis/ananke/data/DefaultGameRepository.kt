@@ -23,9 +23,13 @@ class DefaultGameRepository @Inject constructor(
         }
     }
 
-    override fun getCurrentGame(): Flow<CurrentGame> = flow { emit(CurrentGame("-1")) }
+    override fun getCurrentGame(): Flow<CurrentGame> = flow { emit(CurrentGame.ABSENT) }
 
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {
         anankeDataStore?.setCurrentGameId(currentGame.id)
+    }
+
+    override suspend fun removeCurrentGame(currentGame: CurrentGame) {
+        anankeDataStore?.setCurrentGameId(CurrentGame.ABSENT.id)
     }
 }

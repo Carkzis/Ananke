@@ -85,6 +85,17 @@ class GameRepositoryTest {
         assertEquals(currentGame.id, anankeDataStore.data.first())
     }
 
+    @Test
+    fun `repository removes current game from preferences`() = runTest {
+        val currentGame = CurrentGame("12345")
+        gameRepository.updateCurrentGame(currentGame)
+
+        gameRepository.removeCurrentGame(currentGame)
+
+        val noGameId = "-1"
+        assertEquals(noGameId, anankeDataStore.data.first())
+    }
+
     private suspend fun getGamesEntitiesAsDomainObjects() =
         gameDao.getGames()
             .first()

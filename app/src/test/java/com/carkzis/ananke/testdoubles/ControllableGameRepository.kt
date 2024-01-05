@@ -30,6 +30,7 @@ class ControllableGameRepository : GameRepository {
 
     override fun getCurrentGame(): Flow<CurrentGame> = flow {}
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {}
+    override suspend fun removeCurrentGame(currentGame: CurrentGame) {}
 
     fun emitGames(newGames: List<Game>) {
         _games.tryEmit(newGames)
