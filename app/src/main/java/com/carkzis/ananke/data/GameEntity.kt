@@ -15,8 +15,12 @@ data class GameEntity(
     val description: String
 )
 
-fun GameEntity.toDomain() = Game(
+fun GameEntity.toDomainListing() = Game(
     id = id.toString(),
     name = name,
     description = description
+)
+
+fun GameEntity.toDomainCurrent() = CurrentGame(
+    id = id.toString()
 )

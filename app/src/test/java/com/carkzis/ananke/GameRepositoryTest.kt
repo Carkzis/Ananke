@@ -9,10 +9,11 @@ import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
 import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
-import com.carkzis.ananke.data.toDomain
+import com.carkzis.ananke.data.toDomainListing
 import com.carkzis.ananke.testdoubles.ControllableGameDao
 import com.carkzis.ananke.testdoubles.DataStoreFailure
 import com.carkzis.ananke.testdoubles.FailingAnankeDataStore
+import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.ui.screens.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.InvalidGameException
@@ -90,8 +91,8 @@ class GameRepositoryTest {
     }
 
     @Test
-    fun `repository adds current game to preferences`() = runTest {
-        val expectedCurrentGame = CurrentGame("12345")
+    fun `repository adds current game to preferences and retrieves by id`() = runTest {
+        val expectedCurrentGame = CurrentGame(dummyGameEntities.first().id.toString())
         gameRepository.updateCurrentGame(expectedCurrentGame)
 
         val actualCurrentGame = gameRepository.getCurrentGame().first()
@@ -143,6 +144,6 @@ class GameRepositoryTest {
     private suspend fun getGamesEntitiesAsDomainObjects() =
         gameDao.getGames()
             .first()
-            .map(GameEntity::toDomain)
+            .map(GameEntity::toDomainListing)
 
 }

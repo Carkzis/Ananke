@@ -14,7 +14,7 @@ class DefaultGameRepository @Inject constructor(
     private val anankeDataStore: AnankeDataStore? = null
 ) : GameRepository {
     override fun getGames(): Flow<List<Game>> = gameDao.getGames().map {
-        it.map(GameEntity::toDomain)
+        it.map(GameEntity::toDomainListing)
     }
 
     override suspend fun addNewGame(newGame: NewGame) {
@@ -26,9 +26,11 @@ class DefaultGameRepository @Inject constructor(
     }
 
     override fun getCurrentGame(): Flow<CurrentGame> = flow {
-        val currentGame = anankeDataStore?.data?.first()
-        currentGame?.let { currentGameId ->
-            emit(CurrentGame(currentGameId))
+        val currentGameId = anankeDataStore?.data?.first()
+
+        currentGameId?.let {
+            val currentGame = gameDao.getGame(currentGameId).first()
+            emit(currentGame.toDomainCurrent())
         } ?: emit(CurrentGame.EMPTY)
     }
 
