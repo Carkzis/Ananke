@@ -1,8 +1,10 @@
 package com.carkzis.ananke.data
 
 import android.database.sqlite.SQLiteConstraintException
+import androidx.datastore.preferences.core.emptyPreferences
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -23,7 +25,12 @@ class DefaultGameRepository @Inject constructor(
         }
     }
 
-    override fun getCurrentGame(): Flow<CurrentGame> = flow { emit(CurrentGame.ABSENT) }
+    override fun getCurrentGame(): Flow<CurrentGame> = flow {
+        val currentGame = anankeDataStore?.data?.first()
+        currentGame?.let { currentGameId ->
+            emit(CurrentGame(currentGameId))
+        } ?: emit(CurrentGame.ABSENT)
+    }
 
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {
         anankeDataStore?.setCurrentGameId(currentGame.id)

@@ -48,6 +48,8 @@ class GameRepositoryTest {
         gameRepository = DefaultGameRepository(gameDao, anankeDataStore)
     }
 
+    //region games
+
     @Test
     fun `repository provides expected list of games`() = runTest {
         val expectedGames = getGamesEntitiesAsDomainObjects()
@@ -70,6 +72,10 @@ class GameRepositoryTest {
         gameRepository.addNewGame(newGameSameName)
     }
 
+    //endregion
+
+    //region current game
+
     @Test
     fun `repository does not provide game data if not in a current game`() = runTest {
         val currentGame = gameRepository.getCurrentGame().first()
@@ -79,10 +85,12 @@ class GameRepositoryTest {
 
     @Test
     fun `repository adds current game to preferences`() = runTest {
-        val currentGame = CurrentGame("12345")
-        gameRepository.updateCurrentGame(currentGame)
+        val expectedCurrentGame = CurrentGame("12345")
+        gameRepository.updateCurrentGame(expectedCurrentGame)
 
-        assertEquals(currentGame.id, anankeDataStore.data.first())
+        val actualCurrentGame = gameRepository.getCurrentGame().first()
+        assertEquals(expectedCurrentGame.id, anankeDataStore.data.first())
+        assertEquals(expectedCurrentGame.id, actualCurrentGame.id)
     }
 
     @Test
@@ -95,6 +103,8 @@ class GameRepositoryTest {
         val noGameId = "-1"
         assertEquals(noGameId, anankeDataStore.data.first())
     }
+
+    //endregion
 
     private suspend fun getGamesEntitiesAsDomainObjects() =
         gameDao.getGames()
