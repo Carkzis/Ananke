@@ -1,6 +1,7 @@
 package com.carkzis.ananke.data
 
 import android.database.sqlite.SQLiteConstraintException
+import com.carkzis.ananke.ui.screens.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -32,10 +33,21 @@ class DefaultGameRepository @Inject constructor(
     }
 
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {
-        anankeDataStore?.setCurrentGameId(currentGame.id)
+        try {
+            validateCurrentGame(currentGame)
+            anankeDataStore?.setCurrentGameId(currentGame.id)
+        } catch (exception: InvalidGameException) {
+            throw exception
+        }
     }
 
     override suspend fun removeCurrentGame(currentGame: CurrentGame) {
-        anankeDataStore?.setCurrentGameId(CurrentGame.EMPTY.id)
+        anankeDataStore?.removeCurrentGameId()
+    }
+
+    private fun validateCurrentGame(currentGame: CurrentGame) {
+        if (currentGame.id == CurrentGame.EMPTY.id) {
+            throw InvalidGameException()
+        }
     }
 }

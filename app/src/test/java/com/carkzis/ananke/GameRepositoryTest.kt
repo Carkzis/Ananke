@@ -11,8 +11,11 @@ import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameDao
+import com.carkzis.ananke.testdoubles.DataStoreFailure
 import com.carkzis.ananke.testdoubles.FailingAnankeDataStore
-import com.carkzis.ananke.ui.screens.nugame.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.ExitGameFailedException
+import com.carkzis.ananke.ui.screens.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -96,11 +99,20 @@ class GameRepositoryTest {
         assertEquals(expectedCurrentGame.id, actualCurrentGame.id)
     }
 
+    @Test(expected = InvalidGameException::class)
+    fun `repository cannot update current game with invalid game`() = runTest {
+        val currentGame = CurrentGame("-1")
+        gameRepository.updateCurrentGame(currentGame)
+    }
+
     @Test(expected = EnterGameFailedException::class)
     fun `repository throws exception if adding current game to preference fails`() = runTest {
-        gameRepository = DefaultGameRepository(gameDao, FailingAnankeDataStore())
-        val expectedCurrentGame = CurrentGame("12345")
-        gameRepository.updateCurrentGame(expectedCurrentGame)
+        gameRepository = DefaultGameRepository(
+            gameDao,
+            FailingAnankeDataStore(DataStoreFailure.ENTER_GAME)
+        )
+        val currentGame = CurrentGame("12345")
+        gameRepository.updateCurrentGame(currentGame)
     }
 
     @Test
@@ -113,6 +125,19 @@ class GameRepositoryTest {
         val noGameId = "-1"
         assertEquals(noGameId, anankeDataStore.data.first())
     }
+
+    @Test(expected = ExitGameFailedException::class)
+    fun `repository throws exception if removing current game from preferences fails`() = runTest {
+        gameRepository = DefaultGameRepository(
+            gameDao,
+            FailingAnankeDataStore(DataStoreFailure.EXIT_GAME)
+        )
+        val currentGame = CurrentGame("12345")
+        gameRepository.updateCurrentGame(currentGame)
+
+        gameRepository.removeCurrentGame(currentGame)
+    }
+
 
     //endregion
 

@@ -4,7 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.carkzis.ananke.ui.screens.nugame.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.ExitGameFailedException
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -25,6 +26,16 @@ class DefaultAnankeDataStore @Inject constructor(
             }
         } catch (exception: IOException) {
             throw EnterGameFailedException()
+        }
+    }
+
+    override suspend fun removeCurrentGameId() {
+        try {
+            preferences.edit { preferences ->
+                preferences[GAME_ID] = CurrentGame.EMPTY.id
+            }
+        } catch (exception: IOException) {
+            throw ExitGameFailedException()
         }
     }
 }
