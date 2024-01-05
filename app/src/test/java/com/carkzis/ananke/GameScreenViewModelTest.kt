@@ -3,6 +3,7 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.GameScreenViewModel
+import com.carkzis.ananke.ui.screens.GamingState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -37,6 +38,13 @@ class GameScreenViewModelTest {
         assertEquals(dummyGames(), viewModel.gameList.value)
 
         collection.cancel()
+    }
+
+    @Test
+    fun `view model provides out of game state when no current game`() = runTest {
+        val currentGamingState = viewModel.gamingState.value
+
+        assertEquals(currentGamingState, GamingState.OUT_OF_GAME)
     }
 
     fun dummyGames() = listOf(

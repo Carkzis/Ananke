@@ -138,7 +138,6 @@ class GameRepositoryTest {
         gameRepository.removeCurrentGame(currentGame)
     }
 
-
     //endregion
 
     private suspend fun getGamesEntitiesAsDomainObjects() =
