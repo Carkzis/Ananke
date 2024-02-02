@@ -1,10 +1,15 @@
 package com.carkzis.ananke
 
 import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.GameScreenViewModel
 import com.carkzis.ananke.ui.screens.GamingState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -42,9 +47,35 @@ class GameScreenViewModelTest {
 
     @Test
     fun `view model provides out of game state when no current game`() = runTest {
-        val currentGamingState = viewModel.gamingState.value
+        val expectedCurrentGamingState = GamingState.OUT_OF_GAME
 
-        assertEquals(currentGamingState, GamingState.OUT_OF_GAME)
+        val actualCurrentGamingState = viewModel.gamingState.value
+        assertEquals(expectedCurrentGamingState, actualCurrentGamingState)
+    }
+
+    @Test
+    fun `view model provides in game state when in current game`() = runTest {
+        val expectedCurrentGamingState = GamingState.IN_GAME
+
+        viewModel.enterGame(dummyGames().first().toCurrentGame())
+
+        val actualCurrentGamingState = viewModel.gamingState.value
+        assertEquals(expectedCurrentGamingState, actualCurrentGamingState)
+    }
+
+    @Test
+    fun `view model updates the current game`() = runTest {
+        val expectedCurrentGame = dummyGames().first().toCurrentGame()
+        viewModel.enterGame(expectedCurrentGame)
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.currentGame.collect()
+        }
+
+        val actualCurrentGameId = viewModel.currentGame.value
+        assertEquals(expectedCurrentGame, actualCurrentGameId)
+
+        collection.cancel()
     }
 
     fun dummyGames() = listOf(
