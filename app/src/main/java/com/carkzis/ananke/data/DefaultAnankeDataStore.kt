@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.carkzis.ananke.ui.screens.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.ExitGameFailedException
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -14,10 +15,11 @@ val GAME_ID = stringPreferencesKey("game_id")
 class DefaultAnankeDataStore @Inject constructor(
     private val preferences: DataStore<Preferences>
 ) : AnankeDataStore {
-    override val data = preferences.data
+    private val data = preferences.data
         .map { preferences ->
             preferences[GAME_ID]
         }
+    override suspend fun currentGameId() = data.first()
 
     override suspend fun setCurrentGameId(gameId: String) {
         try {

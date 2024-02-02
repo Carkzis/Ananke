@@ -5,6 +5,7 @@ import com.carkzis.ananke.ui.screens.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -26,24 +27,20 @@ class DefaultGameRepository @Inject constructor(
     }
 
     override fun getCurrentGame(): Flow<CurrentGame> = flow {
-        val currentGameId = anankeDataStore?.data?.first()
+        val currentGameId = anankeDataStore?.currentGameId()
 
         currentGameId?.let {
-            val currentGame = gameDao.getGame(currentGameId).first()
+            val currentGame = gameDao.getGame(it).first()
             emit(currentGame.toDomainCurrent())
         } ?: emit(CurrentGame.EMPTY)
     }
 
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {
-        try {
-            validateCurrentGame(currentGame)
-            anankeDataStore?.setCurrentGameId(currentGame.id)
-        } catch (exception: InvalidGameException) {
-            throw exception
-        }
+        validateCurrentGame(currentGame)
+        anankeDataStore?.setCurrentGameId(currentGame.id)
     }
 
-    override suspend fun removeCurrentGame(currentGame: CurrentGame) {
+    override suspend fun removeCurrentGame() {
         anankeDataStore?.removeCurrentGameId()
     }
 

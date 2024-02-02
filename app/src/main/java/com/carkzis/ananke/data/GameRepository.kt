@@ -11,5 +11,5 @@ interface GameRepository {
 
     suspend fun updateCurrentGame(currentGame: CurrentGame)
 
-    suspend fun removeCurrentGame(currentGame: CurrentGame)
+    suspend fun removeCurrentGame()
 }

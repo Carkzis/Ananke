@@ -12,5 +12,5 @@ class DummyGameRepository : GameRepository {
     override suspend fun addNewGame(newGame: NewGame) {}
     override fun getCurrentGame(): Flow<CurrentGame> = flow {}
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {}
-    override suspend fun removeCurrentGame(currentGame: CurrentGame) {}
+    override suspend fun removeCurrentGame() {}
 }

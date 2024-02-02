@@ -96,7 +96,7 @@ class GameRepositoryTest {
         gameRepository.updateCurrentGame(expectedCurrentGame)
 
         val actualCurrentGame = gameRepository.getCurrentGame().first()
-        assertEquals(expectedCurrentGame.id, anankeDataStore.data.first())
+        assertEquals(expectedCurrentGame.id, anankeDataStore.currentGameId())
         assertEquals(expectedCurrentGame.id, actualCurrentGame.id)
     }
 
@@ -121,10 +121,10 @@ class GameRepositoryTest {
         val currentGame = CurrentGame("12345")
         gameRepository.updateCurrentGame(currentGame)
 
-        gameRepository.removeCurrentGame(currentGame)
+        gameRepository.removeCurrentGame()
 
         val noGameId = "-1"
-        assertEquals(noGameId, anankeDataStore.data.first())
+        assertEquals(noGameId, anankeDataStore.currentGameId())
     }
 
     @Test(expected = ExitGameFailedException::class)
@@ -136,7 +136,7 @@ class GameRepositoryTest {
         val currentGame = CurrentGame("12345")
         gameRepository.updateCurrentGame(currentGame)
 
-        gameRepository.removeCurrentGame(currentGame)
+        gameRepository.removeCurrentGame()
     }
 
     //endregion
