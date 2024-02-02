@@ -1,6 +1,5 @@
 package com.carkzis.ananke.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -14,22 +13,27 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TransitEnterexit
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.Game
@@ -83,6 +87,21 @@ private fun GameCard(
     modifier: Modifier,
     game: Game
 ) {
+    val enterGameDialog = remember { mutableStateOf(false) }
+    val onEnterGameClick = {
+        enterGameDialog.value = true
+    }
+
+    if (enterGameDialog.value) {
+        GameEnterDialog(
+            modifier,
+            onDismissRequest = {
+                enterGameDialog.value = false
+            },
+            game
+        )
+    }
+
     Card(
         modifier = modifier
             .padding(4.dp)
@@ -100,13 +119,42 @@ private fun GameCard(
 
                 Row {
                     GameCardDescriptionText(game, modifier)
-                    GameCardEnterButton(modifier)
+                    GameCardEnterButton(modifier, onEnterGameClick)
                 }
 
                 GameCardMetadata(modifier)
             }
         }
     }
+}
+
+@Composable
+private fun GameEnterDialog(
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit,
+    game: Game
+) {
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+        title = { Text(game.name) },
+        text = { Text("Enter game?") },
+        confirmButton = {
+            Icon(
+                imageVector = Icons.Rounded.Done,
+                contentDescription = null,
+                modifier = Modifier.padding(16.dp)
+            )
+        },
+        dismissButton = {
+            Icon(
+                imageVector = Icons.Rounded.Close,
+                contentDescription = null,
+                modifier = Modifier.padding(16.dp)
+            )
+        },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    )
 }
 
 @Composable
@@ -126,16 +174,20 @@ private fun GameCardDivider(modifier: Modifier) {
 private fun RowScope.GameCardDescriptionText(game: Game, modifier: Modifier) {
     AnankeText(
         text = game.description, textAlign = TextAlign.Start, modifier = modifier
-            .height(96.dp).weight(1f)
+            .height(96.dp)
+            .weight(1f)
     )
 }
 
 @Composable
-private fun RowScope.GameCardEnterButton(modifier: Modifier) {
-    IconButton(onClick = {}, modifier = modifier.align(CenterVertically)) {
+private fun RowScope.GameCardEnterButton(modifier: Modifier, onEnterGameClick: () -> Unit) {
+    IconButton(
+        onClick = onEnterGameClick,
+        modifier = modifier.align(CenterVertically)
+    ) {
         Icon(
             imageVector = Icons.Filled.TransitEnterexit,
-            contentDescription = null
+            contentDescription = null,
         )
     }
 }
@@ -157,6 +209,21 @@ private fun GameCardPreview() {
     AnankeTheme {
         GameCard(
             modifier = Modifier,
+            game = Game(
+                id = "",
+                name = "The Game",
+                description = "This is a game.",
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun GameEnterDialogPreview() {
+    AnankeTheme {
+        GameEnterDialog(
+            onDismissRequest = {},
             game = Game(
                 id = "",
                 name = "The Game",
