@@ -2,6 +2,7 @@ package com.carkzis.ananke.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.carkzis.ananke.GameStateUseCase
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameRepository
@@ -21,13 +22,9 @@ class GameScreenViewModel @Inject constructor(private val gameRepository: GameRe
         listOf()
     )
 
-    val gamingState = gameRepository.getCurrentGame().map {
-        if (it == CurrentGame.EMPTY) {
-            GamingState.OutOfGame
-        } else {
-            GamingState.InGame(it)
-        }
-    }.stateIn(
+    val gameStateUseCase = GameStateUseCase(gameRepository)
+
+    val gamingState = gameStateUseCase().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
         GamingState.OutOfGame
