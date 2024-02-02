@@ -1,11 +1,11 @@
 package com.carkzis.ananke.data
 
 import android.database.sqlite.SQLiteConstraintException
+import com.carkzis.ananke.ui.screens.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -30,7 +30,7 @@ class DefaultGameRepository @Inject constructor(
         val currentGameId = anankeDataStore?.currentGameId()
 
         currentGameId?.let {
-            val currentGame = gameDao.getGame(it).first()
+            val currentGame = gameDao.getGame(it).first() ?: throw GameDoesNotExistException()
             emit(currentGame.toDomainCurrent())
         } ?: emit(CurrentGame.EMPTY)
     }

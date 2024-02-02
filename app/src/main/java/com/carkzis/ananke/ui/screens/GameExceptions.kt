@@ -12,3 +12,7 @@ class InvalidGameException : Throwable() {
     override val message = "Game is invalid."
 }
 
+class GameDoesNotExistException : Throwable() {
+    override val message = "Current game does not exist in database."
+}
+

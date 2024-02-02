@@ -5,16 +5,15 @@ import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.AnankeDatabase
-import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
-import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -58,6 +57,15 @@ class GameDaoTest {
         val actualGame = gameDao.getGame(id).first()
 
         assertEquals(expectedGame, actualGame)
+    }
+
+    @Test
+    fun `gameDao fetches null for non-existent game`() = runTest {
+        gameDao.upsertGames(dummyGameEntities.shuffled())
+        val nonExistentGameId = "47"
+
+        val actualGame = gameDao.getGame(nonExistentGameId).first()
+        assertNull(actualGame)
     }
 
     @Test

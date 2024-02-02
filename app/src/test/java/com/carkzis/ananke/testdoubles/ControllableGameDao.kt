@@ -5,7 +5,6 @@ import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
@@ -14,9 +13,9 @@ class ControllableGameDao : GameDao {
 
     override fun getGames(): Flow<List<GameEntity>> = games
 
-    override fun getGame(gameId: String): Flow<GameEntity> = flow {
+    override fun getGame(gameId: String): Flow<GameEntity?> = flow {
         emit(
-            games.value.first {
+            games.value.firstOrNull {
                 it.id.toString() == gameId
             }
         )

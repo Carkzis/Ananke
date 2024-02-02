@@ -16,6 +16,7 @@ import com.carkzis.ananke.testdoubles.FailingAnankeDataStore
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.ui.screens.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.ExitGameFailedException
+import com.carkzis.ananke.ui.screens.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -114,6 +115,14 @@ class GameRepositoryTest {
         )
         val currentGame = CurrentGame("12345")
         gameRepository.updateCurrentGame(currentGame)
+    }
+
+    @Test(expected = GameDoesNotExistException::class)
+    fun `repository throws exception if adding current game not in database`() = runTest {
+        val currentGame = CurrentGame("12345")
+        gameRepository.updateCurrentGame(currentGame)
+
+        gameRepository.getCurrentGame().first()
     }
 
     @Test
