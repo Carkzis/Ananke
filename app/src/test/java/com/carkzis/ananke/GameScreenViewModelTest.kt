@@ -53,14 +53,33 @@ class GameScreenViewModelTest {
     @Test
     fun `view model updates state to in game with current game`() = runTest {
         val expectedCurrentGame = dummyGames().first().toCurrentGame()
-        viewModel.enterGame(expectedCurrentGame)
 
         val collection = launch(UnconfinedTestDispatcher()) {
             viewModel.gamingState.collect()
         }
 
+        viewModel.enterGame(expectedCurrentGame)
+
         val actualCurrentGame = (viewModel.gamingState.value as GamingState.InGame).currentGame
         assertEquals(expectedCurrentGame, actualCurrentGame)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model exits game reverting to state out of current game`() = runTest {
+        val currentGame = dummyGames().first().toCurrentGame()
+        val expectedCurrentGamingState = GamingState.OutOfGame
+        viewModel.enterGame(currentGame)
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gamingState.collect()
+        }
+
+        viewModel.exitGame()
+
+        val actualCurrentGamingState = viewModel.gamingState.value
+        assertEquals(expectedCurrentGamingState, actualCurrentGamingState)
 
         collection.cancel()
     }

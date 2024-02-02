@@ -36,7 +36,9 @@ class ControllableGameRepository : GameRepository {
         _currentGame.tryEmit(currentGame)
     }
 
-    override suspend fun removeCurrentGame() {}
+    override suspend fun removeCurrentGame() {
+        _currentGame.tryEmit(CurrentGame.EMPTY)
+    }
 
     fun emitGames(newGames: List<Game>) {
         _games.tryEmit(newGames)

@@ -22,7 +22,11 @@ class GameScreenViewModel @Inject constructor(private val gameRepository: GameRe
     )
 
     val gamingState = gameRepository.getCurrentGame().map {
-        GamingState.InGame(it)
+        if (it == CurrentGame.EMPTY) {
+            GamingState.OutOfGame
+        } else {
+            GamingState.InGame(it)
+        }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
@@ -31,6 +35,10 @@ class GameScreenViewModel @Inject constructor(private val gameRepository: GameRe
 
     suspend fun enterGame(currentGame: CurrentGame) {
         gameRepository.updateCurrentGame(currentGame)
+    }
+
+    suspend fun exitGame() {
+        gameRepository.removeCurrentGame()
     }
 }
 
