@@ -9,7 +9,6 @@ import com.carkzis.ananke.data.GameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +28,7 @@ class GameScreenViewModel @Inject constructor(
     val gamingState = gameStateUseCase().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
-        GamingState.OutOfGame
+        GamingState.Loading
     )
 
     fun enterGame(currentGame: CurrentGame) {
@@ -47,5 +46,6 @@ class GameScreenViewModel @Inject constructor(
 
 sealed interface GamingState {
     object OutOfGame: GamingState
+    object Loading : GamingState
     data class InGame(val currentGame: CurrentGame): GamingState
 }

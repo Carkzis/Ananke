@@ -43,11 +43,25 @@ class GameScreenViewModelTest {
     }
 
     @Test
-    fun `view model provides out of game state when no current game`() = runTest {
-        val expectedCurrentGamingState = GamingState.OutOfGame
+    fun `view model provides loading state initially`() = runTest {
+        val expectedCurrentGamingState = GamingState.Loading
 
         val actualCurrentGamingState = viewModel.gamingState.value
         assertEquals(expectedCurrentGamingState, actualCurrentGamingState)
+    }
+
+    @Test
+    fun `view model provides out of game state when no current game`() = runTest {
+        val expectedCurrentGamingState = GamingState.OutOfGame
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gamingState.collect()
+        }
+
+        val actualCurrentGamingState = viewModel.gamingState.value
+        assertEquals(expectedCurrentGamingState, actualCurrentGamingState)
+
+        collection.cancel()
     }
 
     @Test

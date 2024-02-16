@@ -54,6 +54,7 @@ fun GameScreen(
 ) {
     val lazyListState = rememberLazyListState()
     when (gamingState) {
+        is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {
             LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
                 item {
