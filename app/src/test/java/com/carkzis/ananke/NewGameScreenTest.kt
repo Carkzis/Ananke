@@ -12,9 +12,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.carkzis.ananke.navigation.GameDestination
-import com.carkzis.ananke.testdoubles.DummyNewGameViewModel
+import com.carkzis.ananke.testdoubles.DummyGameRepository
 import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
 import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure
+import com.carkzis.ananke.ui.screens.nugame.NewGameViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -55,7 +56,7 @@ class NewGameScreenTest {
                 the text in the text fields.
                  */
                 NewGameRoute(onAddGameClick = { redirected = true },
-                    viewModel = DummyNewGameViewModel(),
+                    viewModel = NewGameViewModel(DummyGameRepository()),
                     onShowSnackbar = { message ->
                         snackbarHostState.showSnackbar(
                             message = message, duration = SnackbarDuration.Short

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
+class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
     ViewModel() {
 
     private val _gameTitle = MutableStateFlow("")
