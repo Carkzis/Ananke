@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.carkzis.ananke.ui.AnankeAppState
+import com.carkzis.ananke.ui.screens.GameRoute
 import com.carkzis.ananke.ui.screens.GameScreen
 import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
 import com.carkzis.ananke.ui.screens.TeamScreen
@@ -29,7 +30,7 @@ fun AnankeNavHost(
             startDestination = "${AnankeDestination.GAME}/${GameDestination.HOME}"
         ) {
             composable(route = "${AnankeDestination.GAME}/${GameDestination.HOME}") {
-                GameScreen(onNewGameClick = {
+                GameRoute(onNewGameClick = {
                     navController.navigate("${AnankeDestination.GAME}/${GameDestination.NEW}") {
                         launchSingleTop = true
                     }

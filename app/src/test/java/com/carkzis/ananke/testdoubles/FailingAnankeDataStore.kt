@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class FailingAnankeDataStore(private val dataStoreFailure: DataStoreFailure) : AnankeDataStore {
-    override suspend fun currentGameId(): String? = null
+    override suspend fun currentGameId(): Flow<String?> = flow {}
 
     override suspend fun setCurrentGameId(gameId: String) {
         if (dataStoreFailure == DataStoreFailure.ENTER_GAME) throw EnterGameFailedException()

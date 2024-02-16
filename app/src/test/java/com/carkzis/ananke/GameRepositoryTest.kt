@@ -97,7 +97,7 @@ class GameRepositoryTest {
         gameRepository.updateCurrentGame(expectedCurrentGame)
 
         val actualCurrentGame = gameRepository.getCurrentGame().first()
-        assertEquals(expectedCurrentGame.id, anankeDataStore.currentGameId())
+        assertEquals(expectedCurrentGame.id, anankeDataStore.currentGameId().first())
         assertEquals(expectedCurrentGame.id, actualCurrentGame.id)
     }
 
@@ -133,7 +133,7 @@ class GameRepositoryTest {
         gameRepository.removeCurrentGame()
 
         val noGameId = "-1"
-        assertEquals(noGameId, anankeDataStore.currentGameId())
+        assertEquals(noGameId, anankeDataStore.currentGameId().first())
         assertEquals(noGameId, gameRepository.getCurrentGame().first().id)
     }
 

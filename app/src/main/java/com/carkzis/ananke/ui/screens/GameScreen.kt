@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
@@ -49,13 +48,12 @@ import com.carkzis.ananke.ui.theme.Typography
 fun GameScreen(
     modifier: Modifier = Modifier,
     onNewGameClick: () -> Unit = {},
-    viewModel: GameScreenViewModel = hiltViewModel()
+    viewModel: GameScreenViewModel = hiltViewModel(),
+    games: List<Game>,
+    gamingState: GamingState
 ) {
-    val games = viewModel.gameList.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
-    val gameState = viewModel.gamingState.collectAsStateWithLifecycle()
-
-    when (gameState.value) {
+    when (gamingState) {
         is GamingState.OutOfGame -> {
             LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
                 item {
@@ -68,7 +66,7 @@ fun GameScreen(
                     )
                 }
 
-                games.value.forEach { game ->
+                games.forEach { game ->
                     item(key = game.id) {
                         GameCard(
                             modifier = modifier.testTag("${GameDestination.HOME}-gameitem"),
@@ -93,19 +91,24 @@ fun GameScreen(
             }
         }
         is GamingState.InGame -> {
-            val game = (gameState.value as GamingState.InGame).currentGame.id
-            AnankeText(
-                text = game,
-                modifier = modifier
-                    .padding(8.dp)
-                    .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
-            )
-            AnankeButton(onClick = {
-                viewModel.exitGame()
-            }) {
-                AnankeText(
-                    text = "Exit Game"
-                )
+            val game = gamingState.currentGame.id
+            LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-current-game")) {
+                item {
+                    AnankeText(
+                        text = game,
+                        modifier = modifier
+                            .padding(8.dp)
+                    )
+                }
+                item {
+                    AnankeButton(onClick = {
+                        viewModel.exitGame()
+                    }) {
+                        AnankeText(
+                            text = "Exit Game"
+                        )
+                    }
+                }
             }
         }
     }

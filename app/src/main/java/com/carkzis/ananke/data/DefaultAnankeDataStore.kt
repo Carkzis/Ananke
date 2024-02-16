@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.carkzis.ananke.ui.screens.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.ExitGameFailedException
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
@@ -19,7 +20,7 @@ class DefaultAnankeDataStore @Inject constructor(
         .map { preferences ->
             preferences[GAME_ID]
         }
-    override suspend fun currentGameId() = data.first()
+    override suspend fun currentGameId() = data
 
     override suspend fun setCurrentGameId(gameId: String) {
         try {
