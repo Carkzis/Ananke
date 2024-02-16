@@ -27,7 +27,7 @@ class GameScreenViewModelTest {
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        viewModel = GameScreenViewModel(gameRepository)
+        viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
     }
 
     @Test
