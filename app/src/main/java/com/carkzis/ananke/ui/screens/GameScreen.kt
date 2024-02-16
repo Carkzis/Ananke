@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
@@ -48,7 +49,8 @@ import com.carkzis.ananke.ui.theme.Typography
 fun GameScreen(
     modifier: Modifier = Modifier,
     onNewGameClick: () -> Unit = {},
-    viewModel: GameScreenViewModel = hiltViewModel(),
+    onEnterGame: (CurrentGame) -> Unit = {},
+    onExitGame: () -> Unit = {},
     games: List<Game>,
     gamingState: GamingState
 ) {
@@ -71,9 +73,7 @@ fun GameScreen(
                     item(key = game.id) {
                         GameCard(
                             modifier = modifier.testTag("${GameDestination.HOME}-gameitem"),
-                            onEnterGame = {
-                                viewModel.enterGame(game.toCurrentGame())
-                            },
+                            onEnterGame = onEnterGame,
                             game = game
                         )
                     }
@@ -97,7 +97,8 @@ fun GameScreen(
                     AnankeText(
                         text = gamingState.currentGame.name,
                         modifier = modifier
-                            .padding(8.dp),
+                            .padding(8.dp)
+                            .testTag("${GameDestination.HOME}-current-game-title"),
                         textStyle = MaterialTheme.typography.headlineMedium
                     )
                 }
@@ -112,9 +113,7 @@ fun GameScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 item {
-                    AnankeButton(onClick = {
-                        viewModel.exitGame()
-                    }) {
+                    AnankeButton(onClick = onExitGame) {
                         AnankeText(
                             text = "Exit Game"
                         )
@@ -130,7 +129,7 @@ fun GameScreen(
 @Composable
 private fun GameCard(
     modifier: Modifier,
-    onEnterGame: () -> Unit,
+    onEnterGame: (CurrentGame) -> Unit,
     game: Game
 ) {
     val enterGameDialog = remember { mutableStateOf(false) }
@@ -146,7 +145,7 @@ private fun GameCard(
             },
             onConfirmRequest = {
                 enterGameDialog.value = false
-                onEnterGame()
+                onEnterGame(game.toCurrentGame())
             },
             game
         )

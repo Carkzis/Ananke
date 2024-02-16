@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.carkzis.ananke.data.toCurrentGame
 
 @Composable
 fun GameRoute(
@@ -19,6 +20,12 @@ fun GameRoute(
         modifier = modifier,
         onNewGameClick = onNewGameClick,
         games = games,
-        gamingState = gameState
+        gamingState = gameState,
+        onEnterGame = { currentGame ->
+            viewModel.enterGame(currentGame)
+        },
+        onExitGame = {
+            viewModel.exitGame()
+        }
     )
 }

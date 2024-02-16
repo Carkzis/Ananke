@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class GameScreenViewModel @Inject constructor(
+class GameScreenViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
     private val gameRepository: GameRepository
 ) : ViewModel() {
