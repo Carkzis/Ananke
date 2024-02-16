@@ -7,5 +7,7 @@ data class Game(
 )
 
 fun Game.toCurrentGame() = CurrentGame(
-    id = id
+    id = id,
+    name = name,
+    description = description
 )

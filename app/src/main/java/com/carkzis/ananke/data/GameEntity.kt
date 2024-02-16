@@ -22,5 +22,7 @@ fun GameEntity.toDomainListing() = Game(
 )
 
 fun GameEntity.toDomainCurrent() = CurrentGame(
-    id = id.toString()
+    id = id.toString(),
+    name = name,
+    description = description
 )

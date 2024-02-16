@@ -92,14 +92,24 @@ fun GameScreen(
             }
         }
         is GamingState.InGame -> {
-            val game = gamingState.currentGame.id
-            LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-current-game")) {
+            LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-current-game-column")) {
                 item {
                     AnankeText(
-                        text = game,
+                        text = gamingState.currentGame.name,
                         modifier = modifier
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        textStyle = MaterialTheme.typography.headlineMedium
                     )
+                }
+                item {
+                    AnankeText(
+                        text = gamingState.currentGame.description,
+                        modifier = modifier
+                            .padding(8.dp),
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 item {
                     AnankeButton(onClick = {

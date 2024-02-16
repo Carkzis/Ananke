@@ -1,8 +1,9 @@
 package com.carkzis.ananke.data
 
-// TODO: Need all the domain game info.
 data class CurrentGame(
-    val id: String
+    val id: String,
+    val name: String = "",
+    val description: String = ""
 ) {
     companion object {
         val EMPTY = CurrentGame("-1")
