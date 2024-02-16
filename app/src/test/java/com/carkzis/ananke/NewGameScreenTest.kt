@@ -48,22 +48,20 @@ class NewGameScreenTest {
 
     @Before
     fun setUp() {
-        composeTestRule.apply {
-            composeTestRule.setContent {
-                snackbarHostState = remember { SnackbarHostState() }
-                /*
-                Using NewGameRoute to allow control of dynamically changing
-                the text in the text fields.
-                 */
-                NewGameRoute(onAddGameClick = { redirected = true },
-                    viewModel = NewGameViewModel(DummyGameRepository()),
-                    onShowSnackbar = { message ->
-                        snackbarHostState.showSnackbar(
-                            message = message, duration = SnackbarDuration.Short
-                        ) == SnackbarResult.Dismissed
-                    }
-                )
-            }
+        composeTestRule.setContent {
+            snackbarHostState = remember { SnackbarHostState() }
+            /*
+            Using NewGameRoute to allow control of dynamically changing
+            the text in the text fields.
+             */
+            NewGameRoute(onAddGameClick = { redirected = true },
+                viewModel = NewGameViewModel(DummyGameRepository()),
+                onShowSnackbar = { message ->
+                    snackbarHostState.showSnackbar(
+                        message = message, duration = SnackbarDuration.Short
+                    ) == SnackbarResult.Dismissed
+                }
+            )
         }
     }
 
