@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 class DefaultGameRepository @Inject constructor(
@@ -27,12 +28,14 @@ class DefaultGameRepository @Inject constructor(
     }
 
     override fun getCurrentGame(): Flow<CurrentGame> = flow {
-        val currentGameId = anankeDataStore?.currentGameId()
+        val currentGameId = anankeDataStore?.currentGameId() ?: CurrentGame.EMPTY.id
 
-        currentGameId?.let {
-            val currentGame = gameDao.getGame(it).first() ?: throw GameDoesNotExistException()
+        if (currentGameId == CurrentGame.EMPTY.id) {
+            emit(CurrentGame.EMPTY)
+        } else {
+            val currentGame = gameDao.getGame(currentGameId).first() ?: throw GameDoesNotExistException()
             emit(currentGame.toDomainCurrent())
-        } ?: emit(CurrentGame.EMPTY)
+        }
     }
 
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {

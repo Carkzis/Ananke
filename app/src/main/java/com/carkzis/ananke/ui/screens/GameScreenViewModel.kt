@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,12 +31,16 @@ class GameScreenViewModel @Inject constructor(
         GamingState.OutOfGame
     )
 
-    suspend fun enterGame(currentGame: CurrentGame) {
-        gameRepository.updateCurrentGame(currentGame)
+    fun enterGame(currentGame: CurrentGame) {
+        viewModelScope.launch {
+            gameRepository.updateCurrentGame(currentGame)
+        }
     }
 
-    suspend fun exitGame() {
-        gameRepository.removeCurrentGame()
+    fun exitGame() {
+        viewModelScope.launch {
+            gameRepository.removeCurrentGame()
+        }
     }
 }
 

@@ -134,6 +134,7 @@ class GameRepositoryTest {
 
         val noGameId = "-1"
         assertEquals(noGameId, anankeDataStore.currentGameId())
+        assertEquals(noGameId, gameRepository.getCurrentGame().first().id)
     }
 
     @Test(expected = ExitGameFailedException::class)

@@ -1,5 +1,6 @@
 package com.carkzis.ananke.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -37,6 +38,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
@@ -51,40 +53,70 @@ fun GameScreen(
 ) {
     val games = viewModel.gameList.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
+    val gameState = viewModel.gamingState.collectAsStateWithLifecycle()
 
-    LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
-        item {
-            AnankeText(
-                text = "Games",
-                modifier = modifier
-                    .padding(8.dp)
-                    .testTag("${GameDestination.HOME}-title"),
-                textStyle = MaterialTheme.typography.headlineMedium
-            )
-        }
+    when (gameState.value) {
+        is GamingState.OutOfGame -> {
+            LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
+                item {
+                    AnankeText(
+                        text = "Games",
+                        modifier = modifier
+                            .padding(8.dp)
+                            .testTag("${GameDestination.HOME}-title"),
+                        textStyle = MaterialTheme.typography.headlineMedium
+                    )
+                }
 
-        games.value.forEach { game ->
-            item(key = game.id) {
-                GameCard(modifier.testTag("${GameDestination.HOME}-gameitem"), game)
+                games.value.forEach { game ->
+                    item(key = game.id) {
+                        GameCard(
+                            modifier = modifier.testTag("${GameDestination.HOME}-gameitem"),
+                            onEnterGame = {
+                                viewModel.enterGame(game.toCurrentGame())
+                            },
+                            game = game
+                        )
+                    }
+                }
+
+                item {
+                    AnankeButton(onClick = onNewGameClick) {
+                        AnankeText(
+                            text = "Add New Game",
+                            modifier = modifier
+                                .padding(8.dp)
+                                .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
+                        )
+                    }
+                }
             }
         }
-
-        item {
-            AnankeButton(onClick = onNewGameClick) {
+        is GamingState.InGame -> {
+            val game = (gameState.value as GamingState.InGame).currentGame.id
+            AnankeText(
+                text = game,
+                modifier = modifier
+                    .padding(8.dp)
+                    .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
+            )
+            AnankeButton(onClick = {
+                viewModel.exitGame()
+            }) {
                 AnankeText(
-                    text = "Add New Game",
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
+                    text = "Exit Game"
                 )
             }
         }
     }
+
+
 }
 
 @Composable
 private fun GameCard(
     modifier: Modifier,
+    onEnterGame: () -> Unit,
     game: Game
 ) {
     val enterGameDialog = remember { mutableStateOf(false) }
@@ -97,6 +129,10 @@ private fun GameCard(
             modifier,
             onDismissRequest = {
                 enterGameDialog.value = false
+            },
+            onConfirmRequest = {
+                enterGameDialog.value = false
+                onEnterGame()
             },
             game
         )
@@ -132,6 +168,7 @@ private fun GameCard(
 private fun GameEnterDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit,
     game: Game
 ) {
     AlertDialog(
@@ -143,14 +180,18 @@ private fun GameEnterDialog(
             Icon(
                 imageVector = Icons.Rounded.Done,
                 contentDescription = null,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable { onConfirmRequest() }
             )
         },
         dismissButton = {
             Icon(
                 imageVector = Icons.Rounded.Close,
                 contentDescription = null,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable { onDismissRequest() }
             )
         },
         properties = DialogProperties(usePlatformDefaultWidth = false)
@@ -209,6 +250,7 @@ private fun GameCardPreview() {
     AnankeTheme {
         GameCard(
             modifier = Modifier,
+            onEnterGame = {},
             game = Game(
                 id = "",
                 name = "The Game",
@@ -224,6 +266,7 @@ private fun GameEnterDialogPreview() {
     AnankeTheme {
         GameEnterDialog(
             onDismissRequest = {},
+            onConfirmRequest = {},
             game = Game(
                 id = "",
                 name = "The Game",
