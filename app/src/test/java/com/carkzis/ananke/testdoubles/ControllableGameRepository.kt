@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class ControllableGameRepository : GameRepository {
+class ControllableGameRepository(initialCurrentGame: CurrentGame = CurrentGame.EMPTY) : GameRepository {
 
     var gameExists = false
 
     private val _games = MutableSharedFlow<List<Game>>(replay = 1)
     private val games get() = _games.replayCache.firstOrNull() ?: listOf()
 
-    private val _currentGame = MutableStateFlow(CurrentGame.EMPTY)
+    private val _currentGame = MutableStateFlow(initialCurrentGame)
 
     override fun getGames(): Flow<List<Game>> = _games
 

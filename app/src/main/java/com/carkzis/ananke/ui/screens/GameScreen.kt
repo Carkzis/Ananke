@@ -112,7 +112,7 @@ fun GameScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 item {
-                    AnankeButton(onClick = onExitGame) {
+                    AnankeButton(modifier = Modifier.testTag("${GameDestination.HOME}-exit-current-game"), onClick = onExitGame) {
                         AnankeText(
                             text = "Exit Game"
                         )
