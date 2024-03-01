@@ -1,8 +1,15 @@
 package com.carkzis.ananke
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.screens.GameScreen
@@ -54,8 +61,19 @@ class GameScreenTest {
 
             onNodeWithTag("${GameDestination.HOME}-title")
                 .assertExists()
-
-            // TODO: Test for game list items.
+            onNodeWithTag("${GameDestination.HOME}-gameslist")
+                .assertExists()
+            onAllNodesWithTag("${GameDestination.HOME}-gamecard").apply {
+                fetchSemanticsNodes().forEachIndexed { index, _ ->
+                    val currentCard = get(index)
+                    currentCard.apply {
+                        assertTextContains(dummyGames()[index].name)
+                        assertTextContains(dummyGames()[index].description)
+                        onNodeWithTag("${GameDestination.HOME}-game-enter-button")
+                            .assertHasClickAction()
+                    }
+                }
+            }
         }
     }
 

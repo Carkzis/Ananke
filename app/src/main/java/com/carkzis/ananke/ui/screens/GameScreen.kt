@@ -154,7 +154,7 @@ private fun GameCard(
     Card(
         modifier = modifier
             .padding(4.dp)
-            .testTag("${GameDestination.HOME}-gameCard"),
+            .testTag("${GameDestination.HOME}-gamecard"),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -237,7 +237,9 @@ private fun RowScope.GameCardDescriptionText(game: Game, modifier: Modifier) {
 private fun RowScope.GameCardEnterButton(modifier: Modifier, onEnterGameClick: () -> Unit) {
     IconButton(
         onClick = onEnterGameClick,
-        modifier = modifier.align(CenterVertically)
+        modifier = modifier
+            .align(CenterVertically)
+            .testTag("${GameDestination.HOME}-game-enter-button")
     ) {
         Icon(
             imageVector = Icons.Filled.TransitEnterexit,
