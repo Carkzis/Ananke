@@ -1,6 +1,7 @@
 package com.carkzis.ananke
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
@@ -12,19 +13,31 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
+import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.DummyGameRepository
 import com.carkzis.ananke.ui.screens.GameScreen
+import com.carkzis.ananke.ui.screens.GameScreenViewModel
 import com.carkzis.ananke.ui.screens.GamingState
+import com.carkzis.ananke.ui.screens.nugame.NewGameViewModel
+import com.google.common.base.CharMatcher.`is`
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,14 +101,22 @@ class GameScreenTest {
     @Test
     fun `enter expected game via dialog`() {
         composeTestRule.apply {
+            val gameRepository = ControllableGameRepository()
+            val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
+            var actualCurrentGame = CurrentGame.EMPTY
             composeTestRule.setContent {
                 GameScreen(
                     games = dummyGames(),
-                    gamingState = GamingState.OutOfGame
+                    gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
+                    onEnterGame = {
+                        actualCurrentGame = it
+                        viewModel.enterGame(it)
+                    }
                 )
             }
 
-            onAllNodesWithTag("${GameDestination.HOME}-gamecard")
+            // Open dialog of entering particular game.
+            val targetCard = onAllNodesWithTag("${GameDestination.HOME}-gamecard")
                 .filter(
                     hasAnyChild(
                         hasText(dummyGames().first().name, substring = true)
@@ -103,10 +124,35 @@ class GameScreenTest {
                 )
                 .assertCountEquals(1)
                 .onFirst()
+            val enterButtonForTargetCard = targetCard.onChildren()
+                .filter(
+                    hasTestTag("${GameDestination.HOME}-game-enter-button")
+                )
+                .assertCountEquals(1)
+                .onFirst()
+
+            enterButtonForTargetCard
+                .assertHasClickAction()
                 .performClick()
 
-            // TODO: Check dialog opens.
-            // TODO: Check enter expected game.
+            // Dialog exists, and so enter game.
+            onNodeWithTag("${GameDestination.HOME}-enter-alert")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-enter-alert-confirm")
+                .assertExists()
+                .performClick()
+
+            // In expected game screen.
+            onNodeWithTag("${GameDestination.HOME}-enter-alert")
+                .assertDoesNotExist()
+            onNodeWithTag("${GameDestination.HOME}-gamecard")
+                .assertDoesNotExist()
+            onNodeWithTag("${GameDestination.HOME}-current-game-column")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-current-game-title")
+                .assertTextContains(dummyGames().first().toCurrentGame().name)
+
+            assertEquals(dummyGames().first().toCurrentGame(), actualCurrentGame)
         }
 
     }
@@ -118,7 +164,61 @@ class GameScreenTest {
 
     @Test
     fun `dismiss an enter game dialog to remove it`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository()
+            val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
+            var actualCurrentGame = CurrentGame.EMPTY
+            composeTestRule.setContent {
+                GameScreen(
+                    games = dummyGames(),
+                    gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
+                    onEnterGame = {
+                        actualCurrentGame = it
+                        viewModel.enterGame(it)
+                    }
+                )
+            }
 
+            // Open dialog of entering particular game.
+            val targetCard = onAllNodesWithTag("${GameDestination.HOME}-gamecard")
+                .filter(
+                    hasAnyChild(
+                        hasText(dummyGames().first().name, substring = true)
+                    )
+                )
+                .assertCountEquals(1)
+                .onFirst()
+            val enterButtonForTargetCard = targetCard.onChildren()
+                .filter(
+                    hasTestTag("${GameDestination.HOME}-game-enter-button")
+                )
+                .assertCountEquals(1)
+                .onFirst()
+
+            enterButtonForTargetCard
+                .assertHasClickAction()
+                .performClick()
+
+            // Dialog exists, but dismiss it.
+            onNodeWithTag("${GameDestination.HOME}-enter-alert")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-enter-alert-reject")
+                .assertExists()
+                .performClick()
+
+            // Still in original out of game screen.
+            onNodeWithTag("${GameDestination.HOME}-title")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-gameslist")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-enter-alert")
+                .assertDoesNotExist()
+            onAllNodesWithTag("${GameDestination.HOME}-gamecard")
+                .onLast()
+                .assertExists()
+
+            assertEquals(CurrentGame.EMPTY, actualCurrentGame)
+        }
     }
 
     fun dummyGames() = listOf(

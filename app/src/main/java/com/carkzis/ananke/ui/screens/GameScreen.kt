@@ -35,7 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
@@ -185,7 +184,7 @@ private fun GameEnterDialog(
     game: Game
 ) {
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier.testTag("${GameDestination.HOME}-enter-alert"),
         onDismissRequest = onDismissRequest,
         title = { Text(game.name) },
         text = { Text("Enter game?") },
@@ -196,6 +195,7 @@ private fun GameEnterDialog(
                 modifier = Modifier
                     .padding(16.dp)
                     .clickable { onConfirmRequest() }
+                    .testTag("${GameDestination.HOME}-enter-alert-confirm")
             )
         },
         dismissButton = {
@@ -205,6 +205,7 @@ private fun GameEnterDialog(
                 modifier = Modifier
                     .padding(16.dp)
                     .clickable { onDismissRequest() }
+                    .testTag("${GameDestination.HOME}-enter-alert-reject")
             )
         },
         properties = DialogProperties(usePlatformDefaultWidth = false)
