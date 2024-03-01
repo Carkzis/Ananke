@@ -72,7 +72,7 @@ fun GameScreen(
                 games.forEach { game ->
                     item(key = game.id) {
                         GameCard(
-                            modifier = modifier.testTag("${GameDestination.HOME}-gameitem"),
+                            modifier = modifier,
                             onEnterGame = onEnterGame,
                             game = game
                         )
