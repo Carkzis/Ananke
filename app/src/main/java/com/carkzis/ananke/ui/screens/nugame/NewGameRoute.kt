@@ -29,7 +29,7 @@ fun NewGameRoute(
         gameDescription = gameDescription,
         onTitleValueChanged = viewModel::updateGameTitle,
         onDescriptionValueChanged = viewModel::updateGameDescription,
-        onAddGameClick = {
+        onAttemptAddGameClick = {
             viewModel.addNewGame(
                 NewGame(
                     gameTitle,

@@ -5,15 +5,11 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.navigation.GameDestination
-import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.GameRoute
 import com.carkzis.ananke.ui.screens.GameScreen
-import com.carkzis.ananke.ui.screens.GameScreenViewModel
 import com.carkzis.ananke.ui.screens.GamingState
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
