@@ -1,31 +1,32 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.team.TeamViewModel
+import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class TeamViewModelTest {
+class YouViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: TeamViewModel
+    private lateinit var viewModel: YouViewModel
     private lateinit var gameRepository: ControllableGameRepository
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        viewModel = TeamViewModel(GameStateUseCase(gameRepository))
+        viewModel = YouViewModel(GameStateUseCase(gameRepository))
     }
 
     @Test
@@ -39,7 +40,7 @@ class TeamViewModelTest {
             }
         }
 
-        assertEquals(expectedGameTitle, actualGameTitle)
+        Assert.assertEquals(expectedGameTitle, actualGameTitle)
 
         collection.cancel()
     }
@@ -58,7 +59,7 @@ class TeamViewModelTest {
 
         gameRepository.emitCurrentGame(currentGame)
 
-        assertEquals(expectedGameTitle, actualGameTitle)
+        Assert.assertEquals(expectedGameTitle, actualGameTitle)
 
         collection.cancel()
     }

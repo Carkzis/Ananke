@@ -1,4 +1,4 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.ui
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection

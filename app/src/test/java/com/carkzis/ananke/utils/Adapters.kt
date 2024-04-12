@@ -1,4 +1,4 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.utils
 
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame

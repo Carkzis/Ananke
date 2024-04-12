@@ -1,5 +1,7 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.asGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository

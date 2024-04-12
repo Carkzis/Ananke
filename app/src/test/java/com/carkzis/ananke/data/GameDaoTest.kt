@@ -1,12 +1,9 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.data
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.carkzis.ananke.data.AnankeDatabase
-import com.carkzis.ananke.data.GameDao
-import com.carkzis.ananke.data.GameEntity
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

@@ -1,4 +1,4 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.ui
 
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.SnackbarDuration

@@ -1,6 +1,6 @@
 package com.carkzis.ananke.testdoubles
 
-import com.carkzis.ananke.asGame
+import com.carkzis.ananke.utils.asGame
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameRepository

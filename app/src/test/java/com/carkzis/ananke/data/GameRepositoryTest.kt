@@ -1,15 +1,8 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.data
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import com.carkzis.ananke.data.AnankeDataStore
-import com.carkzis.ananke.data.DefaultAnankeDataStore
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.DefaultGameRepository
-import com.carkzis.ananke.data.GameDao
-import com.carkzis.ananke.data.GameEntity
-import com.carkzis.ananke.data.GameRepository
-import com.carkzis.ananke.data.NewGame
-import com.carkzis.ananke.data.toDomainListing
+import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.asGame
 import com.carkzis.ananke.testdoubles.ControllableGameDao
 import com.carkzis.ananke.testdoubles.DataStoreFailure
 import com.carkzis.ananke.testdoubles.FailingAnankeDataStore
