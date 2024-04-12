@@ -9,6 +9,7 @@ import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChildren
@@ -17,6 +18,7 @@ import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
@@ -86,25 +88,7 @@ class GameScreenTest {
                 }
             )
 
-            // Open dialog of entering particular game.
-            val targetCard = onAllNodesWithTag("${GameDestination.HOME}-gamecard")
-                .filter(
-                    hasAnyChild(
-                        hasText(dummyGames().first().name, substring = true)
-                    )
-                )
-                .assertCountEquals(1)
-                .onFirst()
-            val enterButtonForTargetCard = targetCard.onChildren()
-                .filter(
-                    hasTestTag("${GameDestination.HOME}-game-enter-button")
-                )
-                .assertCountEquals(1)
-                .onFirst()
-
-            enterButtonForTargetCard
-                .assertHasClickAction()
-                .performClick()
+            openDialogForEnteringFirstGame()
 
             // Dialog exists, and so enter game.
             onNodeWithTag("${GameDestination.HOME}-enter-alert")
@@ -183,25 +167,7 @@ class GameScreenTest {
                 }
             )
 
-            // Open dialog of entering particular game.
-            val targetCard = onAllNodesWithTag("${GameDestination.HOME}-gamecard")
-                .filter(
-                    hasAnyChild(
-                        hasText(dummyGames().first().name, substring = true)
-                    )
-                )
-                .assertCountEquals(1)
-                .onFirst()
-            val enterButtonForTargetCard = targetCard.onChildren()
-                .filter(
-                    hasTestTag("${GameDestination.HOME}-game-enter-button")
-                )
-                .assertCountEquals(1)
-                .onFirst()
-
-            enterButtonForTargetCard
-                .assertHasClickAction()
-                .performClick()
+            openDialogForEnteringFirstGame()
 
             // Dialog exists, but dismiss it.
             onNodeWithTag("${GameDestination.HOME}-enter-alert")
@@ -264,6 +230,27 @@ class GameScreenTest {
                 }
             )
         }
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.openDialogForEnteringFirstGame() {
+        val targetCard = onAllNodesWithTag("${GameDestination.HOME}-gamecard")
+            .filter(
+                hasAnyChild(
+                    hasText(dummyGames().first().name, substring = true)
+                )
+            )
+            .assertCountEquals(1)
+            .onFirst()
+        val enterButtonForTargetCard = targetCard.onChildren()
+            .filter(
+                hasTestTag("${GameDestination.HOME}-game-enter-button")
+            )
+            .assertCountEquals(1)
+            .onFirst()
+
+        enterButtonForTargetCard
+            .assertHasClickAction()
+            .performClick()
     }
 
     private fun dummyGames() = listOf(
