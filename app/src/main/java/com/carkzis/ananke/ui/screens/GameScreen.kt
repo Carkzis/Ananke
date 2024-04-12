@@ -91,7 +91,7 @@ private fun InGameScreen(
     LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-current-game-column")) {
         currentGameTitle(gamingState, modifier)
         currentGameDescription(gamingState, modifier)
-        exitGameButton(onExitGame)
+        exitGameButton(onExitGame, modifier)
     }
 }
 
@@ -153,10 +153,11 @@ private fun LazyListScope.currentGameDescription(
     item { Spacer(modifier = Modifier.height(8.dp)) }
 }
 
-private fun LazyListScope.exitGameButton(onExitGame: () -> Unit) {
-    item {
-        GameScreenExitGameButton(onExitGame)
-    }
+private fun LazyListScope.exitGameButton(
+    onExitGame: () -> Unit,
+    modifier: Modifier
+) {
+    item { GameScreenExitGameButton(onExitGame, modifier) }
 }
 
 private fun LazyListScope.newGameButton(
@@ -173,9 +174,7 @@ private fun GameCard(
     game: Game
 ) {
     val enterGameDialog = remember { mutableStateOf(false) }
-    val onEnterGameClick = {
-        enterGameDialog.value = true
-    }
+    val onEnterGameClick = { enterGameDialog.value = true }
 
     if (enterGameDialog.value) {
         GameEnterDialog(
@@ -200,20 +199,7 @@ private fun GameCard(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        Box(modifier = modifier
-            .padding(16.dp)
-        ) {
-            Column {
-                GameCardTitle(game, modifier)
-
-                Row {
-                    GameCardDescriptionText(game, modifier)
-                    GameCardEnterButton(modifier, onEnterGameClick)
-                }
-
-                GameCardMetadata(modifier)
-            }
-        }
+        GameCardBox(modifier, game, onEnterGameClick)
     }
 }
 
@@ -229,28 +215,33 @@ private fun GameEnterDialog(
         onDismissRequest = onDismissRequest,
         title = { Text(game.name) },
         text = { Text("Enter game?") },
-        confirmButton = {
-            Icon(
-                imageVector = Icons.Rounded.Done,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .clickable { onConfirmRequest() }
-                    .testTag("${GameDestination.HOME}-enter-alert-confirm")
-            )
-        },
-        dismissButton = {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .clickable { onDismissRequest() }
-                    .testTag("${GameDestination.HOME}-enter-alert-reject")
-            )
-        },
+        confirmButton = { GameEnterConfirmIcon(onConfirmRequest) },
+        dismissButton = { GameEnterDismissIcon(onDismissRequest) },
         properties = DialogProperties(usePlatformDefaultWidth = false)
     )
+}
+
+@Composable
+private fun GameCardBox(
+    modifier: Modifier,
+    game: Game,
+    onEnterGameClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .padding(16.dp)
+    ) {
+        Column {
+            GameCardTitle(game, modifier)
+
+            Row {
+                GameCardDescriptionText(game, modifier)
+                GameCardEnterButton(modifier, onEnterGameClick)
+            }
+
+            GameCardMetadata(modifier)
+        }
+    }
 }
 
 @Composable
@@ -291,6 +282,30 @@ private fun RowScope.GameCardEnterButton(modifier: Modifier, onEnterGameClick: (
 }
 
 @Composable
+private fun GameEnterConfirmIcon(onConfirmRequest: () -> Unit) {
+    Icon(
+        imageVector = Icons.Rounded.Done,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable { onConfirmRequest() }
+            .testTag("${GameDestination.HOME}-enter-alert-confirm")
+    )
+}
+
+@Composable
+private fun GameEnterDismissIcon(onDismissRequest: () -> Unit) {
+    Icon(
+        imageVector = Icons.Rounded.Close,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable { onDismissRequest() }
+            .testTag("${GameDestination.HOME}-enter-alert-reject")
+    )
+}
+
+@Composable
 private fun ColumnScope.GameCardMetadata(modifier: Modifier) {
     GameCardDivider(modifier)
     AnankeText(
@@ -314,13 +329,15 @@ private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifi
 }
 
 @Composable
-private fun GameScreenExitGameButton(onExitGame: () -> Unit) {
+private fun GameScreenExitGameButton(onExitGame: () -> Unit, modifier: Modifier) {
     AnankeButton(
         modifier = Modifier.testTag("${GameDestination.HOME}-exit-current-game"),
         onClick = onExitGame
     ) {
         AnankeText(
-            text = "Exit Game"
+            text = "Exit Game",
+            modifier = modifier
+                .padding(8.dp)
         )
     }
 }
@@ -343,10 +360,21 @@ private fun GameCardPreview() {
 
 @Preview
 @Composable
-private fun GameButtonPreview() {
+private fun GameScreenNewGameButtonPreview() {
     AnankeTheme {
         GameScreenNewGameButton(
             onNewGameClick = {},
+            modifier = Modifier
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun GameScreenExitGameButtonPreview() {
+    AnankeTheme {
+        GameScreenExitGameButton(
+            onExitGame = {},
             modifier = Modifier
         )
     }
