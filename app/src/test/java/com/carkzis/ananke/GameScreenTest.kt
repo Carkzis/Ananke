@@ -1,6 +1,7 @@
 package com.carkzis.ananke
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextContains
@@ -48,12 +49,7 @@ class GameScreenTest {
     @Test
     fun `no title when loading`() {
         composeTestRule.apply {
-            composeTestRule.setContent {
-                GameScreen(
-                    games = dummyGames(),
-                    gamingState = GamingState.Loading
-                )
-            }
+            initialiseGameScreen(gamingState = GamingState.Loading)
 
             onNodeWithTag("${GameDestination.HOME}-title")
                 .assertDoesNotExist()
@@ -63,12 +59,7 @@ class GameScreenTest {
     @Test
     fun `expected list of games displays with expected details when outside game`() {
         composeTestRule.apply {
-            composeTestRule.setContent {
-                GameScreen(
-                    games = dummyGames(),
-                    gamingState = GamingState.OutOfGame
-                )
-            }
+            initialiseGameScreen(gamingState = GamingState.OutOfGame)
 
             onNodeWithTag("${GameDestination.HOME}-title")
                 .assertExists()
@@ -76,14 +67,7 @@ class GameScreenTest {
                 .assertExists()
 
             onAllNodesWithTag("${GameDestination.HOME}-gamecard").apply {
-                fetchSemanticsNodes().forEachIndexed { index, _ ->
-                    val currentCard = get(index)
-                    currentCard.apply {
-                        hasAnyChild(hasText(dummyGames()[index].name))
-                        hasAnyChild(hasText(dummyGames()[index].description))
-                        hasAnyChild(hasTestTag("${GameDestination.HOME}-game-enter-button"))
-                    }
-                }
+                assertGamesInListHaveExpectedData()
             }
         }
     }
@@ -94,16 +78,13 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository()
             val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
             var actualCurrentGame = CurrentGame.EMPTY
-            composeTestRule.setContent {
-                GameScreen(
-                    games = dummyGames(),
-                    gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
-                    onEnterGame = {
-                        actualCurrentGame = it
-                        viewModel.enterGame(it)
-                    }
-                )
-            }
+
+            initialiseGameScreen(
+                viewModel,
+                onEnterGame = {
+                    actualCurrentGame = it
+                }
+            )
 
             // Open dialog of entering particular game.
             val targetCard = onAllNodesWithTag("${GameDestination.HOME}-gamecard")
@@ -144,7 +125,6 @@ class GameScreenTest {
 
             assertEquals(dummyGames().first().toCurrentGame(), actualCurrentGame)
         }
-
     }
 
     @Test
@@ -153,16 +133,13 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame())
             val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
             var actualCurrentGame = dummyGames().first().toCurrentGame()
-            composeTestRule.setContent {
-                GameScreen(
-                    games = dummyGames(),
-                    gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
-                    onExitGame = {
-                        viewModel.exitGame()
-                        actualCurrentGame = CurrentGame.EMPTY
-                    }
-                )
-            }
+
+            initialiseGameScreen(
+                viewModel,
+                onExitGame = {
+                    actualCurrentGame = it
+                }
+            )
 
             // Ensure current state is within game.
             onNodeWithTag("${GameDestination.HOME}-gamecard")
@@ -198,16 +175,13 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository()
             val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
             var actualCurrentGame = CurrentGame.EMPTY
-            composeTestRule.setContent {
-                GameScreen(
-                    games = dummyGames(),
-                    gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
-                    onEnterGame = {
-                        actualCurrentGame = it
-                        viewModel.enterGame(it)
-                    }
-                )
-            }
+
+            initialiseGameScreen(
+                viewModel,
+                onEnterGame = {
+                    actualCurrentGame = it
+                }
+            )
 
             // Open dialog of entering particular game.
             val targetCard = onAllNodesWithTag("${GameDestination.HOME}-gamecard")
@@ -251,7 +225,48 @@ class GameScreenTest {
         }
     }
 
-    fun dummyGames() = listOf(
+    private fun SemanticsNodeInteractionCollection.assertGamesInListHaveExpectedData() {
+        fetchSemanticsNodes().forEachIndexed { index, _ ->
+            val currentCard = get(index)
+            currentCard.apply {
+                hasAnyChild(hasText(dummyGames()[index].name))
+                hasAnyChild(hasText(dummyGames()[index].description))
+                hasAnyChild(hasTestTag("${GameDestination.HOME}-game-enter-button"))
+            }
+        }
+    }
+
+    private fun initialiseGameScreen(gamingState: GamingState) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = dummyGames(),
+                gamingState = gamingState
+            )
+        }
+    }
+
+    private fun initialiseGameScreen(
+        viewModel: GameScreenViewModel,
+        onEnterGame: (CurrentGame) -> Unit = {},
+        onExitGame: (CurrentGame) -> Unit = {}
+    ) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = dummyGames(),
+                gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
+                onEnterGame = {
+                    onEnterGame(it)
+                    viewModel.enterGame(it)
+                },
+                onExitGame = {
+                    viewModel.exitGame()
+                    onExitGame(CurrentGame.EMPTY)
+                }
+            )
+        }
+    }
+
+    private fun dummyGames() = listOf(
         Game("abc", "My First Game", "It is the first one."),
         Game("def", "My Second Game", "It is the second one."),
         Game("ghi", "My Third Game", "It is the third one.")
