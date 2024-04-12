@@ -1,4 +1,4 @@
-package com.carkzis.ananke.ui.screens
+package com.carkzis.ananke.ui.screens.team
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -14,13 +14,13 @@ import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.theme.AnankeTheme
 
 @Composable
-fun YouScreen(currentGame: CurrentGame, modifier: Modifier = Modifier) {
+fun TeamScreen(currentGame: CurrentGame, modifier: Modifier = Modifier) {
     Column {
         AnankeText(
-            text = "You",
+            text = "Team",
             modifier = modifier
                 .padding(8.dp)
-                .testTag("${AnankeDestination.YOU}-title"),
+                .testTag("${AnankeDestination.TEAM}-title"),
             textStyle = MaterialTheme.typography.headlineMedium
         )
 
@@ -28,7 +28,7 @@ fun YouScreen(currentGame: CurrentGame, modifier: Modifier = Modifier) {
             text = currentGame.name,
             modifier = modifier
                 .padding(8.dp)
-                .testTag("${AnankeDestination.YOU}-current-game"),
+                .testTag("${AnankeDestination.TEAM}-current-game"),
             textStyle = MaterialTheme.typography.headlineSmall
         )
     }
@@ -36,9 +36,9 @@ fun YouScreen(currentGame: CurrentGame, modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-private fun YouScreenPreview() {
+private fun TeamScreenPreview() {
     AnankeTheme {
-        YouScreen(
+        TeamScreen(
             currentGame = CurrentGame(
                 id = "1",
                 name = "Preview Game",

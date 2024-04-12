@@ -8,8 +8,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.TeamScreen
-import com.carkzis.ananke.ui.screens.TeamViewModel
+import com.carkzis.ananke.ui.screens.team.TeamScreen
+import com.carkzis.ananke.ui.screens.team.TeamViewModel
+import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication

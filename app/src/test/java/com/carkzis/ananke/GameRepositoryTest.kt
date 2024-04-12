@@ -14,10 +14,10 @@ import com.carkzis.ananke.testdoubles.ControllableGameDao
 import com.carkzis.ananke.testdoubles.DataStoreFailure
 import com.carkzis.ananke.testdoubles.FailingAnankeDataStore
 import com.carkzis.ananke.testdoubles.dummyGameEntities
-import com.carkzis.ananke.ui.screens.EnterGameFailedException
-import com.carkzis.ananke.ui.screens.ExitGameFailedException
-import com.carkzis.ananke.ui.screens.GameDoesNotExistException
-import com.carkzis.ananke.ui.screens.InvalidGameException
+import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
+import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
+import com.carkzis.ananke.ui.screens.game.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

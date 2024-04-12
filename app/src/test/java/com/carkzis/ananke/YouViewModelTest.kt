@@ -2,7 +2,8 @@ package com.carkzis.ananke
 
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.YouViewModel
+import com.carkzis.ananke.ui.screens.you.YouViewModel
+import com.carkzis.ananke.utils.GameStateUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

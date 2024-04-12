@@ -1,8 +1,8 @@
 package com.carkzis.ananke.data
 
 import android.database.sqlite.SQLiteConstraintException
-import com.carkzis.ananke.ui.screens.GameDoesNotExistException
-import com.carkzis.ananke.ui.screens.InvalidGameException
+import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
+import com.carkzis.ananke.ui.screens.game.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

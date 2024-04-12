@@ -4,10 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.carkzis.ananke.ui.screens.EnterGameFailedException
-import com.carkzis.ananke.ui.screens.ExitGameFailedException
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
+import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject

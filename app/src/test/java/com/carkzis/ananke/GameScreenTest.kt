@@ -24,9 +24,10 @@ import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.GameScreen
-import com.carkzis.ananke.ui.screens.GameViewModel
-import com.carkzis.ananke.ui.screens.GamingState
+import com.carkzis.ananke.ui.screens.game.GameScreen
+import com.carkzis.ananke.ui.screens.game.GameViewModel
+import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication

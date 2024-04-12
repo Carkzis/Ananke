@@ -5,16 +5,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.ui.AnankeAppState
-import com.carkzis.ananke.ui.screens.GameRoute
-import com.carkzis.ananke.ui.screens.GameScreen
-import com.carkzis.ananke.ui.screens.GamingState
-import com.carkzis.ananke.ui.screens.TeamRoute
+import com.carkzis.ananke.ui.screens.game.GameRoute
+import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
-import com.carkzis.ananke.ui.screens.TeamScreen
-import com.carkzis.ananke.ui.screens.YouRoute
-import com.carkzis.ananke.ui.screens.YouScreen
+import com.carkzis.ananke.ui.screens.you.YouRoute
 
 @Composable
 fun AnankeNavHost(

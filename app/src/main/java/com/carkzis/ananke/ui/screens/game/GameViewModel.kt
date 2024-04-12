@@ -1,8 +1,8 @@
-package com.carkzis.ananke.ui.screens
+package com.carkzis.ananke.ui.screens.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.carkzis.ananke.GameStateUseCase
+import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameRepository

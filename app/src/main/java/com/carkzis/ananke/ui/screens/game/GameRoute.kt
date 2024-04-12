@@ -1,4 +1,4 @@
-package com.carkzis.ananke.ui.screens
+package com.carkzis.ananke.ui.screens.game
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

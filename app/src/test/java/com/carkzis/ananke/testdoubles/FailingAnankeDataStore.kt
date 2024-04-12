@@ -1,8 +1,8 @@
 package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.data.AnankeDataStore
-import com.carkzis.ananke.ui.screens.EnterGameFailedException
-import com.carkzis.ananke.ui.screens.ExitGameFailedException
+import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

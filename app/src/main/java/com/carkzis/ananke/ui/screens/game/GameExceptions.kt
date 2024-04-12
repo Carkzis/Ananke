@@ -1,4 +1,4 @@
-package com.carkzis.ananke.ui.screens
+package com.carkzis.ananke.ui.screens.game
 
 class EnterGameFailedException : Throwable() {
     override val message = "Failed to enter game."

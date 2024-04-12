@@ -3,8 +3,9 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.GameViewModel
-import com.carkzis.ananke.ui.screens.GamingState
+import com.carkzis.ananke.ui.screens.game.GameViewModel
+import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.utils.GameStateUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
