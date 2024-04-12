@@ -43,4 +43,8 @@ class ControllableGameRepository(initialCurrentGame: CurrentGame = CurrentGame.E
         _games.tryEmit(newGames)
     }
 
+    fun emitCurrentGame(currentGame: CurrentGame) {
+        _currentGame.tryEmit(currentGame)
+    }
+
 }
