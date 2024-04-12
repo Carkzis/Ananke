@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -57,65 +59,111 @@ fun GameScreen(
     when (gamingState) {
         is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {
-            LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
-                item {
-                    AnankeText(
-                        text = "Games",
-                        modifier = modifier
-                            .padding(8.dp)
-                            .testTag("${GameDestination.HOME}-title"),
-                        textStyle = MaterialTheme.typography.headlineMedium
-                    )
-                }
-
-                games.forEach { game ->
-                    item(key = game.id) {
-                        GameCard(
-                            modifier = modifier,
-                            onEnterGame = onEnterGame,
-                            game = game
-                        )
-                    }
-                }
-
-                item {
-                    GameScreenNewGameButton(onNewGameClick, modifier)
-                }
-            }
+            OutOfGameScreen(modifier, lazyListState, games, onEnterGame, onNewGameClick)
         }
         is GamingState.InGame -> {
-            LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-current-game-column")) {
-                item {
-                    AnankeText(
-                        text = gamingState.currentGame.name,
-                        modifier = modifier
-                            .padding(8.dp)
-                            .testTag("${GameDestination.HOME}-current-game-title"),
-                        textStyle = MaterialTheme.typography.headlineMedium
-                    )
-                }
-                item {
-                    AnankeText(
-                        text = gamingState.currentGame.description,
-                        modifier = modifier
-                            .padding(8.dp),
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-                item {
-                    AnankeButton(modifier = Modifier.testTag("${GameDestination.HOME}-exit-current-game"), onClick = onExitGame) {
-                        AnankeText(
-                            text = "Exit Game"
-                        )
-                    }
-                }
-            }
+            InGameScreen(modifier, gamingState, onExitGame)
         }
     }
+}
 
+@Composable
+private fun OutOfGameScreen(
+    modifier: Modifier,
+    lazyListState: LazyListState,
+    games: List<Game>,
+    onEnterGame: (CurrentGame) -> Unit,
+    onNewGameClick: () -> Unit
+) {
+    LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
+        gameScreenTitle(modifier)
+        listOfAvailableGames(games, modifier, onEnterGame)
+        newGameButton(onNewGameClick, modifier)
+    }
+}
 
+@Composable
+private fun InGameScreen(
+    modifier: Modifier,
+    gamingState: GamingState.InGame,
+    onExitGame: () -> Unit
+) {
+    LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-current-game-column")) {
+        currentGameTitle(gamingState, modifier)
+        currentGameDescription(gamingState, modifier)
+        exitGameButton(onExitGame)
+    }
+}
+
+private fun LazyListScope.gameScreenTitle(modifier: Modifier) {
+    item {
+        AnankeText(
+            text = "Games",
+            modifier = modifier
+                .padding(8.dp)
+                .testTag("${GameDestination.HOME}-title"),
+            textStyle = MaterialTheme.typography.headlineMedium
+        )
+    }
+}
+
+private fun LazyListScope.listOfAvailableGames(
+    games: List<Game>,
+    modifier: Modifier,
+    onEnterGame: (CurrentGame) -> Unit
+) {
+    games.forEach { game ->
+        item(key = game.id) {
+            GameCard(
+                modifier = modifier,
+                onEnterGame = onEnterGame,
+                game = game
+            )
+        }
+    }
+}
+
+private fun LazyListScope.currentGameTitle(
+    gamingState: GamingState.InGame,
+    modifier: Modifier
+) {
+    item {
+        AnankeText(
+            text = gamingState.currentGame.name,
+            modifier = modifier
+                .padding(8.dp)
+                .testTag("${GameDestination.HOME}-current-game-title"),
+            textStyle = MaterialTheme.typography.headlineMedium
+        )
+    }
+}
+
+private fun LazyListScope.currentGameDescription(
+    gamingState: GamingState.InGame,
+    modifier: Modifier
+) {
+    item {
+        AnankeText(
+            text = gamingState.currentGame.description,
+
+            modifier = modifier
+                .padding(8.dp),
+        )
+    }
+    item { Spacer(modifier = Modifier.height(8.dp)) }
+}
+
+private fun LazyListScope.exitGameButton(onExitGame: () -> Unit) {
+    item {
+        GameScreenExitGameButton(onExitGame)
+    }
+}
+
+private fun LazyListScope.newGameButton(
+    onNewGameClick: () -> Unit,
+    modifier: Modifier
+) {
+    item { GameScreenNewGameButton(onNewGameClick, modifier) }
 }
 
 @Composable
@@ -261,6 +309,18 @@ private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifi
             modifier = modifier
                 .padding(8.dp)
                 .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
+        )
+    }
+}
+
+@Composable
+private fun GameScreenExitGameButton(onExitGame: () -> Unit) {
+    AnankeButton(
+        modifier = Modifier.testTag("${GameDestination.HOME}-exit-current-game"),
+        onClick = onExitGame
+    ) {
+        AnankeText(
+            text = "Exit Game"
         )
     }
 }
