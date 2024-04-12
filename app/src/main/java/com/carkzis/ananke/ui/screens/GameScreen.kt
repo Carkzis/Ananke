@@ -79,14 +79,7 @@ fun GameScreen(
                 }
 
                 item {
-                    AnankeButton(onClick = onNewGameClick) {
-                        AnankeText(
-                            text = "Add New Game",
-                            modifier = modifier
-                                .padding(8.dp)
-                                .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
-                        )
-                    }
+                    GameScreenNewGameButton(onNewGameClick, modifier)
                 }
             }
         }
@@ -260,6 +253,18 @@ private fun ColumnScope.GameCardMetadata(modifier: Modifier) {
     )
 }
 
+@Composable
+private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifier) {
+    AnankeButton(onClick = onNewGameClick) {
+        AnankeText(
+            text = "Add New Game",
+            modifier = modifier
+                .padding(8.dp)
+                .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun GameCardPreview() {
@@ -278,6 +283,17 @@ private fun GameCardPreview() {
 
 @Preview
 @Composable
+private fun GameButtonPreview() {
+    AnankeTheme {
+        GameScreenNewGameButton(
+            onNewGameClick = {},
+            modifier = Modifier
+        )
+    }
+}
+
+@Preview
+@Composable
 private fun GameEnterDialogPreview() {
     AnankeTheme {
         GameEnterDialog(
@@ -287,6 +303,45 @@ private fun GameEnterDialogPreview() {
                 id = "",
                 name = "The Game",
                 description = "This is a game.",
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OutOfGameScreenPreview() {
+    AnankeTheme {
+        GameScreen(
+            games = listOf(
+                Game(
+                    id = "1",
+                    name = "Game 1",
+                    description = "This is a game.",
+                ),
+                Game(
+                    id = "2",
+                    name = "Game 2",
+                    description = "This is another game.",
+                )
+            ),
+            gamingState = GamingState.OutOfGame
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun InGameScreenPreview() {
+    AnankeTheme {
+        GameScreen(
+            games = listOf(),
+            gamingState = GamingState.InGame(
+                CurrentGame(
+                    id = "3",
+                    name = "Game 3",
+                    description = "We are in the game."
+                )
             )
         )
     }
