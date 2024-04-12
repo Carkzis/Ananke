@@ -7,13 +7,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.CurrentGame
 
 @Composable
-fun TeamRoute(
+fun YouRoute(
     modifier: Modifier = Modifier,
     viewModel: TeamViewModel = hiltViewModel(),
 ) {
     val currentGame = viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
 
-    TeamScreen(
+    YouScreen(
         modifier = modifier,
         currentGame = currentGame.value
     )

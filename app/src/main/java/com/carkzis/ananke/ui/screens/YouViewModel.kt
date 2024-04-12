@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class TeamViewModel @Inject constructor(gameStateUseCase: GameStateUseCase) : ViewModel() {
+class YouViewModel @Inject constructor(gameStateUseCase: GameStateUseCase) : ViewModel() {
     val gamingState = gameStateUseCase().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),

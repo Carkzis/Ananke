@@ -13,6 +13,7 @@ import com.carkzis.ananke.ui.screens.GamingState
 import com.carkzis.ananke.ui.screens.TeamRoute
 import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
 import com.carkzis.ananke.ui.screens.TeamScreen
+import com.carkzis.ananke.ui.screens.YouRoute
 import com.carkzis.ananke.ui.screens.YouScreen
 
 @Composable
@@ -51,7 +52,7 @@ fun AnankeNavHost(
             TeamRoute()
         }
         composable(route = AnankeDestination.YOU.toString()) {
-            YouScreen()
+            YouRoute()
         }
     }
 }

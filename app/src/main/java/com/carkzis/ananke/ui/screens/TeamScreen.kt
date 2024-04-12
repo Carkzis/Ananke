@@ -13,9 +13,12 @@ import com.carkzis.ananke.ui.components.AnankeText
 
 @Composable
 fun TeamScreen(currentGame: CurrentGame, modifier: Modifier = Modifier) {
-    AnankeText(text = "Team", modifier = modifier
-        .padding(8.dp)
-        .testTag("${AnankeDestination.TEAM}-title"))
+    AnankeText(
+        text = "Team",
+        modifier = modifier
+            .padding(8.dp)
+            .testTag("${AnankeDestination.TEAM}-title")
+    )
 
     AnankeText(
         text = currentGame.name,
