@@ -25,7 +25,7 @@ import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.GameScreen
-import com.carkzis.ananke.ui.screens.GameScreenViewModel
+import com.carkzis.ananke.ui.screens.GameViewModel
 import com.carkzis.ananke.ui.screens.GamingState
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -78,7 +78,7 @@ class GameScreenTest {
     fun `enter expected game via dialog`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
-            val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -115,7 +115,7 @@ class GameScreenTest {
     fun `exit a game so that a list of games displays again`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame())
-            val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
             var actualCurrentGame = dummyGames().first().toCurrentGame()
 
             initialiseGameScreen(
@@ -157,7 +157,7 @@ class GameScreenTest {
     fun `dismiss an enter game dialog to remove it`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
-            val viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -212,7 +212,7 @@ class GameScreenTest {
     }
 
     private fun initialiseGameScreen(
-        viewModel: GameScreenViewModel,
+        viewModel: GameViewModel,
         onEnterGame: (CurrentGame) -> Unit = {},
         onExitGame: (CurrentGame) -> Unit = {}
     ) {

@@ -3,7 +3,7 @@ package com.carkzis.ananke
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.GameScreenViewModel
+import com.carkzis.ananke.ui.screens.GameViewModel
 import com.carkzis.ananke.ui.screens.GamingState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -16,18 +16,18 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class GameScreenViewModelTest {
+class GameViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: GameScreenViewModel
+    private lateinit var viewModel: GameViewModel
     private lateinit var gameRepository: ControllableGameRepository
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        viewModel = GameScreenViewModel(GameStateUseCase(gameRepository), gameRepository)
+        viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
     }
 
     @Test

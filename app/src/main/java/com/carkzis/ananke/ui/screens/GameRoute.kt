@@ -10,7 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun GameRoute(
     modifier: Modifier = Modifier,
     onNewGameClick: () -> Unit = {},
-    viewModel: GameScreenViewModel = hiltViewModel(),
+    viewModel: GameViewModel = hiltViewModel(),
 ) {
     val games by viewModel.gameList.collectAsStateWithLifecycle()
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
