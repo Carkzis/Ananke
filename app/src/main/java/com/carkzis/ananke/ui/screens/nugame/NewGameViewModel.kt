@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
-import com.carkzis.ananke.utils.ValidatorResponse
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.descriptionValidator
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.titleValidator
+import com.carkzis.ananke.utils.ValidatorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

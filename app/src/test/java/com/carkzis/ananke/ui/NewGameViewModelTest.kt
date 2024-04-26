@@ -182,7 +182,7 @@ class NewGameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        gameRepository.gameExists = true
+        gameRepository.gameExistsWhenAddingGame = true
         viewModel.addNewGame(NewGame("A Game That Already Exists", "It already exists."))
 
         assertEquals(GameAlreadyExistsException().message, messages.firstOrNull())

@@ -4,8 +4,12 @@ import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
+import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.ui.screens.game.InvalidGameException
 import com.carkzis.ananke.utils.GameStateUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -96,6 +100,77 @@ class GameViewModelTest {
 
         val actualCurrentGamingState = viewModel.gamingState.value
         assertEquals(expectedCurrentGamingState, actualCurrentGamingState)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message about when failing to enter game`() = runTest {
+        val currentGame = dummyGames().first().toCurrentGame()
+        val messages = mutableListOf<String>()
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.failToEnterGameOther = true
+        viewModel.enterGame(currentGame)
+
+        assertEquals(EnterGameFailedException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message about when game is invalid`() = runTest {
+        val currentGame = dummyGames().first().toCurrentGame()
+        val messages = mutableListOf<String>()
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.gameIsInvalid = true
+        viewModel.enterGame(currentGame)
+
+        assertEquals(InvalidGameException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message about when game does not exist`() = runTest {
+        val currentGame = dummyGames().first().toCurrentGame()
+        val messages = mutableListOf<String>()
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.gameExistsWhenEnteringGame = false
+        viewModel.enterGame(currentGame)
+
+        assertEquals(GameDoesNotExistException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message about when failing to exit game`() = runTest {
+        val messages = mutableListOf<String>()
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.failToExitGame = true
+        viewModel.exitGame()
+
+        assertEquals(ExitGameFailedException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
 
         collection.cancel()
     }
