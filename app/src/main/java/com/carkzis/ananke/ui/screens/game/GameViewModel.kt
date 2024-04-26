@@ -44,7 +44,9 @@ class GameViewModel @Inject constructor(
                 gameRepository.updateCurrentGame(currentGame)
             } catch (exception: Throwable) {
                 when (exception) {
-                    is InvalidGameException, is GameDoesNotExistException, is EnterGameFailedException -> {
+                    is InvalidGameException,
+                    is GameDoesNotExistException,
+                    is EnterGameFailedException -> {
                         exception.message?.let { _message.emit(it) }
                     }
                     else -> throw Exception(exception.message)

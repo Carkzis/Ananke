@@ -2,6 +2,7 @@ package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.data.Game
+import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
@@ -113,7 +114,7 @@ class GameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        gameRepository.failToEnterGameOther = true
+        gameRepository.ENTRY_GENERIC_FAIL = true
         viewModel.enterGame(currentGame)
 
         assertEquals(EnterGameFailedException().message, messages.firstOrNull())
@@ -131,7 +132,7 @@ class GameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        gameRepository.gameIsInvalid = true
+        gameRepository.ENTRY_GAME_INVALID = true
         viewModel.enterGame(currentGame)
 
         assertEquals(InvalidGameException().message, messages.firstOrNull())
@@ -149,7 +150,7 @@ class GameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        gameRepository.gameExistsWhenEnteringGame = false
+        gameRepository.ENTRY_GAME_EXISTS = false
         viewModel.enterGame(currentGame)
 
         assertEquals(GameDoesNotExistException().message, messages.firstOrNull())
@@ -166,7 +167,7 @@ class GameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        gameRepository.failToExitGame = true
+        gameRepository.FAIL_EXIT = true
         viewModel.exitGame()
 
         assertEquals(ExitGameFailedException().message, messages.firstOrNull())

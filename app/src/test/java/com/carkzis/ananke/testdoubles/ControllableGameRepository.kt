@@ -15,12 +15,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class ControllableGameRepository(initialCurrentGame: CurrentGame = CurrentGame.EMPTY) : GameRepository {
+    var ADD_GAME_EXISTS = false
 
-    var gameExistsWhenAddingGame = false
-    var gameIsInvalid = false
-    var gameExistsWhenEnteringGame = true
-    var failToEnterGameOther = false
-    var failToExitGame = false
+    var ENTRY_GAME_EXISTS = true
+    var ENTRY_GAME_INVALID = false
+    var ENTRY_GENERIC_FAIL = false
+
+    var FAIL_EXIT = false
 
     private val _games = MutableSharedFlow<List<Game>>(replay = 1)
     private val games get() = _games.replayCache.firstOrNull() ?: listOf()
@@ -30,29 +31,29 @@ class ControllableGameRepository(initialCurrentGame: CurrentGame = CurrentGame.E
     override fun getGames(): Flow<List<Game>> = _games
 
     override suspend fun addNewGame(newGame: NewGame) {
-        if (gameExistsWhenAddingGame) throw GameAlreadyExistsException()
+        if (ADD_GAME_EXISTS) throw GameAlreadyExistsException()
 
         games.let {
             _games.tryEmit(it + newGame.asGame())
         }
     }
 
-    override fun getCurrentGame(): Flow<CurrentGame> = if (gameExistsWhenEnteringGame) {
+    override fun getCurrentGame(): Flow<CurrentGame> = if (ENTRY_GAME_EXISTS) {
         _currentGame
     } else {
         throw GameDoesNotExistException()
     }
 
     override suspend fun updateCurrentGame(currentGame: CurrentGame) {
-        if (gameIsInvalid) throw InvalidGameException()
-        if (!gameExistsWhenEnteringGame) throw GameDoesNotExistException()
-        if (failToEnterGameOther) throw EnterGameFailedException()
+        if (!ENTRY_GAME_EXISTS) throw GameDoesNotExistException()
+        if (ENTRY_GAME_INVALID) throw InvalidGameException()
+        if (ENTRY_GENERIC_FAIL) throw EnterGameFailedException()
 
         _currentGame.tryEmit(currentGame)
     }
 
     override suspend fun removeCurrentGame() {
-        if (failToExitGame) throw ExitGameFailedException()
+        if (FAIL_EXIT) throw ExitGameFailedException()
 
         _currentGame.tryEmit(CurrentGame.EMPTY)
     }
