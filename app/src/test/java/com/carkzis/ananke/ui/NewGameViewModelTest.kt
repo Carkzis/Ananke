@@ -1,5 +1,7 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.asGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -180,7 +182,7 @@ class NewGameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        gameRepository.gameExists = true
+        gameRepository.ADD_GAME_EXISTS = true
         viewModel.addNewGame(NewGame("A Game That Already Exists", "It already exists."))
 
         assertEquals(GameAlreadyExistsException().message, messages.firstOrNull())

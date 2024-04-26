@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
-import com.carkzis.ananke.ui.screens.ValidatorResponse
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.descriptionValidator
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.titleValidator
+import com.carkzis.ananke.utils.ValidatorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-open class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
+class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
     ViewModel() {
 
     private val _gameTitle = MutableStateFlow("")

@@ -16,7 +16,6 @@ import com.carkzis.ananke.navigation.AnankeNavHost
 import com.carkzis.ananke.ui.components.AnankeBackground
 import com.carkzis.ananke.ui.components.AnankeTopBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnankeApp(
     appState: AnankeAppState = rememberAnankeAppState()

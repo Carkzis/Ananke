@@ -14,16 +14,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.carkzis.ananke.ui.theme.Typography
 
 @Composable
 fun AnankeText(
     text: String,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium
+    textAlign: TextAlign = TextAlign.Center,
+    textStyle: TextStyle = Typography.bodyMedium
 ) {
     Text(
         text = text,
-        textAlign = TextAlign.Center,
+        textAlign = textAlign,
         style = textStyle,
         modifier = modifier.fillMaxWidth()
     )

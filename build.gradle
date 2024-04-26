@@ -12,6 +12,7 @@ buildscript {
         hilt_version = "2.47"
         timber_version = "5.0.1"
         room_version = "2.5.2"
+        datastore = "1.0.0"
 
         junit_version = "4.13.2"
         robolectric_version = "4.9.1"

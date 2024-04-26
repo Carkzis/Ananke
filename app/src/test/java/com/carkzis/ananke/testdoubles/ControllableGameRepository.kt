@@ -1,33 +1,78 @@
 package com.carkzis.ananke.testdoubles
 
-import com.carkzis.ananke.asGame
+import com.carkzis.ananke.utils.asGame
+import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.data.NewGame
+import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
+import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
+import com.carkzis.ananke.ui.screens.game.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 
-class ControllableGameRepository : GameRepository {
+class ControllableGameRepository(
+    initialCurrentGame: CurrentGame = CurrentGame.EMPTY,
+    initialGames: List<Game> = listOf()
+) : GameRepository {
+    var ADD_GAME_EXISTS = false
 
-    var gameExists = false
+    var ENTRY_GAME_EXISTS = true
+    var ENTRY_GAME_INVALID = false
+    var ENTRY_GENERIC_FAIL = false
+
+    var FAIL_EXIT = false
 
     private val _games = MutableSharedFlow<List<Game>>(replay = 1)
+    private val games get() = _games.replayCache.firstOrNull() ?: listOf()
 
-    private val currentGames get() = _games.replayCache.firstOrNull() ?: listOf()
+    private val _currentGame = MutableStateFlow(initialCurrentGame)
+
+    init {
+        if (initialGames.isNotEmpty()) {
+            _games.tryEmit(initialGames)
+        }
+    }
 
     override fun getGames(): Flow<List<Game>> = _games
 
     override suspend fun addNewGame(newGame: NewGame) {
-        if (gameExists) throw GameAlreadyExistsException()
+        if (ADD_GAME_EXISTS) throw GameAlreadyExistsException()
 
-        currentGames.let {
+        games.let {
             _games.tryEmit(it + newGame.asGame())
         }
     }
 
+    override fun getCurrentGame(): Flow<CurrentGame> = if (ENTRY_GAME_EXISTS) {
+        _currentGame
+    } else {
+        throw GameDoesNotExistException()
+    }
+
+    override suspend fun updateCurrentGame(currentGame: CurrentGame) {
+        if (!ENTRY_GAME_EXISTS) throw GameDoesNotExistException()
+        if (ENTRY_GAME_INVALID) throw InvalidGameException()
+        if (ENTRY_GENERIC_FAIL) throw EnterGameFailedException()
+
+        _currentGame.tryEmit(currentGame)
+    }
+
+    override suspend fun removeCurrentGame() {
+        if (FAIL_EXIT) throw ExitGameFailedException()
+
+        _currentGame.tryEmit(CurrentGame.EMPTY)
+    }
+
     fun emitGames(newGames: List<Game>) {
         _games.tryEmit(newGames)
+    }
+
+    fun emitCurrentGame(currentGame: CurrentGame) {
+        _currentGame.tryEmit(currentGame)
     }
 
 }

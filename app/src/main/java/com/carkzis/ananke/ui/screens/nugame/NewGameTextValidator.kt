@@ -1,7 +1,7 @@
 package com.carkzis.ananke.ui.screens.nugame
 
-import com.carkzis.ananke.ui.screens.TextValidator
-import com.carkzis.ananke.ui.screens.ValidatorResponse
+import com.carkzis.ananke.utils.TextValidator
+import com.carkzis.ananke.utils.ValidatorResponse
 import com.carkzis.ananke.ui.screens.nugame.NewGameConstants.Companion.MAXIMUM_GAME_DESCRIPTION_LENGTH
 import com.carkzis.ananke.ui.screens.nugame.NewGameConstants.Companion.MAXIMUM_GAME_TITLE_LENGTH
 import com.carkzis.ananke.ui.screens.nugame.NewGameConstants.Companion.MINIMUM_GAME_TITLE_LENGTH

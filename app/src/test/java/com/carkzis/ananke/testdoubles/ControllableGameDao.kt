@@ -5,12 +5,21 @@ import com.carkzis.ananke.data.GameDao
 import com.carkzis.ananke.data.GameEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
 class ControllableGameDao : GameDao {
     private var games = MutableStateFlow(dummyGameEntities)
 
     override fun getGames(): Flow<List<GameEntity>> = games
+
+    override fun getGame(gameId: String): Flow<GameEntity?> = flow {
+        emit(
+            games.value.firstOrNull {
+                it.id.toString() == gameId
+            }
+        )
+    }
 
     override suspend fun upsertGames(gameEntities: List<GameEntity>) {
         games.update { previousValues ->

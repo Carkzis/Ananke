@@ -31,7 +31,7 @@ fun NewGameScreen(
     gameDescription: String,
     onTitleValueChanged: (String) -> Unit,
     onDescriptionValueChanged: (String) -> Unit,
-    onAddGameClick: () -> Unit,
+    onAttemptAddGameClick: () -> Unit,
     onAddDummyGameClick: () -> Unit,
     onAddGameSucceeds: suspend () -> Unit,
     onShowSnackbar: suspend () -> Unit
@@ -42,7 +42,7 @@ fun NewGameScreen(
         newGameTitle(modifier)
         gameTitleTextField(modifier, gameTitle, onTitleValueChanged)
         gameDescriptionTextField(modifier, gameDescription, onDescriptionValueChanged)
-        addGameButtonRow(modifier, onAddGameClick, onAddDummyGameClick)
+        addGameButtonRow(modifier, onAttemptAddGameClick, onAddDummyGameClick)
     }
 }
 
@@ -226,7 +226,7 @@ private fun NewGameScreenPreview() {
             gameDescription = "A Description",
             onTitleValueChanged = {},
             onDescriptionValueChanged = {},
-            onAddGameClick = {},
+            onAttemptAddGameClick = {},
             onAddDummyGameClick = {},
             onAddGameSucceeds = {},
             onShowSnackbar = {}

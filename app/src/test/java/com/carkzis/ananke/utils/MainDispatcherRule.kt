@@ -1,4 +1,4 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

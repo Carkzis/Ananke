@@ -1,4 +1,4 @@
-package com.carkzis.ananke
+package com.carkzis.ananke.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
@@ -11,8 +11,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.carkzis.ananke.navigation.AnankeDestination
-import com.carkzis.ananke.navigation.GameDestination
+import com.carkzis.ananke.MainActivity
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication

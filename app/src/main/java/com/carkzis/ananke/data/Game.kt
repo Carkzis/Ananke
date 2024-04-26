@@ -5,3 +5,9 @@ data class Game(
     val name: String,
     val description: String
 )
+
+fun Game.toCurrentGame() = CurrentGame(
+    id = id,
+    name = name,
+    description = description
+)

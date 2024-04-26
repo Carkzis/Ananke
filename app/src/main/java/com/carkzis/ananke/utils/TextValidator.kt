@@ -1,4 +1,4 @@
-package com.carkzis.ananke.ui.screens
+package com.carkzis.ananke.utils
 
 interface TextValidator {
     fun validateText(text: String) : ValidatorResponse

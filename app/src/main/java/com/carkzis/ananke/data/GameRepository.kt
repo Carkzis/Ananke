@@ -6,4 +6,10 @@ interface GameRepository {
     fun getGames(): Flow<List<Game>>
 
     suspend fun addNewGame(newGame: NewGame)
+
+    fun getCurrentGame(): Flow<CurrentGame>
+
+    suspend fun updateCurrentGame(currentGame: CurrentGame)
+
+    suspend fun removeCurrentGame()
 }
