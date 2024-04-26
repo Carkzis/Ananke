@@ -157,7 +157,7 @@ class NewGameScreenTest {
                 .performClick()
             runBlocking {
                 val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
-                    .filterNotNull().first().visuals.message
+                    .first()?.visuals?.message
                 val expectedSnackbarText = NewGameValidatorFailure.TITLE_EMPTY.message
                 assertEquals(expectedSnackbarText, actualSnackbarText)
             }

@@ -39,9 +39,9 @@ import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -59,6 +59,13 @@ class GameScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private var snackbarHostState: SnackbarHostState? = null
+
+    @After
+    fun tearDown() {
+        snackbarHostState = null
+    }
 
     @Test
     fun `no title when loading`() {
@@ -101,23 +108,11 @@ class GameScreenTest {
             )
 
             openDialogForEnteringFirstGame()
+            enterGameThroughDialog()
 
-            // Dialog exists, and so enter game.
-            onNodeWithTag("${GameDestination.HOME}-enter-alert")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-enter-alert-confirm")
-                .assertExists()
-                .performClick()
-
-            // In expected game screen.
             onNodeWithTag("${GameDestination.HOME}-enter-alert")
                 .assertDoesNotExist()
-            onNodeWithTag("${GameDestination.HOME}-gamecard")
-                .assertDoesNotExist()
-            onNodeWithTag("${GameDestination.HOME}-current-game-column")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-current-game-title")
-                .assertTextContains(dummyGames().first().toCurrentGame().name)
+            assertCurrentStateIsWithinGame()
 
             assertEquals(dummyGames().first().toCurrentGame(), actualCurrentGame)
         }
@@ -137,33 +132,18 @@ class GameScreenTest {
                 }
             )
 
-            // Ensure current state is within game.
-            onNodeWithTag("${GameDestination.HOME}-gamecard")
-                .assertDoesNotExist()
-            onNodeWithTag("${GameDestination.HOME}-current-game-column")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-current-game-title")
-                .assertTextContains(dummyGames().first().toCurrentGame().name)
+            assertCurrentStateIsWithinGame()
 
-            // Press button to exit game.
             onNodeWithTag("${GameDestination.HOME}-exit-current-game")
                 .assertHasClickAction()
                 .performClick()
 
-            // Now in out of game screen.
-            onNodeWithTag("${GameDestination.HOME}-title")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-gameslist")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-enter-alert")
-                .assertDoesNotExist()
-            onAllNodesWithTag("${GameDestination.HOME}-gamecard")
-                .onLast()
-                .assertExists()
+            assertCurrentStateIsOutOfGame()
 
             assertEquals(CurrentGame.EMPTY, actualCurrentGame)
         }
     }
+
 
     @Test
     fun `dismiss an enter game dialog to remove it`() {
@@ -180,24 +160,9 @@ class GameScreenTest {
             )
 
             openDialogForEnteringFirstGame()
+            dismissDialog()
 
-            // Dialog exists, but dismiss it.
-            onNodeWithTag("${GameDestination.HOME}-enter-alert")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-enter-alert-reject")
-                .assertExists()
-                .performClick()
-
-            // Still in original out of game screen.
-            onNodeWithTag("${GameDestination.HOME}-title")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-gameslist")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-enter-alert")
-                .assertDoesNotExist()
-            onAllNodesWithTag("${GameDestination.HOME}-gamecard")
-                .onLast()
-                .assertExists()
+            assertCurrentStateIsOutOfGame()
 
             assertEquals(CurrentGame.EMPTY, actualCurrentGame)
         }
@@ -205,106 +170,60 @@ class GameScreenTest {
 
     @Test
     fun `failing to enter game results in dialog disappearing and snackbar displaying`() {
-        var snackbarHostState: SnackbarHostState? = null
-
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository(initialGames = dummyGames()).apply {
                 ENTRY_GENERIC_FAIL = true
             }
             val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
 
-            composeTestRule.setContent {
-                snackbarHostState = remember { SnackbarHostState() }
-                GameRoute(
-                    viewModel = viewModel,
-                    onShowSnackbar = { message ->
-                        snackbarHostState?.showSnackbar(
-                            message = message, duration = SnackbarDuration.Short
-                        ) == SnackbarResult.Dismissed
-                    }
-                )
-            }
+            initialiseGameScreenViaGameRoute(viewModel)
 
             openDialogForEnteringFirstGame()
+            enterGameThroughDialog()
 
-            // Dialog exists, and so enter game.
-            onNodeWithTag("${GameDestination.HOME}-enter-alert")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-enter-alert-confirm")
-                .assertExists()
-                .performClick()
+            assertCurrentStateIsOutOfGame()
 
-            // Still in original out of game screen.
-            onNodeWithTag("${GameDestination.HOME}-title")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-gameslist")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-enter-alert")
-                .assertDoesNotExist()
-            onAllNodesWithTag("${GameDestination.HOME}-gamecard")
-                .onLast()
-                .assertExists()
-
-            runBlocking {
-                val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
-                    .filterNotNull().first().visuals.message
-                val expectedSnackbarText = EnterGameFailedException().message
-                assertEquals(expectedSnackbarText, actualSnackbarText)
-            }
+            assertSnapshotHasExpectedMessage(expectedSnackbarText = EnterGameFailedException().message)
         }
     }
 
     @Test
     fun `failing to exit a game results in dialog disappearing and snackbar displaying`() {
-        var snackbarHostState: SnackbarHostState? = null
-
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame()).apply {
                 FAIL_EXIT = true
             }
             val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
 
-            composeTestRule.setContent {
-                snackbarHostState = remember { SnackbarHostState() }
-                GameRoute(
-                    viewModel = viewModel,
-                    onShowSnackbar = { message ->
-                        snackbarHostState?.showSnackbar(
-                            message = message, duration = SnackbarDuration.Short
-                        ) == SnackbarResult.Dismissed
-                    }
-                )
-            }
+            initialiseGameScreenViaGameRoute(viewModel)
 
-            // Ensure current state is within game.
-            onNodeWithTag("${GameDestination.HOME}-gamecard")
-                .assertDoesNotExist()
-            onNodeWithTag("${GameDestination.HOME}-current-game-column")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-current-game-title")
-                .assertTextContains(dummyGames().first().toCurrentGame().name)
+            assertCurrentStateIsWithinGame()
 
-            // Press button to exit game.
             onNodeWithTag("${GameDestination.HOME}-exit-current-game")
                 .assertHasClickAction()
                 .performClick()
 
-            // Still in previous game screen.
             onNodeWithTag("${GameDestination.HOME}-enter-alert")
                 .assertDoesNotExist()
-            onNodeWithTag("${GameDestination.HOME}-gamecard")
-                .assertDoesNotExist()
-            onNodeWithTag("${GameDestination.HOME}-current-game-column")
-                .assertExists()
-            onNodeWithTag("${GameDestination.HOME}-current-game-title")
-                .assertTextContains(dummyGames().first().toCurrentGame().name)
+            assertCurrentStateIsWithinGame()
 
-            runBlocking {
-                val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
-                    .filterNotNull().first().visuals.message
-                val expectedSnackbarText = ExitGameFailedException().message
-                assertEquals(expectedSnackbarText, actualSnackbarText)
-            }
+            assertSnapshotHasExpectedMessage(expectedSnackbarText = ExitGameFailedException().message)
+        }
+    }
+
+    private fun initialiseGameScreenViaGameRoute(
+        viewModel: GameViewModel
+    ) {
+        composeTestRule.setContent {
+            snackbarHostState = remember { SnackbarHostState() }
+            GameRoute(
+                viewModel = viewModel,
+                onShowSnackbar = { message ->
+                    snackbarHostState?.showSnackbar(
+                        message = message, duration = SnackbarDuration.Short
+                    ) == SnackbarResult.Dismissed
+                }
+            )
         }
     }
 
@@ -368,6 +287,51 @@ class GameScreenTest {
         enterButtonForTargetCard
             .assertHasClickAction()
             .performClick()
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.enterGameThroughDialog() {
+        onNodeWithTag("${GameDestination.HOME}-enter-alert")
+            .assertExists()
+        onNodeWithTag("${GameDestination.HOME}-enter-alert-confirm")
+            .assertExists()
+            .performClick()
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.dismissDialog() {
+        onNodeWithTag("${GameDestination.HOME}-enter-alert")
+            .assertExists()
+        onNodeWithTag("${GameDestination.HOME}-enter-alert-reject")
+            .assertExists()
+            .performClick()
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.assertCurrentStateIsWithinGame() {
+        onNodeWithTag("${GameDestination.HOME}-gamecard")
+            .assertDoesNotExist()
+        onNodeWithTag("${GameDestination.HOME}-current-game-column")
+            .assertExists()
+        onNodeWithTag("${GameDestination.HOME}-current-game-title")
+            .assertTextContains(dummyGames().first().toCurrentGame().name)
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.assertCurrentStateIsOutOfGame() {
+        onNodeWithTag("${GameDestination.HOME}-title")
+            .assertExists()
+        onNodeWithTag("${GameDestination.HOME}-gameslist")
+            .assertExists()
+        onNodeWithTag("${GameDestination.HOME}-enter-alert")
+            .assertDoesNotExist()
+        onAllNodesWithTag("${GameDestination.HOME}-gamecard")
+            .onLast()
+            .assertExists()
+    }
+
+    private fun assertSnapshotHasExpectedMessage(expectedSnackbarText: String) {
+        runBlocking {
+            val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
+                .first()?.visuals?.message
+            assertEquals(expectedSnackbarText, actualSnackbarText)
+        }
     }
 
     private fun dummyGames() = listOf(
