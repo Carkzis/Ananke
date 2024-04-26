@@ -32,6 +32,7 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -189,6 +190,95 @@ class GameScreenTest {
                 .assertExists()
 
             assertEquals(CurrentGame.EMPTY, actualCurrentGame)
+        }
+    }
+
+    @Test
+    fun `failing to enter game results in dialog disappearing and snackbar displaying`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository().apply {
+                ENTRY_GENERIC_FAIL = true
+            }
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+            var attemptedCurrentGame = CurrentGame.EMPTY
+
+            initialiseGameScreen(
+                viewModel,
+                onEnterGame = {
+                    attemptedCurrentGame = it
+                }
+            )
+
+            openDialogForEnteringFirstGame()
+
+            // Dialog exists, and so enter game.
+            onNodeWithTag("${GameDestination.HOME}-enter-alert")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-enter-alert-confirm")
+                .assertExists()
+                .performClick()
+
+            // Still in original out of game screen.
+            onNodeWithTag("${GameDestination.HOME}-title")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-gameslist")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-enter-alert")
+                .assertDoesNotExist()
+            onAllNodesWithTag("${GameDestination.HOME}-gamecard")
+                .onLast()
+                .assertExists()
+
+            // An attempt to enter a game made, but failed.
+            assertEquals(dummyGames().first().toCurrentGame(), attemptedCurrentGame)
+
+            // TODO: Snackbar test
+        }
+    }
+
+    @Test
+    fun `failing to exit a game results in dialog disappearing and snackbar displaying`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame()).apply {
+                FAIL_EXIT = true
+            }
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+            var attemptedCurrentGame = dummyGames().first().toCurrentGame()
+
+            initialiseGameScreen(
+                viewModel,
+                onExitGame = {
+                    attemptedCurrentGame = it
+                }
+            )
+
+            // Ensure current state is within game.
+            onNodeWithTag("${GameDestination.HOME}-gamecard")
+                .assertDoesNotExist()
+            onNodeWithTag("${GameDestination.HOME}-current-game-column")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-current-game-title")
+                .assertTextContains(dummyGames().first().toCurrentGame().name)
+
+            // Press button to exit game.
+            onNodeWithTag("${GameDestination.HOME}-exit-current-game")
+                .assertHasClickAction()
+                .performClick()
+
+            // Still in previous game screen.
+            onNodeWithTag("${GameDestination.HOME}-enter-alert")
+                .assertDoesNotExist()
+            onNodeWithTag("${GameDestination.HOME}-gamecard")
+                .assertDoesNotExist()
+            onNodeWithTag("${GameDestination.HOME}-current-game-column")
+                .assertExists()
+            onNodeWithTag("${GameDestination.HOME}-current-game-title")
+                .assertTextContains(dummyGames().first().toCurrentGame().name)
+
+            // An attempt to exit a game made, but failed.
+            assertEquals(CurrentGame.EMPTY, attemptedCurrentGame)
+
+            // TODO: Snackbar test
         }
     }
 
