@@ -29,18 +29,24 @@ fun AnankeNavHost(
             startDestination = "${AnankeDestination.GAME}/${GameDestination.HOME}"
         ) {
             composable(route = "${AnankeDestination.GAME}/${GameDestination.HOME}") {
-                GameRoute(onNewGameClick = {
-                    navController.navigate("${AnankeDestination.GAME}/${GameDestination.NEW}") {
-                        launchSingleTop = true
-                    }
-                })
+                GameRoute(
+                    onNewGameClick = {
+                        navController.navigate("${AnankeDestination.GAME}/${GameDestination.NEW}") {
+                            launchSingleTop = true
+                        }
+                    },
+                    onShowSnackbar = onShowSnackbar
+                )
             }
             composable(
                 route = "${AnankeDestination.GAME}/${GameDestination.NEW}"
             ) {
-                NewGameRoute(onAddGameClick = {
-                    navController.popBackStack()
-                }, onShowSnackbar = onShowSnackbar)
+                NewGameRoute(
+                    onAddGameClick = {
+                        navController.popBackStack()
+                    },
+                    onShowSnackbar = onShowSnackbar
+                )
             }
         }
         composable(route = AnankeDestination.TEAM.toString()) {

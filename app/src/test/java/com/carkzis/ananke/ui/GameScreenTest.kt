@@ -1,6 +1,11 @@
 package com.carkzis.ananke.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
@@ -24,6 +29,9 @@ import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
+import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
+import com.carkzis.ananke.ui.screens.game.GameRoute
 import com.carkzis.ananke.ui.screens.game.GameScreen
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
@@ -31,8 +39,10 @@ import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -195,19 +205,25 @@ class GameScreenTest {
 
     @Test
     fun `failing to enter game results in dialog disappearing and snackbar displaying`() {
+        var snackbarHostState: SnackbarHostState? = null
+
         composeTestRule.apply {
-            val gameRepository = ControllableGameRepository().apply {
+            val gameRepository = ControllableGameRepository(initialGames = dummyGames()).apply {
                 ENTRY_GENERIC_FAIL = true
             }
             val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
-            var attemptedCurrentGame = CurrentGame.EMPTY
 
-            initialiseGameScreen(
-                viewModel,
-                onEnterGame = {
-                    attemptedCurrentGame = it
-                }
-            )
+            composeTestRule.setContent {
+                snackbarHostState = remember { SnackbarHostState() }
+                GameRoute(
+                    viewModel = viewModel,
+                    onShowSnackbar = { message ->
+                        snackbarHostState?.showSnackbar(
+                            message = message, duration = SnackbarDuration.Short
+                        ) == SnackbarResult.Dismissed
+                    }
+                )
+            }
 
             openDialogForEnteringFirstGame()
 
@@ -229,28 +245,36 @@ class GameScreenTest {
                 .onLast()
                 .assertExists()
 
-            // An attempt to enter a game made, but failed.
-            assertEquals(dummyGames().first().toCurrentGame(), attemptedCurrentGame)
-
-            // TODO: Snackbar test
+            runBlocking {
+                val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
+                    .filterNotNull().first().visuals.message
+                val expectedSnackbarText = EnterGameFailedException().message
+                assertEquals(expectedSnackbarText, actualSnackbarText)
+            }
         }
     }
 
     @Test
     fun `failing to exit a game results in dialog disappearing and snackbar displaying`() {
+        var snackbarHostState: SnackbarHostState? = null
+
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame()).apply {
                 FAIL_EXIT = true
             }
             val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
-            var attemptedCurrentGame = dummyGames().first().toCurrentGame()
 
-            initialiseGameScreen(
-                viewModel,
-                onExitGame = {
-                    attemptedCurrentGame = it
-                }
-            )
+            composeTestRule.setContent {
+                snackbarHostState = remember { SnackbarHostState() }
+                GameRoute(
+                    viewModel = viewModel,
+                    onShowSnackbar = { message ->
+                        snackbarHostState?.showSnackbar(
+                            message = message, duration = SnackbarDuration.Short
+                        ) == SnackbarResult.Dismissed
+                    }
+                )
+            }
 
             // Ensure current state is within game.
             onNodeWithTag("${GameDestination.HOME}-gamecard")
@@ -275,10 +299,12 @@ class GameScreenTest {
             onNodeWithTag("${GameDestination.HOME}-current-game-title")
                 .assertTextContains(dummyGames().first().toCurrentGame().name)
 
-            // An attempt to exit a game made, but failed.
-            assertEquals(CurrentGame.EMPTY, attemptedCurrentGame)
-
-            // TODO: Snackbar test
+            runBlocking {
+                val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
+                    .filterNotNull().first().visuals.message
+                val expectedSnackbarText = ExitGameFailedException().message
+                assertEquals(expectedSnackbarText, actualSnackbarText)
+            }
         }
     }
 
@@ -305,7 +331,7 @@ class GameScreenTest {
     private fun initialiseGameScreen(
         viewModel: GameViewModel,
         onEnterGame: (CurrentGame) -> Unit = {},
-        onExitGame: (CurrentGame) -> Unit = {}
+        onExitGame: (CurrentGame) -> Unit = {},
     ) {
         composeTestRule.setContent {
             GameScreen(

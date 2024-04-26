@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,8 +54,10 @@ fun GameScreen(
     onEnterGame: (CurrentGame) -> Unit = {},
     onExitGame: () -> Unit = {},
     games: List<Game>,
-    gamingState: GamingState
+    gamingState: GamingState,
+    onShowSnackbar: suspend () -> Unit = {}
 ) {
+    GameScreenLaunchedEffects(onShowSnackbar)
     val lazyListState = rememberLazyListState()
     when (gamingState) {
         is GamingState.Loading -> {}
@@ -64,6 +67,15 @@ fun GameScreen(
         is GamingState.InGame -> {
             InGameScreen(modifier, gamingState, onExitGame)
         }
+    }
+}
+
+@Composable
+private fun GameScreenLaunchedEffects(
+    onShowSnackbar: suspend () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        onShowSnackbar()
     }
 }
 

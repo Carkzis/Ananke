@@ -14,7 +14,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class ControllableGameRepository(initialCurrentGame: CurrentGame = CurrentGame.EMPTY) : GameRepository {
+class ControllableGameRepository(
+    initialCurrentGame: CurrentGame = CurrentGame.EMPTY,
+    initialGames: List<Game> = listOf()
+) : GameRepository {
     var ADD_GAME_EXISTS = false
 
     var ENTRY_GAME_EXISTS = true
@@ -27,6 +30,12 @@ class ControllableGameRepository(initialCurrentGame: CurrentGame = CurrentGame.E
     private val games get() = _games.replayCache.firstOrNull() ?: listOf()
 
     private val _currentGame = MutableStateFlow(initialCurrentGame)
+
+    init {
+        if (initialGames.isNotEmpty()) {
+            _games.tryEmit(initialGames)
+        }
+    }
 
     override fun getGames(): Flow<List<Game>> = _games
 

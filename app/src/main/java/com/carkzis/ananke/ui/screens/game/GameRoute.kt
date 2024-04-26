@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun GameRoute(
     modifier: Modifier = Modifier,
     onNewGameClick: () -> Unit = {},
+    onShowSnackbar: suspend (String) -> Boolean,
     viewModel: GameViewModel = hiltViewModel(),
 ) {
     val games by viewModel.gameList.collectAsStateWithLifecycle()
@@ -25,6 +26,11 @@ fun GameRoute(
         },
         onExitGame = {
             viewModel.exitGame()
+        },
+        onShowSnackbar = {
+            viewModel.message.collect {
+                onShowSnackbar(it)
+            }
         }
     )
 }
