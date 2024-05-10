@@ -27,7 +27,7 @@ class NavigationTest {
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
 
-    @get:Rule(order = 2)
+    @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Test(expected = NoActivityResumedException::class)

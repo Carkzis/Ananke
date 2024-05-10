@@ -9,7 +9,12 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
 import androidx.navigation.testing.TestNavHostController
+import com.carkzis.ananke.data.GameRepository
 import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.utils.GameStateUseCase
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -25,6 +30,9 @@ class AnankeAppStateTest {
 
     private lateinit var appState: AnankeAppState
 
+    private val gameRepository: GameRepository = ControllableGameRepository()
+    private val gameStateUseCase = GameStateUseCase(gameRepository)
+
     @Before
     fun setUp() {
         ShadowLog.stream = System.out
@@ -35,7 +43,7 @@ class AnankeAppStateTest {
         val expectedDestinations = AnankeDestination.values()
 
         composeTestRule.setContent {
-            appState = rememberAnankeAppState()
+            appState = rememberAnankeAppState(gameState = gameStateUseCase)
         }
 
         assertEquals(3, appState.destinations.size)
@@ -45,13 +53,13 @@ class AnankeAppStateTest {
     }
 
     @Test
-    fun `anankeAppState has the expected default initial destination`() {
+    fun `anankeAppState has the expected default initial destination`() = runTest {
         val expectedInitialDestination = AnankeDestination.GAME.toString()
 
         var actualInitialDestination: String? =  null
         composeTestRule.setContent {
             val navController = rememberTestNavController()
-            appState = rememberAnankeAppState(navController = navController)
+            appState = rememberAnankeAppState(navController = navController, gameState = gameStateUseCase)
             actualInitialDestination = appState.currentDestination?.route
         }
 
@@ -59,13 +67,13 @@ class AnankeAppStateTest {
     }
 
     @Test
-    fun `anankeAppState has the expected new destination`() {
+    fun `anankeAppState has the expected new destination`() = runTest {
         val expectedInitialDestination = AnankeDestination.TEAM.toString()
 
         var actualInitialDestination: String? =  null
         composeTestRule.setContent {
             val navController = rememberTestNavController()
-            appState = rememberAnankeAppState(navController = navController)
+            appState = rememberAnankeAppState(navController = navController, gameState = gameStateUseCase)
             actualInitialDestination = appState.currentDestination?.route
 
             LaunchedEffect(Unit) {
@@ -74,6 +82,21 @@ class AnankeAppStateTest {
         }
 
         assertEquals(expectedInitialDestination, actualInitialDestination)
+    }
+
+    @Test
+    fun `anankeAppState has the expected availabilities of destinations on initialisation`() = runTest {
+        val expectedAvailabilityMap = AnankeDestination.values().associateWith {
+            true
+        }
+
+        composeTestRule.setContent {
+            appState = rememberAnankeAppState(gameState = gameStateUseCase)
+        }
+
+        val actualAvailabilityMap = appState.availabilityMap.first()
+
+        assertEquals(expectedAvailabilityMap, actualAvailabilityMap)
     }
 }
 

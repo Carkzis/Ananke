@@ -22,6 +22,7 @@ fun AnankeBottomBar(
     modifier: Modifier = Modifier,
     destinations: List<AnankeDestination>,
     currentDestination: NavDestination?,
+    availabilities: Map<AnankeDestination, Boolean>,
     onNavigate: (AnankeDestination) -> Unit
 ) {
     NavigationBar(
@@ -31,6 +32,7 @@ fun AnankeBottomBar(
         destinations.forEach { destination ->
             val isCurrentlySelected =
                 currentDestination?.route?.contains(destination.name, false) ?: false
+            val isAvailable = availabilities.getOrDefault(destination, false)
             AnankeNavigationItem(
                 selected = isCurrentlySelected,
                 onClick = { onNavigate(destination) },
@@ -46,6 +48,7 @@ fun AnankeBottomBar(
                         contentDescription = null
                     )
                 },
+                enabled = isAvailable,
                 modifier = modifier.testTag(tag = "$destination-navigation-item")
             )
         }
@@ -57,12 +60,14 @@ fun RowScope.AnankeNavigationItem(
     selected: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    enabled: Boolean,
     selectedIcon: @Composable () -> Unit,
     icon: @Composable () -> Unit
 ) {
     NavigationBarItem(
         selected = selected,
         modifier = modifier,
+        enabled = enabled,
         icon = if (selected) selectedIcon else icon,
         onClick = onClick
     )
@@ -74,7 +79,9 @@ fun BottomBar() {
     AnankeBottomBar(
         destinations = AnankeDestination.values().toList(),
         currentDestination = null,
-        onNavigate = {})
+        onNavigate = {},
+        availabilities = AnankeDestination.values().associateWith { true }
+    )
 }
 
 @Preview(widthDp = 100, heightDp = 100)
@@ -87,6 +94,7 @@ fun NavigationItemSelected() {
             selected = true,
             onClick = {},
             selectedIcon = { Icon(imageVector = Icons.Filled.Games, null) },
+            enabled = true,
             icon = { Icon(imageVector = Icons.Filled.Games, null) })
     }
 }
@@ -101,6 +109,7 @@ fun NavigationItemUnselected() {
             selected = false,
             onClick = {},
             selectedIcon = { Icon(imageVector = Icons.Filled.Games, null) },
+            enabled = true,
             icon = { Icon(imageVector = Icons.Filled.Games, null) })
     }
 }

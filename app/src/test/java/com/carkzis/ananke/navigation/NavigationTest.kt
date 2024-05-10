@@ -14,6 +14,8 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.MainActivity
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.ui.screens.game.GameScreen
+import com.carkzis.ananke.ui.screens.game.GamingState
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
