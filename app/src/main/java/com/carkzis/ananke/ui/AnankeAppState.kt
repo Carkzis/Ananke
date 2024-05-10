@@ -37,7 +37,7 @@ class AnankeAppState(
             SharingStarted.WhileSubscribed(5000L),
             GamingState.OutOfGame
         ).map { gamingState ->
-            val screenIsAvailable = gamingState !is GamingState.InGame
+            val screenIsAvailable = gamingState is GamingState.InGame
             destinations.associateWith { destination ->
                 when (destination) {
                     AnankeDestination.GAME -> true
