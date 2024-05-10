@@ -12,14 +12,20 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.MainActivity
+import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.GameRepository
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
@@ -57,29 +63,12 @@ class NavigationTest {
     }
 
     @Test
-    fun `navigates from game screen to the new game screen with expected navigation states`() {
+    fun `screen prior to top level screens will always be games`() {
         composeTestRule.apply {
-            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
-                .assertIsDisplayed()
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()
-
-            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
-            onNodeWithTag("${GameDestination.NEW}-title")
-                .assertIsDisplayed()
-
-            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
-            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
-        }
-    }
-
-    @Test
-    fun `navigates from new game screen back to game screen when back selected with expected navigation states`() {
-        composeTestRule.apply {
-            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
+            onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
                 .performClick()
-
-            onNodeWithTag("${GameDestination.NEW}-title")
-                .assertIsDisplayed()
 
             activityRule.scenario.onActivity {
                 it.onBackPressedDispatcher.onBackPressed()
@@ -92,34 +81,17 @@ class NavigationTest {
     }
 
     @Test
-    fun `navigates from new game screen back to game screen when new game added`() {
-        composeTestRule.apply {
-            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
-                .performClick()
-
-            onNodeWithTag("${GameDestination.NEW}-addnewgame-lazycolumn")
-                .performTouchInput {
-                    swipeUp()
-                }
-
-            onNodeWithTag("${GameDestination.NEW}-addnewgame-button-dummy", useUnmergedTree = true)
-                .performClick()
-
-            assertScreenSelected(AnankeDestination.GAME)
-        }
-    }
-
-    @Test
-    fun `screen prior to top level screens will always be games`() {
+    fun `cannot navigate to team or you screen if not in a game`() {
         composeTestRule.apply {
             onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()
+
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.HOME}-title")
+                .assertIsDisplayed()
+
             onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
                 .performClick()
-
-            activityRule.scenario.onActivity {
-                it.onBackPressedDispatcher.onBackPressed()
-            }
 
             assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
             onNodeWithTag("${GameDestination.HOME}-title")

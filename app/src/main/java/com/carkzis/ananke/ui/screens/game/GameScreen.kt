@@ -60,7 +60,9 @@ fun GameScreen(
     GameScreenLaunchedEffects(onShowSnackbar)
     val lazyListState = rememberLazyListState()
     when (gamingState) {
-        is GamingState.Loading -> {}
+        is GamingState.Loading -> {
+            println("yes")
+        }
         is GamingState.OutOfGame -> {
             OutOfGameScreen(modifier, lazyListState, games, onEnterGame, onNewGameClick)
         }
