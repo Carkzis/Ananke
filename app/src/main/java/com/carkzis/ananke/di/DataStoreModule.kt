@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
+import kotlin.random.Random
 
 private const val USER_PREFERENCES = "user_preferences"
 
@@ -30,7 +31,7 @@ object DataStoreModule {
         PreferenceDataStoreFactory.create(
             scope = CoroutineScope(IO + SupervisorJob()),
         ) {
-            context.preferencesDataStoreFile(USER_PREFERENCES)
+            context.preferencesDataStoreFile("$USER_PREFERENCES-${Random.nextInt()}")
         }
 
 }

@@ -12,19 +12,37 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.MainActivity
+import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.di.DataModule
+import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.ui.screens.game.GameScreen
+import com.carkzis.ananke.ui.screens.game.GamingState
+import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
+import dagger.hilt.android.testing.UninstallModules
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
+@UninstallModules(DataModule::class)
 class NavigationTest {
+
+    @BindValue
+    @JvmField
+    val gameRepository: GameRepository = ControllableGameRepository()
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
@@ -40,77 +58,26 @@ class NavigationTest {
     }
 
     @Test
-    fun `navigates to from game screen to team screen and you screens`() {
+    fun `navigates to from game screen to team screen and you screens`() = runTest {
+        gameRepository.updateCurrentGame(CurrentGame("YeS", "No", "MaYbE"))
         composeTestRule.apply {
-            assertScreenSelected(AnankeDestination.GAME)
+            assertScreenSelected(AnankeDestination.GAME, inGame = true)
 
             onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()
 
-            assertScreenSelected(AnankeDestination.TEAM)
+            assertScreenSelected(AnankeDestination.TEAM, inGame = true)
 
             onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
                 .performClick()
 
-            assertScreenSelected(AnankeDestination.YOU)
+            assertScreenSelected(AnankeDestination.YOU, inGame = true)
         }
     }
 
     @Test
-    fun `navigates from game screen to the new game screen with expected navigation states`() {
-        composeTestRule.apply {
-            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
-                .assertIsDisplayed()
-                .performClick()
-
-            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
-            onNodeWithTag("${GameDestination.NEW}-title")
-                .assertIsDisplayed()
-
-            assertNavigationItemNotSelected("${AnankeDestination.TEAM}-navigation-item")
-            assertNavigationItemNotSelected("${AnankeDestination.YOU}-navigation-item")
-        }
-    }
-
-    @Test
-    fun `navigates from new game screen back to game screen when back selected with expected navigation states`() {
-        composeTestRule.apply {
-            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
-                .performClick()
-
-            onNodeWithTag("${GameDestination.NEW}-title")
-                .assertIsDisplayed()
-
-            activityRule.scenario.onActivity {
-                it.onBackPressedDispatcher.onBackPressed()
-            }
-
-            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
-            onNodeWithTag("${GameDestination.HOME}-title")
-                .assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `navigates from new game screen back to game screen when new game added`() {
-        composeTestRule.apply {
-            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
-                .performClick()
-
-            onNodeWithTag("${GameDestination.NEW}-addnewgame-lazycolumn")
-                .performTouchInput {
-                    swipeUp()
-                }
-
-            onNodeWithTag("${GameDestination.NEW}-addnewgame-button-dummy", useUnmergedTree = true)
-                .performClick()
-
-            assertScreenSelected(AnankeDestination.GAME)
-        }
-    }
-
-    @Test
-    fun `screen prior to top level screens will always be games`() {
+    fun `screen prior to top level screens will always be games`() = runTest {
+        gameRepository.updateCurrentGame(CurrentGame("YeS", "No", "MaYbE"))
         composeTestRule.apply {
             onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()
@@ -122,13 +89,36 @@ class NavigationTest {
             }
 
             assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.HOME}-current-game-title")
+                .assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `cannot navigate to team or you screen if not in a game`() = runTest {
+        composeTestRule.apply {
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
+                .performClick()
+
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
+            onNodeWithTag("${GameDestination.HOME}-title")
+                .assertIsDisplayed()
+
+            onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
+                .performClick()
+
+            assertNavigationItemSelected("${AnankeDestination.GAME}-navigation-item")
             onNodeWithTag("${GameDestination.HOME}-title")
                 .assertIsDisplayed()
         }
     }
 
-    private fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.assertScreenSelected(destination: AnankeDestination) {
-        val expectedTitle = if (destination == AnankeDestination.GAME) "${GameDestination.HOME}-title" else "$destination-title"
+    private fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.assertScreenSelected(destination: AnankeDestination, inGame: Boolean = false) {
+        val expectedTitle = when {
+            destination == AnankeDestination.GAME && inGame -> "${GameDestination.HOME}-current-game-title"
+            destination == AnankeDestination.GAME && !inGame -> "${GameDestination.HOME}-title"
+            else -> "$destination-title"
+        }
         val expectedDestination = "$destination-navigation-item"
         val expectedUnselectedNavigationItems = AnankeDestination.values().filter {
             it != destination

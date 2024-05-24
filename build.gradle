@@ -15,7 +15,7 @@ buildscript {
         datastore = "1.0.0"
 
         junit_version = "4.13.2"
-        robolectric_version = "4.9.1"
+        robolectric_version = "4.12.2"
         compose_junit_version = "1.4.3"
         androidx_test_ext_junit_version = "1.1.5"
         espresso_version = "3.5.1"

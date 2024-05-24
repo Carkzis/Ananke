@@ -11,26 +11,37 @@ import androidx.compose.ui.unit.dp
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.ui.components.AnankeText
+import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.theme.AnankeTheme
 
 @Composable
-fun YouScreen(currentGame: CurrentGame, modifier: Modifier = Modifier) {
-    Column {
-        AnankeText(
-            text = "You",
-            modifier = modifier
-                .padding(8.dp)
-                .testTag("${AnankeDestination.YOU}-title"),
-            textStyle = MaterialTheme.typography.headlineMedium
-        )
+fun YouScreen(
+    currentGame: CurrentGame,
+    gamingState: GamingState,
+    modifier: Modifier = Modifier
+) {
+    when (gamingState) {
+        is GamingState.Loading -> {}
+        is GamingState.OutOfGame -> {}
+        is GamingState.InGame -> {
+            Column {
+                AnankeText(
+                    text = "You",
+                    modifier = modifier
+                        .padding(8.dp)
+                        .testTag("${AnankeDestination.YOU}-title"),
+                    textStyle = MaterialTheme.typography.headlineMedium
+                )
 
-        AnankeText(
-            text = currentGame.name,
-            modifier = modifier
-                .padding(8.dp)
-                .testTag("${AnankeDestination.YOU}-current-game"),
-            textStyle = MaterialTheme.typography.headlineSmall
-        )
+                AnankeText(
+                    text = currentGame.name,
+                    modifier = modifier
+                        .padding(8.dp)
+                        .testTag("${AnankeDestination.YOU}-current-game"),
+                    textStyle = MaterialTheme.typography.headlineSmall
+                )
+            }
+        }
     }
 }
 
@@ -38,12 +49,14 @@ fun YouScreen(currentGame: CurrentGame, modifier: Modifier = Modifier) {
 @Composable
 private fun YouScreenPreview() {
     AnankeTheme {
+        val currentGame = CurrentGame(
+            id = "1",
+            name = "Preview Game",
+            description = "This is not a real game."
+        )
         YouScreen(
-            currentGame = CurrentGame(
-                id = "1",
-                name = "Preview Game",
-                description = "This is not a real game."
-            )
+            currentGame = currentGame,
+            gamingState = GamingState.InGame(currentGame)
         )
     }
 }

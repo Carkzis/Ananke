@@ -26,7 +26,7 @@ class TeamViewModelTest {
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        viewModel = TeamViewModel(GameStateUseCase(gameRepository))
+        viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository)
     }
 
     @Test
