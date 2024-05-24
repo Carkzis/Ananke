@@ -19,10 +19,9 @@ import com.carkzis.ananke.ui.theme.AnankeTheme
 @Composable
 fun TeamScreen(
     currentGame: CurrentGame,
+    gamingState: GamingState,
     modifier: Modifier = Modifier,
-    onOutOfGame: () -> Unit = {},
     onTestGameRemoval: () -> Unit = {},
-    gamingState: GamingState
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
@@ -63,18 +62,14 @@ fun TeamScreen(
 @Composable
 private fun TeamScreenPreview() {
     AnankeTheme {
+        val currentGame = CurrentGame(
+            id = "1",
+            name = "Preview Game",
+            description = "This is not a real game."
+        )
         TeamScreen(
-            currentGame = CurrentGame(
-                id = "1",
-                name = "Preview Game",
-                description = "This is not a real game."
-            ),
-            onOutOfGame = { },
-            gamingState = GamingState.InGame(CurrentGame(
-                id = "1",
-                name = "Preview Game",
-                description = "This is not a real game."
-            ))
+            currentGame = currentGame,
+            gamingState = GamingState.InGame(currentGame)
         )
     }
 }
