@@ -27,8 +27,5 @@ fun TeamRoute(
         modifier = modifier,
         currentGame = currentGame,
         gamingState = gameState,
-        onTestGameRemoval = {
-            viewModel.removeGameForTest()
-        }
     )
 }

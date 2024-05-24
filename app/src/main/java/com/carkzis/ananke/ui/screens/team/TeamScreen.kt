@@ -20,8 +20,7 @@ import com.carkzis.ananke.ui.theme.AnankeTheme
 fun TeamScreen(
     currentGame: CurrentGame,
     gamingState: GamingState,
-    modifier: Modifier = Modifier,
-    onTestGameRemoval: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
@@ -43,16 +42,6 @@ fun TeamScreen(
                         .testTag("${AnankeDestination.TEAM}-current-game"),
                     textStyle = MaterialTheme.typography.headlineSmall
                 )
-                AnankeButton(
-                    modifier = Modifier.testTag("${AnankeDestination.TEAM}-test-current-game-removal"),
-                    onClick = onTestGameRemoval
-                ) {
-                    AnankeText(
-                        text = "Exit Game",
-                        modifier = modifier
-                            .padding(8.dp)
-                    )
-                }
             }
         }
     }
