@@ -50,7 +50,11 @@ fun AnankeNavHost(
             }
         }
         composable(route = AnankeDestination.TEAM.toString()) {
-            TeamRoute()
+            TeamRoute(
+                onOutOfGame = {
+                    navController.popBackStack()
+                }
+            )
         }
         composable(route = AnankeDestination.YOU.toString()) {
             YouRoute()
