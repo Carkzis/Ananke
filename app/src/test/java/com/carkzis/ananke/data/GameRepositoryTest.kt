@@ -86,7 +86,7 @@ class GameRepositoryTest {
 
     @Test
     fun `repository adds current game to preferences and retrieves by id`() = runTest {
-        val expectedCurrentGame = CurrentGame(dummyGameEntities.first().id.toString())
+        val expectedCurrentGame = CurrentGame(dummyGameEntities.first().gameId.toString())
         gameRepository.updateCurrentGame(expectedCurrentGame)
 
         val actualCurrentGame = gameRepository.getCurrentGame().first()

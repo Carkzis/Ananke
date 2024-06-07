@@ -49,7 +49,7 @@ class GameDaoTest {
     fun `gameDao fetches game for id`() = runTest {
         gameDao.upsertGames(dummyGameEntities.shuffled())
         val expectedGame = dummyGameEntities.first()
-        val id = expectedGame.id.toString()
+        val id = expectedGame.gameId.toString()
 
         val actualGame = gameDao.getGame(id).first()
 

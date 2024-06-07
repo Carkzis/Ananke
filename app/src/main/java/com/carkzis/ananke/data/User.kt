@@ -5,8 +5,7 @@ data class User(
     val name: String,
 )
 
-fun User.toEntity(gameIds: List<Long>) = UserEntity(
-    id = id,
-    name = name,
-    gameIds = gameIds
+fun User.toEntity() = UserEntity(
+    userId = id,
+    name = name
 )

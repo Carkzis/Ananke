@@ -4,6 +4,7 @@ import com.carkzis.ananke.data.network.DefaultNetworkDataSource
 import com.carkzis.ananke.data.network.NetworkDataSource
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.testdoubles.ControllableTeamDao
+import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -41,7 +42,7 @@ class TeamRepositoryTest {
     @Test
     fun `repository adds particular user to a particular game in database`() = runTest {
         val expectedTeamMember = networkDataSource.getUsers().first().toDomainUser()
-        val expectedGameId = 15L
+        val expectedGameId = dummyGameEntities.random().gameId
         teamRepository.addTeamMember(expectedTeamMember, expectedGameId)
 
         assertTrue(getUserEntitiesAsDomainObjects(expectedGameId).contains(expectedTeamMember))
@@ -51,7 +52,9 @@ class TeamRepositoryTest {
     fun `repository adds additional game to existing user in database`() = runTest {  }
 
     private suspend fun getUserEntitiesAsDomainObjects(id: Long) =
-        teamDao.getTeamMembers(id)
+        teamDao.getTeamMembersWithGames(id)
             .first()
-            .map(UserEntity::toDomain)
+            .map {
+                it.user.toDomain()
+            }
 }
