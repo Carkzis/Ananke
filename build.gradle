@@ -21,6 +21,8 @@ buildscript {
         espresso_version = "3.5.1"
         testRunnerVersion = "1.5.1"
         testRulesVersion = "1.5.0"
+        mockito_core_version = "5.6.0"
+        mockito_kotlin_version = "5.1.0"
     }
 
     dependencies {

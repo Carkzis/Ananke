@@ -33,11 +33,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     buildFeatures {
         buildConfig = true
@@ -90,6 +90,8 @@ dependencies {
     testImplementation "androidx.compose.ui:ui-test-junit4:$compose_junit_version"
     testImplementation "androidx.room:room-testing:$room_version"
     testImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    testImplementation "org.mockito:mockito-core:$mockito_core_version"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockito_kotlin_version"
 
     kaptTest "com.google.dagger:hilt-android-compiler:$hilt_version"
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"

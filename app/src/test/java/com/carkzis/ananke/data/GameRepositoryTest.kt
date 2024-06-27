@@ -1,17 +1,15 @@
 package com.carkzis.ananke.data
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import com.carkzis.ananke.utils.MainDispatcherRule
-import com.carkzis.ananke.utils.asGame
 import com.carkzis.ananke.testdoubles.ControllableGameDao
-import com.carkzis.ananke.testdoubles.DataStoreFailure
-import com.carkzis.ananke.testdoubles.FailingAnankeDataStore
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.game.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
+import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.asGame
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -23,6 +21,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameRepositoryTest {
@@ -37,6 +39,8 @@ class GameRepositoryTest {
     private lateinit var gameRepository: GameRepository
     private lateinit var gameDao: GameDao
     private lateinit var anankeDataStore: AnankeDataStore
+
+    private val mockAnankeDataStore: AnankeDataStore = mock()
 
     @Before
     fun setUp() {
@@ -102,9 +106,10 @@ class GameRepositoryTest {
 
     @Test(expected = EnterGameFailedException::class)
     fun `repository throws exception if adding current game to preference fails`() = runTest {
+        whenever(mockAnankeDataStore.setCurrentGameId(anyString())).doAnswer { throw EnterGameFailedException() }
         gameRepository = DefaultGameRepository(
             gameDao,
-            FailingAnankeDataStore(DataStoreFailure.ENTER_GAME)
+            mockAnankeDataStore
         )
         val currentGame = CurrentGame("12345")
         gameRepository.updateCurrentGame(currentGame)
@@ -132,9 +137,10 @@ class GameRepositoryTest {
 
     @Test(expected = ExitGameFailedException::class)
     fun `repository throws exception if removing current game from preferences fails`() = runTest {
+        whenever(mockAnankeDataStore.removeCurrentGameId()).doAnswer { throw ExitGameFailedException() }
         gameRepository = DefaultGameRepository(
             gameDao,
-            FailingAnankeDataStore(DataStoreFailure.EXIT_GAME)
+            mockAnankeDataStore
         )
         val currentGame = CurrentGame("12345")
         gameRepository.updateCurrentGame(currentGame)
