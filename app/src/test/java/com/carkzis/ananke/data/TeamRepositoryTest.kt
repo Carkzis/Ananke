@@ -60,6 +60,31 @@ class TeamRepositoryTest {
         assertTrue(getUserEntitiesAsDomainObjects(secondGameId).contains(expectedTeamMember))
     }
 
+    @Test
+    fun `repository adds additional user to existing game in database`() = runTest {
+
+    }
+
+    @Test
+    fun `repository gets list of users for a particular game`() = runTest {
+
+    }
+
+    @Test
+    fun `repository does not add duplicate user with exception`() = runTest {
+
+    }
+
+    @Test
+    fun `repository does not add more users than cap with exception`() = runTest {
+
+    }
+
+    @Test
+    fun `repository does not add users to non-existent game with exception`() = runTest {
+
+    }
+
     private suspend fun getUserEntitiesAsDomainObjects(id: Long) =
         teamDao.getTeamMembersForGame(id)
             .first()
