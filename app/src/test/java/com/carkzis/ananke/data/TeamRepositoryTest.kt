@@ -49,7 +49,16 @@ class TeamRepositoryTest {
     }
 
     @Test
-    fun `repository adds additional game to existing user in database`() = runTest {  }
+    fun `repository adds additional game to existing user in database`() = runTest {
+        val expectedTeamMember = networkDataSource.getUsers().first().toDomainUser()
+        val firstGameId = dummyGameEntities.first().gameId
+        val secondGameId = dummyGameEntities.last().gameId
+        teamRepository.addTeamMember(expectedTeamMember, firstGameId)
+        teamRepository.addTeamMember(expectedTeamMember, secondGameId)
+
+        assertTrue(getUserEntitiesAsDomainObjects(firstGameId).contains(expectedTeamMember))
+        assertTrue(getUserEntitiesAsDomainObjects(secondGameId).contains(expectedTeamMember))
+    }
 
     private suspend fun getUserEntitiesAsDomainObjects(id: Long) =
         teamDao.getTeamMembersForGame(id)

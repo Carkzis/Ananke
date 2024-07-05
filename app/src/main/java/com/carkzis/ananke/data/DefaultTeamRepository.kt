@@ -14,5 +14,6 @@ class DefaultTeamRepository(
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         teamDao.insertTeamMember(teamMember.toEntity())
+        teamDao.insertOrIgnoreUserGameCrossRefEntities(listOf(UserGameCrossRef(gameId, teamMember.id)))
     }
 }
