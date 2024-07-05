@@ -15,7 +15,21 @@ interface TeamDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTeamMember(teamMember: UserEntity)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOrIgnoreUserGameCrossRefEntities(
+        userGameCrossReferences: List<UserGameCrossRef>
+    )
+
     @Transaction
-    @Query(value = "SELECT * FROM users INNER JOIN games WHERE games.gameId = :gameId")
-    fun getTeamMembersWithGames(gameId: Long): Flow<List<UserEntityWithGames>>
+    @Query(
+        value = """
+            SELECT * FROM users 
+            INNER JOIN UserGameCrossRef ON users.userId = UserGameCrossRef.userId
+            INNER JOIN games ON games.gameId = UserGameCrossRef.gameId
+            WHERE games.gameId = :gameId
+        """,
+    )
+    fun getTeamMembersForGame(gameId: Long): Flow<List<UserEntityWithGames>>
+
+
 }

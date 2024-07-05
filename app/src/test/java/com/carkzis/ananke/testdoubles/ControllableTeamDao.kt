@@ -3,6 +3,7 @@ package com.carkzis.ananke.testdoubles
 import com.carkzis.ananke.data.TeamDao
 import com.carkzis.ananke.data.UserEntity
 import com.carkzis.ananke.data.UserEntityWithGames
+import com.carkzis.ananke.data.UserGameCrossRef
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -21,7 +22,11 @@ class ControllableTeamDao : TeamDao {
         }
     }
 
-    override fun getTeamMembersWithGames(gameId: Long): Flow<List<UserEntityWithGames>> = flow {
+    override suspend fun insertOrIgnoreUserGameCrossRefEntities(userGameCrossReferences: List<UserGameCrossRef>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getTeamMembersForGame(gameId: Long): Flow<List<UserEntityWithGames>> = flow {
         emit(teamMembers.first().map {
             UserEntityWithGames(it, games = listOfGameIds)
         }.filter {

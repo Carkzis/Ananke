@@ -52,7 +52,7 @@ class TeamRepositoryTest {
     fun `repository adds additional game to existing user in database`() = runTest {  }
 
     private suspend fun getUserEntitiesAsDomainObjects(id: Long) =
-        teamDao.getTeamMembersWithGames(id)
+        teamDao.getTeamMembersForGame(id)
             .first()
             .map {
                 it.user.toDomain()

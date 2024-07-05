@@ -12,7 +12,7 @@ import androidx.room.Relation
 data class UserEntity(
     @PrimaryKey
     val userId: Long,
-    val name: String
+    val username: String
 )
 
 @Entity(primaryKeys = ["gameId", "userId"])
@@ -33,5 +33,5 @@ data class UserEntityWithGames(
 
 fun UserEntity.toDomain() = User(
     id = userId,
-    name = name
+    name = username
 )

@@ -7,5 +7,5 @@ data class User(
 
 fun User.toEntity() = UserEntity(
     userId = id,
-    name = name
+    username = name
 )
