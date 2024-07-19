@@ -62,12 +62,28 @@ class TeamRepositoryTest {
 
     @Test
     fun `repository adds additional user to existing game in database`() = runTest {
+        val firstTeamMember = networkDataSource.getUsers()[0].toDomainUser()
+        val secondTeamMember = networkDataSource.getUsers()[1].toDomainUser()
+        val expectedGameId = dummyGameEntities.first().gameId
 
+        teamRepository.addTeamMember(firstTeamMember, expectedGameId)
+        teamRepository.addTeamMember(secondTeamMember, expectedGameId)
+
+        assertTrue(getUserEntitiesAsDomainObjects(expectedGameId).contains(firstTeamMember))
+        assertTrue(getUserEntitiesAsDomainObjects(expectedGameId).contains(secondTeamMember))
     }
 
     @Test
     fun `repository gets list of users for a particular game`() = runTest {
+        val expectedUsers = networkDataSource.getUsers().map { it.toDomainUser() }
+        val expectedGameId = dummyGameEntities.first().gameId
 
+        expectedUsers.forEach {
+            teamRepository.addTeamMember(it, expectedGameId)
+        }
+
+        val actualUsers = teamRepository.getUsers().first()
+        assertEquals(expectedUsers, actualUsers)
     }
 
     @Test
