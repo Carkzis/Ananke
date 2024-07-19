@@ -23,6 +23,10 @@ class ControllableTeamRepository(
 
     override suspend fun getUsers(): Flow<List<User>> = _users
 
+    override suspend fun getTeamMembers(gameId: Long): Flow<List<User>> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         users.let {
             _users.tryEmit(it + teamMember)

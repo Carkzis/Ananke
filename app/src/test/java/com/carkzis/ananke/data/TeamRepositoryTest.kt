@@ -79,16 +79,22 @@ class TeamRepositoryTest {
 
     @Test
     fun `repository gets list of users for a particular game`() = runTest {
-        // TODO: Need to get a list of users for the game, it needs a new method.
-//        val expectedUsers = networkDataSource.getUsers().map { it.toDomainUser() }
-//        val expectedGameId = dummyGameEntities.first().gameId
-//
-//        expectedUsers.forEach {
-//            teamRepository.addTeamMember(it, expectedGameId)
-//        }
-//
-//        val actualUsers = teamRepository.getUsers().first()
-//        assertEquals(expectedUsers, actualUsers)
+        val allUsers = networkDataSource.getUsers().map { it.toDomainUser() }
+        val gameOneUsers = allUsers.take(3)
+        val gameOneId = 1L
+        val gameTwoUsers = allUsers.takeLast(3)
+        val gameTwoId = 2L
+
+        gameOneUsers.forEach {
+            teamRepository.addTeamMember(it, gameOneId)
+        }
+
+        gameTwoUsers.forEach {
+            teamRepository.addTeamMember(it, gameTwoId)
+        }
+
+        val actualUsersForGameOne = teamRepository.getTeamMembers(gameOneId).first()
+        assertEquals(gameOneUsers.toSet(), actualUsersForGameOne.toSet())
     }
 
     @Test(expected = UserAlreadyExistsException::class)
