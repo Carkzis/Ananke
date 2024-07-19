@@ -5,6 +5,7 @@ import com.carkzis.ananke.data.network.NetworkDataSource
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.testdoubles.ControllableTeamDao
 import com.carkzis.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import com.carkzis.ananke.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
@@ -25,12 +26,14 @@ class TeamRepositoryTest {
     private lateinit var networkDataSource: NetworkDataSource
     private lateinit var teamDao: TeamDao
     private lateinit var teamRepository: TeamRepository
+    private lateinit var teamConfiguration: TeamConfiguration
 
     @Before
     fun setUp() {
         teamDao = ControllableTeamDao()
         networkDataSource = DefaultNetworkDataSource()
-        teamRepository = DefaultTeamRepository(teamDao, networkDataSource)
+        teamConfiguration = TeamConfiguration()
+        teamRepository = DefaultTeamRepository(teamDao, networkDataSource, teamConfiguration)
     }
 
     @Test
@@ -96,9 +99,18 @@ class TeamRepositoryTest {
         teamRepository.addTeamMember(newTeamMemberWithSameId, 1)
     }
 
-    @Test
+    @Test(expected = TooManyUsersInTeamException::class)
     fun `repository does not add more users than cap with exception`() = runTest {
+        val memberLimit = 5
+        val exceededMemberLimit = memberLimit + 1
+        teamConfiguration.teamMemberLimit = memberLimit
+        val membersAboveCap = networkDataSource.getUsers()
+            .take(exceededMemberLimit)
+            .map { it.toDomainUser() }
 
+        membersAboveCap.forEach {
+            teamRepository.addTeamMember(it, 1)
+        }
     }
 
     @Test
