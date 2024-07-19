@@ -5,6 +5,7 @@ import com.carkzis.ananke.data.network.NetworkDataSource
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.testdoubles.ControllableTeamDao
 import com.carkzis.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import com.carkzis.ananke.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -86,9 +87,13 @@ class TeamRepositoryTest {
         assertEquals(expectedUsers, actualUsers)
     }
 
-    @Test
-    fun `repository does not add duplicate user with exception`() = runTest {
+    @Test(expected = UserAlreadyExistsException::class)
+    fun `repository does not add new user with existing id with exception`() = runTest {
+        val expectedTeamMember = networkDataSource.getUsers().first().toDomainUser()
+        val newTeamMemberWithSameId = expectedTeamMember.copy(name = "${expectedTeamMember.name}2")
 
+        teamRepository.addTeamMember(expectedTeamMember, 1)
+        teamRepository.addTeamMember(newTeamMemberWithSameId, 1)
     }
 
     @Test

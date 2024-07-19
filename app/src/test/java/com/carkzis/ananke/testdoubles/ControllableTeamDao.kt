@@ -1,5 +1,6 @@
 package com.carkzis.ananke.testdoubles
 
+import android.database.sqlite.SQLiteConstraintException
 import com.carkzis.ananke.data.TeamDao
 import com.carkzis.ananke.data.UserEntity
 import com.carkzis.ananke.data.UserEntityWithGames
@@ -17,6 +18,8 @@ class ControllableTeamDao : TeamDao {
     override fun getTeamMembers(): Flow<List<UserEntity>> = teamMembers
 
     override suspend fun insertTeamMember(teamMember: UserEntity) {
+        val usersWithSameId = teamMembers.value.filter { it.userId == teamMember.userId }
+        if (usersWithSameId.isNotEmpty()) throw SQLiteConstraintException()
         teamMembers.update {
             (it + teamMember)
                 .sortedWith(idDescending())

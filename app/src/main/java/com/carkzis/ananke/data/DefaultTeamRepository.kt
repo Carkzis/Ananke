@@ -1,7 +1,10 @@
 package com.carkzis.ananke.data
 
+import android.database.sqlite.SQLiteConstraintException
 import com.carkzis.ananke.data.network.NetworkDataSource
 import com.carkzis.ananke.data.network.toDomainUser
+import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
 class DefaultTeamRepository(
@@ -13,7 +16,17 @@ class DefaultTeamRepository(
     }
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
-        teamDao.insertTeamMember(teamMember.toEntity())
-        teamDao.insertOrIgnoreUserGameCrossRefEntities(listOf(UserGameCrossRef(gameId, teamMember.id)))
+        try {
+            teamDao.insertTeamMember(teamMember.toEntity())
+        } catch (e: SQLiteConstraintException) {
+            val existingTeamMember = teamDao.getTeamMembers().first().first {
+                it.userId == teamMember.id
+            }
+            if (existingTeamMember.username != teamMember.name) {
+                throw UserAlreadyExistsException()
+            }
+        } finally {
+            teamDao.insertOrIgnoreUserGameCrossRefEntities(listOf(UserGameCrossRef(gameId, teamMember.id)))
+        }
     }
 }
