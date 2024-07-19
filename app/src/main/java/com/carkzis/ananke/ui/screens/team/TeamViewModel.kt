@@ -3,7 +3,10 @@ package com.carkzis.ananke.ui.screens.team
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.data.TeamRepository
+import com.carkzis.ananke.data.User
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +17,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TeamViewModel @Inject constructor(gameStateUseCase: GameStateUseCase, val repository: GameRepository) : ViewModel() {
+class TeamViewModel @Inject constructor(
+    gameStateUseCase: GameStateUseCase,
+    private val gameRepository: GameRepository,
+    private val teamRepository: TeamRepository
+) : ViewModel() {
     val gamingState = gameStateUseCase().stateIn(
         viewModelScope,
         WhileSubscribed(5000L),
@@ -28,9 +35,9 @@ class TeamViewModel @Inject constructor(gameStateUseCase: GameStateUseCase, val 
         }
     }
 
-    fun removeGameForTest() {
+    fun addTeamMember(teamMember: User, game: Game) {
         viewModelScope.launch {
-            repository.removeCurrentGame()
+            teamRepository.addTeamMember(teamMember, game.id.toLong())
         }
     }
 }

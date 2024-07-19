@@ -41,7 +41,7 @@ class YouScreenTest {
     @Test
     fun `display current game name`() {
         val gameRepository = ControllableGameRepository()
-        val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository)
+        val viewModel = YouViewModel(GameStateUseCase(gameRepository))
 
         val currentGame = CurrentGame("1", "A Game", "A Description")
         gameRepository.emitCurrentGame(currentGame)

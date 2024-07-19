@@ -10,6 +10,7 @@ import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.team.TeamScreen
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
@@ -43,7 +44,8 @@ class TeamScreenTest {
     fun `display current game name`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val teamRepository = ControllableTeamRepository()
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository, teamRepository)
 
             val currentGame = CurrentGame("1", "A Game", "A Description")
             gameRepository.emitCurrentGame(currentGame)
@@ -70,7 +72,8 @@ class TeamScreenTest {
         composeTestRule.apply {
             var redirected = false
             val gameRepository = ControllableGameRepository(initialCurrentGame = CurrentGame.EMPTY)
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val teamRepository = ControllableTeamRepository()
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository, teamRepository)
 
             composeTestRule.setContent {
                 TeamRoute(
@@ -89,7 +92,8 @@ class TeamScreenTest {
             var redirected = false
             val game = CurrentGame("123")
             val gameRepository = ControllableGameRepository(initialCurrentGame = game)
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val teamRepository = ControllableTeamRepository()
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository, teamRepository)
 
             composeTestRule.setContent {
                 TeamRoute(

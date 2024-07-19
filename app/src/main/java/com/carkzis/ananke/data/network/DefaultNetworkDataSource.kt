@@ -1,6 +1,8 @@
 package com.carkzis.ananke.data.network
 
-class DefaultNetworkDataSource : NetworkDataSource {
+import javax.inject.Inject
+
+class DefaultNetworkDataSource @Inject constructor() : NetworkDataSource {
     override suspend fun getUsers(): List<NetworkUser> = listOf(
         NetworkUser(id = 1, name = "Zidun"),
         NetworkUser(id = 2, name = "Vivu"),

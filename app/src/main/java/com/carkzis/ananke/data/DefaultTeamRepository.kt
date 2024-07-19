@@ -7,11 +7,12 @@ import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class DefaultTeamRepository(
+class DefaultTeamRepository @Inject constructor(
     private val teamDao: TeamDao,
     private val networkDataSource: NetworkDataSource,
-    private val configuration: TeamConfiguration = TeamConfiguration()
+    private val configuration: TeamConfiguration
 ) : TeamRepository {
     override suspend fun getUsers() = flow {
         emit(networkDataSource.getUsers().map { it.toDomainUser() })

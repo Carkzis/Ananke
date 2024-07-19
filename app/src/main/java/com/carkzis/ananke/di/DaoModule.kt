@@ -2,6 +2,7 @@ package com.carkzis.ananke.di
 
 import com.carkzis.ananke.data.AnankeDatabase
 import com.carkzis.ananke.data.GameDao
+import com.carkzis.ananke.data.TeamConfiguration
 import com.carkzis.ananke.data.TeamDao
 import dagger.Module
 import dagger.Provides
