@@ -3,8 +3,10 @@ package com.carkzis.ananke.ui
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.User
+import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
+import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
 import com.carkzis.ananke.utils.GameStateUseCase
@@ -75,6 +77,7 @@ class TeamViewModelTest {
     fun `view model adds new team mate to game`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
         val expectedGame = Game("1", "A Game", "A Description")
+        gameRepository.emitGames(listOf(expectedGame))
 
         val users = mutableListOf<User>()
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -108,12 +111,39 @@ class TeamViewModelTest {
 
     @Test
     fun `view model gets current list of available users`() = runTest {
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.potentialTeamMemberList.collect {}
+        }
 
+        val expectedAvailableUsers = dummyUserEntities.map { it.toDomain() }
+        teamRepository.emitUsers(expectedAvailableUsers)
+
+        assertEquals(expectedAvailableUsers, viewModel.potentialTeamMemberList.value)
+
+        collection.cancel()
     }
 
     @Test
     fun `view model gets users available for current game`() = runTest {
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+        val allUsers = dummyUserEntities.map { it.toDomain() }
+        val usersInGame = allUsers.dropLast(1)
 
+        gameRepository.updateCurrentGame(currentGame)
+        usersInGame.forEach {
+            teamRepository.addTeamMember(it, currentGame.id.toLong())
+        }
+
+        val users = mutableListOf<User>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.currentTeamMembers().collect {
+                users.addAll(it)
+            }
+        }
+
+        assertEquals(usersInGame, users)
+
+        collection.cancel()
     }
 
     @Test

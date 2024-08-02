@@ -11,7 +11,9 @@ import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -37,6 +39,18 @@ class TeamViewModel @Inject constructor(
             is GamingState.InGame -> (gamingState.value as GamingState.InGame).currentGame
         }
     }
+
+    val potentialTeamMemberList: StateFlow<List<User>> = teamRepository.getUsers().stateIn(
+        viewModelScope,
+        WhileSubscribed(5000L),
+        listOf()
+    )
+
+    suspend fun currentTeamMembers() = teamRepository.getTeamMembers(currentGame.first().id.toLong()).stateIn(
+        viewModelScope,
+        WhileSubscribed(5000L),
+        listOf()
+    )
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
