@@ -58,12 +58,14 @@ class TeamViewModel @Inject constructor(
     fun addTeamMember(teamMember: User, game: Game) {
         viewModelScope.launch {
             try {
-                // TODO: Change to validator.
+                // TODO: Change to validator. UseCase?
                 confirmGameExists(game)
                 teamRepository.addTeamMember(teamMember, game.id.toLong())
             } catch (e: UserAddedToNonExistentGameException) {
                 _message.emit(e.message)
             } catch (e: TooManyUsersInTeamException) {
+                _message.emit(e.message)
+            } catch (e: UserAlreadyExistsException) {
                 _message.emit(e.message)
             }
         }

@@ -11,6 +11,7 @@ import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
+import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -131,6 +132,11 @@ class TeamViewModelTest {
     }
 
     @Test
+    fun `view model changes users available for current game when current game changes`() = runTest {
+        
+    }
+
+    @Test
     fun `view model does not add users to non-existent game with message`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
         val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.")
@@ -182,7 +188,24 @@ class TeamViewModelTest {
 
     @Test
     fun `view model sends message if attempt to add user to game user with id that already exists`() = runTest {
+        val expectedTeamMember = User(1, "Zidun")
+        val teamMemberWithIdenticalId = User(1, "Zudin")
+        val expectedGame = Game("1", "A Game", "A Description")
+        teamRepository.addTeamMember(expectedTeamMember, expectedGame.id.toLong())
+        gameRepository.emitGames(listOf(expectedGame))
 
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect {
+                message = it
+            }
+        }
+
+        viewModel.addTeamMember(teamMemberWithIdenticalId, expectedGame)
+
+        assertEquals(UserAlreadyExistsException().message, message)
+
+        collection.cancel()
     }
 
     private fun CurrentGame.toGame() = Game(this.id, this.name, this.description)

@@ -3,6 +3,7 @@ package com.carkzis.ananke.testdoubles
 import com.carkzis.ananke.data.TeamRepository
 import com.carkzis.ananke.data.User
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
+import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -38,6 +39,10 @@ class ControllableTeamRepository(
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         users.let {
             if (it.size == limit) throw TooManyUsersInTeamException(limit)
+            val usersWithSameId = it.filter { user ->
+                user.id == teamMember.id && user.name != teamMember.name
+            }
+            if (usersWithSameId.isNotEmpty()) throw UserAlreadyExistsException()
 
             val currentUsersForGame = gameToUserMap[gameId] ?: listOf()
             val newUsersForGame = currentUsersForGame + teamMember
