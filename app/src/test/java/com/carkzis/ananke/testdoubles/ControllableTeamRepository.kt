@@ -6,14 +6,13 @@ import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class ControllableTeamRepository(
     initialUsers: List<User> = listOf()
 ) : TeamRepository {
 
-    private val _users = MutableSharedFlow<List<User>>(replay = 1)
+    private val _users = MutableSharedFlow<List<User>>(replay = 3)
     private val users get() = _users.replayCache.firstOrNull() ?: listOf()
 
     private val gameToUserMap = mutableMapOf<Long, List<User>>()
@@ -28,23 +27,20 @@ class ControllableTeamRepository(
 
     override fun getUsers(): Flow<List<User>> = _users
 
-    override fun getTeamMembers(gameId: Long): Flow<List<User>> = flow {
-        emit(
-            getUsers().first().filter {
-                gameToUserMap.getOrDefault(1, listOf()).contains(it)
-            }
-        )
+    override fun getTeamMembers(gameId: Long): Flow<List<User>> = _users.map { users ->
+        users.filter { gameToUserMap.getOrDefault(gameId, listOf()).contains(it) }
     }
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         users.let {
-            if (it.size == limit) throw TooManyUsersInTeamException(limit)
             val usersWithSameId = it.filter { user ->
                 user.id == teamMember.id && user.name != teamMember.name
             }
             if (usersWithSameId.isNotEmpty()) throw UserAlreadyExistsException()
 
             val currentUsersForGame = gameToUserMap[gameId] ?: listOf()
+            if (currentUsersForGame.size == limit) throw TooManyUsersInTeamException(limit)
+
             val newUsersForGame = currentUsersForGame + teamMember
             gameToUserMap[gameId] = newUsersForGame
 

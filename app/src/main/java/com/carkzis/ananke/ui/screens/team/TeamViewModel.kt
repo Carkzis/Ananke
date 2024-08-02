@@ -10,12 +10,15 @@ import com.carkzis.ananke.data.User
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -46,7 +49,10 @@ class TeamViewModel @Inject constructor(
         listOf()
     )
 
-    suspend fun currentTeamMembers() = teamRepository.getTeamMembers(currentGame.first().id.toLong()).stateIn(
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentTeamMembers = currentGame.flatMapLatest { game ->
+        teamRepository.getTeamMembers(game.id.toLong())
+    }.stateIn(
         viewModelScope,
         WhileSubscribed(5000L),
         listOf()

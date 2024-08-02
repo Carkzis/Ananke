@@ -121,7 +121,7 @@ class TeamViewModelTest {
 
         val users = mutableListOf<User>()
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.currentTeamMembers().collect {
+            viewModel.currentTeamMembers.collect {
                 users.addAll(it)
             }
         }
@@ -133,7 +133,41 @@ class TeamViewModelTest {
 
     @Test
     fun `view model changes users available for current game when current game changes`() = runTest {
-        
+        val gameOne = CurrentGame("1", "A Game", "A Description")
+        val gameTwo = CurrentGame("2", "A Different Game", "Another Description")
+        val gameOneTeamMembers = listOf(
+            User(id = 1, name = "Zidun"),
+            User(id = 2, name = "Vivu"),
+            User(id = 3, name = "Steinur"),
+            User(id = 4, name = "Garnut")
+        )
+        val gameTwoTeamMembers = listOf(
+            User(id = 6, name = "Freyu"),
+            User(id = 7, name = "Quinu"),
+            User(id = 8, name = "Eiku"),
+        )
+
+        gameOneTeamMembers.forEach {
+            teamRepository.addTeamMember(it, gameOne.id.toLong())
+        }
+        gameTwoTeamMembers.forEach {
+            viewModel.addTeamMember(it, gameTwo.toGame())
+        }
+        gameRepository.updateCurrentGame(gameOne)
+
+        val users = mutableListOf<User>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.currentTeamMembers.collect {
+                users.addAll(it)
+            }
+        }
+
+        // TODO: This needs sorting out. Not getting the expected members.
+        gameRepository.updateCurrentGame(gameTwo)
+
+        assertEquals(gameTwoTeamMembers, users)
+
+        collection.cancel()
     }
 
     @Test
