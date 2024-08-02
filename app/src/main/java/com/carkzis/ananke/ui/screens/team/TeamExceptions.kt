@@ -7,3 +7,7 @@ class UserAlreadyExistsException : Throwable() {
 class TooManyUsersInTeamException(teamMemberLimit: Int) : Throwable() {
     override val message = "Failed to add team member, limit of $teamMemberLimit exceeded."
 }
+
+class UserAddedToNonExistentGameException(gameName: String) : Throwable() {
+    override val message = "Failed to add team member, $gameName does not exist."
+}

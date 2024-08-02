@@ -1,14 +1,14 @@
 package com.carkzis.ananke.ui
 
-import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.User
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
-import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
+import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
 import com.carkzis.ananke.utils.GameStateUseCase
+import com.carkzis.ananke.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -90,7 +90,20 @@ class TeamViewModelTest {
 
     @Test
     fun `view model does not add users to non-existent game with exception`() = runTest {
+        val expectedTeamMember = User(1, "Zidun")
+        val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.")
 
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        viewModel.addTeamMember(expectedTeamMember, nonExistentGame)
+        gameRepository.emitGames(listOf(Game("1", "A Game", "A Description")))
+
+        assertEquals(UserAddedToNonExistentGameException(nonExistentGame.name).message, message)
+
+        collection.cancel()
     }
 
     @Test

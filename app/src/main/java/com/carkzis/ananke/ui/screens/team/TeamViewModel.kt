@@ -10,7 +10,10 @@ import com.carkzis.ananke.data.User
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -35,9 +38,23 @@ class TeamViewModel @Inject constructor(
         }
     }
 
+    private val _message = MutableSharedFlow<String>()
+    val message = _message.asSharedFlow()
+
     fun addTeamMember(teamMember: User, game: Game) {
         viewModelScope.launch {
-            teamRepository.addTeamMember(teamMember, game.id.toLong())
+            try {
+                confirmGameExists(game)
+                teamRepository.addTeamMember(teamMember, game.id.toLong())
+            } catch (e: UserAddedToNonExistentGameException) {
+                _message.emit(e.message)
+            }
+        }
+    }
+
+    private suspend fun confirmGameExists(game: Game) {
+        if (!gameRepository.getGames().first().contains(game)) {
+            throw UserAddedToNonExistentGameException(game.name)
         }
     }
 }
