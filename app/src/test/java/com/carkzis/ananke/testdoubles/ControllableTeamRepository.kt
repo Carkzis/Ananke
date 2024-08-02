@@ -2,6 +2,7 @@ package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.data.TeamRepository
 import com.carkzis.ananke.data.User
+import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
@@ -15,6 +16,8 @@ class ControllableTeamRepository(
     private val users get() = _users.replayCache.firstOrNull() ?: listOf()
 
     private val gameToUserMap = mutableMapOf<Long, List<User>>()
+
+    var limit = 4
 
     init {
         if (initialUsers.isNotEmpty()) {
@@ -34,9 +37,12 @@ class ControllableTeamRepository(
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         users.let {
+            if (it.size == limit) throw TooManyUsersInTeamException(limit)
+
             val currentUsersForGame = gameToUserMap[gameId] ?: listOf()
             val newUsersForGame = currentUsersForGame + teamMember
             gameToUserMap[gameId] = newUsersForGame
+
             _users.tryEmit(it + teamMember)
         }
     }
