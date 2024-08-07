@@ -14,6 +14,7 @@ import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.team.TeamScreen
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
+import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -45,7 +46,7 @@ class TeamScreenTest {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
             val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository, teamRepository)
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
 
             val currentGame = CurrentGame("1", "A Game", "A Description")
             gameRepository.emitCurrentGame(currentGame)
@@ -73,7 +74,7 @@ class TeamScreenTest {
             var redirected = false
             val gameRepository = ControllableGameRepository(initialCurrentGame = CurrentGame.EMPTY)
             val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository, teamRepository)
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
 
             composeTestRule.setContent {
                 TeamRoute(
@@ -93,7 +94,7 @@ class TeamScreenTest {
             val game = CurrentGame("123")
             val gameRepository = ControllableGameRepository(initialCurrentGame = game)
             val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository, teamRepository)
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
 
             composeTestRule.setContent {
                 TeamRoute(

@@ -11,6 +11,7 @@ import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
+import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +38,11 @@ class TeamViewModelTest {
     fun setUp() {
         gameRepository = ControllableGameRepository()
         teamRepository = ControllableTeamRepository()
-        viewModel = TeamViewModel(GameStateUseCase(gameRepository), gameRepository, teamRepository)
+        viewModel = TeamViewModel(
+            GameStateUseCase(gameRepository),
+            CheckGameExistsUseCase(gameRepository),
+            teamRepository
+        )
     }
 
     @Test
