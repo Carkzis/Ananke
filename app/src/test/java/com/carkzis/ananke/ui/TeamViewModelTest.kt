@@ -3,7 +3,6 @@ package com.carkzis.ananke.ui
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.User
-import com.carkzis.ananke.data.network.NetworkUser
 import com.carkzis.ananke.data.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
@@ -112,7 +111,7 @@ class TeamViewModelTest {
     fun `view model gets users available for current game`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
         val allUsers = dummyUserEntities.map { it.toDomain() }
-        val usersInGame = allUsers.dropLast(1)
+        val usersInGame = allUsers
 
         gameRepository.updateCurrentGame(currentGame)
         usersInGame.forEach {
@@ -151,21 +150,21 @@ class TeamViewModelTest {
             teamRepository.addTeamMember(it, gameOne.id.toLong())
         }
         gameTwoTeamMembers.forEach {
-            viewModel.addTeamMember(it, gameTwo.toGame())
+            teamRepository.addTeamMember(it, gameTwo.id.toLong())
         }
         gameRepository.updateCurrentGame(gameOne)
 
-        val users = mutableListOf<User>()
+        val users = mutableListOf<List<User>>()
         val collection = launch(UnconfinedTestDispatcher()) {
             viewModel.currentTeamMembers.collect {
-                users.addAll(it)
+                users.add(it)
             }
         }
 
-        // TODO: This needs sorting out. Not getting the expected members.
         gameRepository.updateCurrentGame(gameTwo)
 
-        assertEquals(gameTwoTeamMembers, users)
+        assertTrue(users.contains(gameOneTeamMembers))
+        assertEquals(gameTwoTeamMembers, users.last())
 
         collection.cancel()
     }

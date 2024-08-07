@@ -12,7 +12,7 @@ class ControllableTeamRepository(
     initialUsers: List<User> = listOf()
 ) : TeamRepository {
 
-    private val _users = MutableSharedFlow<List<User>>(replay = 3)
+    private val _users = MutableSharedFlow<List<User>>(replay = 1)
     private val users get() = _users.replayCache.firstOrNull() ?: listOf()
 
     private val gameToUserMap = mutableMapOf<Long, List<User>>()
