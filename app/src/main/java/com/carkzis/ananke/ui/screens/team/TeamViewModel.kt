@@ -12,13 +12,11 @@ import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -64,15 +62,12 @@ class TeamViewModel @Inject constructor(
     fun addTeamMember(teamMember: User, game: Game) {
         viewModelScope.launch {
             try {
-                // TODO: Change to validator. UseCase?
                 confirmGameExists(game)
                 teamRepository.addTeamMember(teamMember, game.id.toLong())
-            } catch (e: UserAddedToNonExistentGameException) {
-                _message.emit(e.message)
-            } catch (e: TooManyUsersInTeamException) {
-                _message.emit(e.message)
-            } catch (e: UserAlreadyExistsException) {
-                _message.emit(e.message)
+            } catch (e: Throwable) {
+                e.message?.let {
+                    _message.emit(it)
+                }
             }
         }
     }
