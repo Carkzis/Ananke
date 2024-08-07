@@ -111,7 +111,7 @@ class TeamViewModelTest {
     fun `view model gets users available for current game`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
         val allUsers = dummyUserEntities.map { it.toDomain() }
-        val usersInGame = allUsers
+        val usersInGame = allUsers.dropLast(1)
 
         gameRepository.updateCurrentGame(currentGame)
         usersInGame.forEach {
