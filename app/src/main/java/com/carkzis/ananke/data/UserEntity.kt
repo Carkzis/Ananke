@@ -31,6 +31,8 @@ data class UserEntityWithGames(
     val games: List<GameEntity>
 )
 
+fun UserEntityWithGames.toDomain() = this.user.toDomain()
+
 fun UserEntity.toDomain() = User(
     id = userId,
     name = username

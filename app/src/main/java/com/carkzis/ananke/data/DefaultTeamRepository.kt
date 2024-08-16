@@ -2,11 +2,13 @@ package com.carkzis.ananke.data
 
 import android.database.sqlite.SQLiteConstraintException
 import com.carkzis.ananke.data.network.NetworkDataSource
+import com.carkzis.ananke.data.network.NetworkUser
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DefaultTeamRepository @Inject constructor(
@@ -18,9 +20,7 @@ class DefaultTeamRepository @Inject constructor(
         emit(networkDataSource.getUsers().map { it.toDomainUser() })
     }
 
-    override fun getTeamMembers(gameId: Long) = flow {
-        emit(teamDao.getTeamMembersForGame(gameId).first().map { it.user.toDomain() })
-    }
+    override fun getTeamMembers(gameId: Long) = teamDao.getTeamMembersForGame(gameId).map { it.map(UserEntityWithGames::toDomain) }
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         val teamMembersForGame = teamDao.getTeamMembersForGame(gameId).first()

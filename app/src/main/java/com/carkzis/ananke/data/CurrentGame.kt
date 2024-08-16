@@ -9,3 +9,9 @@ data class CurrentGame(
         val EMPTY = CurrentGame("-1")
     }
 }
+
+fun CurrentGame.toGame() = Game(
+    this.id,
+    this.name,
+    this.description
+)

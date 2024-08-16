@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GroupAdd
@@ -34,65 +35,94 @@ fun TeamScreen(
     currentGame: CurrentGame,
     gamingState: GamingState,
     modifier: Modifier = Modifier,
-    users: List<User> = listOf()
+    users: List<User> = listOf(),
+    teamMembers: List<User> = listOf(),
+    onAddUser: (User) -> Unit = {}
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {}
         is GamingState.InGame -> {
-            Column {
-                AnankeText(
-                    text = "Team",
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${AnankeDestination.TEAM}-title"),
-                    textStyle = MaterialTheme.typography.headlineMedium
-                )
+            val lazyListState = rememberLazyListState()
+            LazyColumn(
+                modifier = modifier.testTag("${AnankeDestination.TEAM}-team-column"),
+                lazyListState
+            ) {
+                item {
+                    AnankeText(
+                        text = "Team",
+                        modifier = modifier
+                            .padding(8.dp)
+                            .testTag("${AnankeDestination.TEAM}-title"),
+                        textStyle = MaterialTheme.typography.headlineMedium
+                    )
+                }
 
-                AnankeText(
-                    text = currentGame.name,
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${AnankeDestination.TEAM}-current-game"),
-                    textStyle = MaterialTheme.typography.headlineSmall
-                )
+                item {
+                    AnankeText(
+                        text = currentGame.name,
+                        modifier = modifier
+                            .padding(8.dp)
+                            .testTag("${AnankeDestination.TEAM}-current-game"),
+                        textStyle = MaterialTheme.typography.headlineSmall
+                    )
+                }
 
-                AnankeText(
-                    text = "Team Members",
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${AnankeDestination.TEAM}-team-member-title"),
-                    textStyle = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Left
-                )
+                item {
+                    AnankeText(
+                        text = "Team Members",
+                        modifier = modifier
+                            .padding(8.dp)
+                            .testTag("${AnankeDestination.TEAM}-team-member-title"),
+                        textStyle = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Left
+                    )
+                }
 
-                AnankeText(
-                    text = "There are currently no users in the game.",
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${AnankeDestination.TEAM}-team-member-title"),
-                    textStyle = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Left
-                )
-
-                AnankeText(
-                    text = "Available Users",
-                    modifier = modifier
-                        .padding(8.dp)
-                        .testTag("${AnankeDestination.TEAM}-users-title"),
-                    textStyle = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Left
-                )
-
-                LazyColumn(modifier = modifier.testTag("${AnankeDestination.TEAM}-team-members-column")) {
-                    users.forEach { user ->
-                        item(key = user.id) {
-                            UserCard(
-                                modifier = modifier,
-                                onAddUser = { /*TODO*/ },
-                                user = user
+                if (teamMembers.isEmpty()) {
+                    item {
+                        AnankeText(
+                            text = "There are currently no users in the game.",
+                            modifier = modifier
+                                .padding(8.dp)
+                                .testTag("${AnankeDestination.TEAM}-no-team-members-text"),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Left
+                        )
+                    }
+                } else {
+                    teamMembers.forEach { teamMember ->
+                        item(key = "${teamMember.id}-tm") {
+                            AnankeText(
+                                text = teamMember.name,
+                                modifier = modifier
+                                    .padding(8.dp)
+                                    .testTag("${AnankeDestination.TEAM}-team-member-name"),
+                                textStyle = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Left
                             )
                         }
+                    }
+                }
+
+                item {
+                    AnankeText(
+                        text = "Available Users",
+                        modifier = modifier
+                            .padding(8.dp)
+                            .testTag("${AnankeDestination.TEAM}-users-title"),
+                        textStyle = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Left
+                    )
+                }
+
+                users.forEach { user ->
+                    item(key = "${user.id}-pt") {
+                        UserCard(
+                            modifier = modifier,
+                            onAddUser = onAddUser,
+                            user = user
+                        )
                     }
                 }
             }
@@ -103,7 +133,7 @@ fun TeamScreen(
 @Composable
 private fun UserCard(
     modifier: Modifier,
-    onAddUser: () -> Unit,
+    onAddUser: (User) -> Unit,
     user: User
 ) {
     Card(
@@ -126,7 +156,7 @@ private fun UserCard(
 @Composable
 private fun UserCardBox(
     modifier: Modifier,
-    onAddUser: () -> Unit,
+    onAddUser: (User) -> Unit,
     user: User
 ) {
     Box(
@@ -150,7 +180,9 @@ private fun UserCardBox(
                 textAlign = TextAlign.Center
             )
             IconButton(
-                onClick = onAddUser,
+                onClick = {
+                    onAddUser(user)
+                },
                 modifier = modifier
                     .align(CenterVertically)
                     .testTag("${AnankeDestination.TEAM}-add-user-button")
