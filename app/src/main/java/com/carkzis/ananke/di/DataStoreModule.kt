@@ -2,7 +2,6 @@ package com.carkzis.ananke.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
@@ -15,7 +14,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
-import kotlin.random.Random
 
 private const val USER_PREFERENCES = "user_preferences"
 
@@ -31,7 +29,7 @@ object DataStoreModule {
         PreferenceDataStoreFactory.create(
             scope = CoroutineScope(IO + SupervisorJob()),
         ) {
-            context.preferencesDataStoreFile("$USER_PREFERENCES-${Random.nextInt()}")
+            context.preferencesDataStoreFile(USER_PREFERENCES)
         }
 
 }
