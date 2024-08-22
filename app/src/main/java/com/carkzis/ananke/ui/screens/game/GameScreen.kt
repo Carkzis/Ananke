@@ -42,7 +42,6 @@ import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.Game
 import com.carkzis.ananke.data.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
-import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.theme.AnankeTheme
 import com.carkzis.ananke.ui.theme.Typography
@@ -258,7 +257,10 @@ private fun GameCardBox(
 
 @Composable
 private fun GameCardTitle(game: Game, modifier: Modifier) {
-    AnankeText(text = game.name, textStyle = Typography.titleMedium)
+    AnankeText(
+        text = game.name,
+        textStyle = Typography.titleMedium
+    )
     GameCardDivider(modifier)
 }
 
@@ -330,7 +332,7 @@ private fun ColumnScope.GameCardMetadata(modifier: Modifier) {
 
 @Composable
 private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifier) {
-    AnankeButton(onClick = onNewGameClick) {
+    com.carkzis.ananke.ui.components.AnankeButton(onClick = onNewGameClick) {
         AnankeText(
             text = "Add New Game",
             modifier = modifier
@@ -342,7 +344,7 @@ private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifi
 
 @Composable
 private fun GameScreenExitGameButton(onExitGame: () -> Unit, modifier: Modifier) {
-    AnankeButton(
+    com.carkzis.ananke.ui.components.AnankeButton(
         modifier = Modifier.testTag("${GameDestination.HOME}-exit-current-game"),
         onClick = onExitGame
     ) {

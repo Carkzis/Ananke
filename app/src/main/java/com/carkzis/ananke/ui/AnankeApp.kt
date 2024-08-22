@@ -12,10 +12,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.carkzis.ananke.data.GameRepository
-import com.carkzis.ananke.ui.components.AnankeBottomBar
+import com.carkzis.ananke.ui.screens.AnankeBottomBar
 import com.carkzis.ananke.navigation.AnankeNavHost
 import com.carkzis.ananke.ui.components.AnankeBackground
-import com.carkzis.ananke.ui.components.AnankeTopBar
 import com.carkzis.ananke.utils.GameStateUseCase
 
 @Composable
@@ -31,10 +30,11 @@ fun AnankeApp(
             modifier = Modifier,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = {
-                AnankeTopBar()
+                com.carkzis.ananke.ui.components.AnankeTopBar()
             },
             bottomBar = {
-                AnankeBottomBar(modifier = Modifier,
+                AnankeBottomBar(
+                    modifier = Modifier,
                     destinations = appState.destinations,
                     availabilities = appState.availabilityMap.collectAsState(initial = mapOf()).value,
                     currentDestination = appState.currentDestination,

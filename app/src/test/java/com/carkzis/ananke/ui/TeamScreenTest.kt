@@ -113,4 +113,7 @@ class TeamScreenTest {
             assertTrue(redirected)
         }
     }
+
+    @Test
+    fun `adding a user to the team immediately displays them in the list of team members`() {}
 }

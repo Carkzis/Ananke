@@ -64,7 +64,10 @@ private fun LazyListScope.gameTitleTextField(
     onTitleValueChanged: (String) -> Unit
 ) {
     item {
-        AnankeMediumTitleText(modifier = modifier, text = "Game Title")
+        AnankeMediumTitleText(
+            modifier = modifier,
+            text = "Game Title"
+        )
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-title"),
             value = gameTitle,
@@ -79,7 +82,10 @@ private fun LazyListScope.gameDescriptionTextField(
     onDescriptionValueChanged: (String) -> Unit
 ) {
     item {
-        AnankeMediumTitleText(modifier = modifier, text = "Game Description")
+        AnankeMediumTitleText(
+            modifier = modifier,
+            text = "Game Description"
+        )
         AnankeTextField(
             modifier = modifier.testTag("${GameDestination.NEW}-game-description"),
             lines = 3,
@@ -136,7 +142,7 @@ private fun NewGameScreenButtonRow(
                 .weight(1f)
                 .fillMaxHeight(),
             onClick = onAddNewGameClick
-            ) {
+        ) {
             AnankeText(
                 text = "Add Game",
                 modifier = modifier
