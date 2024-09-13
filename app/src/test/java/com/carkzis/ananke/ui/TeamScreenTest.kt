@@ -2,13 +2,25 @@ package com.carkzis.ananke.ui
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.test.SemanticsNodeInteractionCollection
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.filter
+import androidx.compose.ui.test.hasAnyChild
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.User
+import com.carkzis.ananke.data.toGame
 import com.carkzis.ananke.navigation.AnankeDestination
-import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.ui.screens.team.TeamRoute
@@ -113,4 +125,107 @@ class TeamScreenTest {
             assertTrue(redirected)
         }
     }
+
+    @Test
+    fun `displays list of potential team members`() = runTest {
+        composeTestRule.apply {
+            val game = CurrentGame("123")
+            val gameRepository = ControllableGameRepository()
+            val teamRepository = ControllableTeamRepository()
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
+
+            gameRepository.emitCurrentGame(game)
+
+            composeTestRule.setContent {
+                val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
+                TeamScreen(
+                    currentGame = game,
+                    gamingState = gameState,
+                    users = dummyUsers()
+                )
+            }
+
+            onNodeWithTag("${AnankeDestination.TEAM}-team-column")
+                .assertExists()
+            onNodeWithTag("${AnankeDestination.TEAM}-users-title")
+                .assertExists()
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-user-card").apply {
+                assertUsersInListHaveExpectedData(dummyUsers())
+            }
+        }
+    }
+
+    @Test
+    fun `adds a team member from the potential list to the current list`() = runTest {
+        composeTestRule.apply {
+            val game = CurrentGame("123")
+            val gameRepository = ControllableGameRepository()
+            val teamRepository = ControllableTeamRepository()
+            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
+
+            gameRepository.emitCurrentGame(game)
+            teamRepository.emitUsers(dummyUsers())
+
+            composeTestRule.setContent {
+                TeamRoute(
+                    viewModel = viewModel,
+                    onOutOfGame = {}
+                )
+            }
+
+            onNodeWithTag("${AnankeDestination.TEAM}-team-column")
+                .assertExists()
+            onNodeWithTag("${AnankeDestination.TEAM}-team-member-title")
+                .assertExists()
+
+            val targetCard = onAllNodesWithTag("${AnankeDestination.TEAM}-user-card")
+                .filter(
+                    hasAnyChild(
+                        hasText(dummyUsers().first().name, substring = true)
+                    )
+                )
+                .assertCountEquals(1)
+                .onFirst()
+            val addTeamMemberButtonForTargetCard = targetCard.onChildren()
+                .filter(
+                    hasTestTag("${AnankeDestination.TEAM}-add-user-button")
+                )
+                .assertCountEquals(1)
+                .onFirst()
+
+            addTeamMemberButtonForTargetCard
+                .assertHasClickAction()
+                .performClick()
+
+            gameRepository.emitGames(listOf(game.toGame()))
+
+            onNodeWithTag("${AnankeDestination.TEAM}-tm-card")
+                .assertExists()
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-tm-card").apply {
+                assertUsersInListHaveExpectedData(expectedUsers = listOf(dummyUsers().first()))
+            }
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-user-card").apply {
+                assertUsersInListHaveExpectedData(expectedUsers = dummyUsers().drop(1))
+            }
+        }
+    }
+
+    private fun SemanticsNodeInteractionCollection.assertUsersInListHaveExpectedData(expectedUsers: List<User>) {
+        fetchSemanticsNodes().forEachIndexed { index, _ ->
+            val currentCard = get(index)
+            currentCard.apply {
+                hasAnyChild(hasText(expectedUsers[index].name))
+            }
+        }
+    }
+
+    private fun dummyUsers() = listOf(
+        User(id = 1, name = "Zidun"),
+        User(id = 2, name = "Vivu"),
+        User(id = 3, name = "Steinur"),
+        User(id = 4, name = "Garnut")
+    )
 }

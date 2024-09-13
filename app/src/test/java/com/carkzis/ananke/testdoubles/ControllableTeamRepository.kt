@@ -44,7 +44,7 @@ class ControllableTeamRepository(
             val newUsersForGame = currentUsersForGame + teamMember
             gameToUserMap[gameId] = newUsersForGame
 
-            _users.tryEmit(it + teamMember)
+            _users.tryEmit((it + teamMember).distinct())
         }
     }
 

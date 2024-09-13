@@ -202,7 +202,7 @@ private fun TeamMemberCardBox(
                 modifier = modifier
                     .align(CenterVertically)
                     .padding(start = 16.dp)
-                    .testTag("${AnankeDestination.TEAM}-team-member-title"),
+                    .testTag("${AnankeDestination.TEAM}-team-member-name"),
                 textStyle = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Left
             )
@@ -255,7 +255,7 @@ private fun UserCardBox(
                 modifier = modifier
                     .align(CenterVertically)
                     .weight(1f)
-                    .testTag("${AnankeDestination.TEAM}-users-title"),
+                    .testTag("${AnankeDestination.TEAM}-user-name"),
                 textStyle = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
