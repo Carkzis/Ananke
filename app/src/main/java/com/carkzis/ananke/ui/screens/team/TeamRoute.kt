@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.toGame
 import com.carkzis.ananke.ui.screens.game.GamingState
 
 @Composable
@@ -16,6 +17,8 @@ fun TeamRoute(
 ) {
     val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
+    val availableUsers by viewModel.potentialTeamMemberList.collectAsStateWithLifecycle()
+    val teamMembers by viewModel.currentTeamMembers.collectAsStateWithLifecycle()
 
     if (gameState == GamingState.OutOfGame) {
         onOutOfGame()
@@ -25,5 +28,10 @@ fun TeamRoute(
         modifier = modifier,
         currentGame = currentGame,
         gamingState = gameState,
+        users = availableUsers,
+        teamMembers = teamMembers,
+        onAddUser = { user ->
+            viewModel.addTeamMember(user, currentGame.toGame())
+        }
     )
 }

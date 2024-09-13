@@ -10,19 +10,19 @@ import androidx.room.PrimaryKey
 )
 data class GameEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0L,
+    val gameId: Long = 0L,
     val name: String,
     val description: String
 )
 
 fun GameEntity.toDomainListing() = Game(
-    id = id.toString(),
+    id = gameId.toString(),
     name = name,
     description = description
 )
 
 fun GameEntity.toDomainCurrent() = CurrentGame(
-    id = id.toString(),
+    id = gameId.toString(),
     name = name,
     description = description
 )

@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GameDao {
 
-    @Query(value = "SELECT * FROM games ORDER BY id DESC")
+    @Query(value = "SELECT * FROM games ORDER BY gameId DESC")
     fun getGames(): Flow<List<GameEntity>>
 
-    @Query(value = "SELECT * FROM games WHERE id = :gameId")
+    @Query(value = "SELECT * FROM games WHERE gameId = :gameId")
     fun getGame(gameId: String): Flow<GameEntity?>
 
     @Upsert

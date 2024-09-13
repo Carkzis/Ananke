@@ -13,7 +13,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.navigation.GameDestination
-import com.carkzis.ananke.testdoubles.DummyGameRepository
 import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
 import com.carkzis.ananke.ui.screens.nugame.NewGameScreen
 import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure
@@ -21,7 +20,6 @@ import com.carkzis.ananke.ui.screens.nugame.NewGameViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -30,6 +28,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -44,9 +43,10 @@ class NewGameScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
+    private val viewModel = NewGameViewModel(mock())
+
     @Test
     fun `text box for new game title takes in typed characters`() {
-        val viewModel = NewGameViewModel(DummyGameRepository())
         composeTestRule.setContent {
             NewGameScreen(
                 gameTitle = viewModel.gameTitle.collectAsStateWithLifecycle().value,
@@ -71,7 +71,6 @@ class NewGameScreenTest {
 
     @Test
     fun `text box for new game description takes in typed characters`() {
-        val viewModel = NewGameViewModel(DummyGameRepository())
         composeTestRule.setContent {
             NewGameScreen(
                 gameTitle = "",
@@ -100,7 +99,7 @@ class NewGameScreenTest {
         composeTestRule.setContent {
             NewGameRoute(
                 onAddGameClick = { redirected = true },
-                viewModel = NewGameViewModel(DummyGameRepository()),
+                viewModel = viewModel,
                 onShowSnackbar = { false }
             )
         }
@@ -124,7 +123,7 @@ class NewGameScreenTest {
         composeTestRule.setContent {
             NewGameRoute(
                 onAddGameClick = { redirected = true },
-                viewModel = NewGameViewModel(DummyGameRepository()),
+                viewModel = viewModel,
                 onShowSnackbar = { false }
             )
         }
@@ -143,7 +142,7 @@ class NewGameScreenTest {
             snackbarHostState = remember { SnackbarHostState() }
             NewGameRoute(
                 onAddGameClick = {},
-                viewModel = NewGameViewModel(DummyGameRepository()),
+                viewModel = viewModel,
                 onShowSnackbar = { message ->
                     snackbarHostState?.showSnackbar(
                         message = message, duration = SnackbarDuration.Short

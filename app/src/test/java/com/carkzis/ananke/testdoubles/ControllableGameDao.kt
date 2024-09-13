@@ -16,7 +16,7 @@ class ControllableGameDao : GameDao {
     override fun getGame(gameId: String): Flow<GameEntity?> = flow {
         emit(
             games.value.firstOrNull {
-                it.id.toString() == gameId
+                it.gameId.toString() == gameId
             }
         )
     }
@@ -24,7 +24,7 @@ class ControllableGameDao : GameDao {
     override suspend fun upsertGames(gameEntities: List<GameEntity>) {
         games.update { previousValues ->
             (previousValues + gameEntities)
-                .distinctBy(GameEntity::id)
+                .distinctBy(GameEntity::gameId)
                 .sortedWith(idDescending())
         }
     }
@@ -32,7 +32,7 @@ class ControllableGameDao : GameDao {
     override suspend fun insertGame(game: GameEntity) {
         games.update { previousValues ->
             previousValues.forEach {
-                if (game.name == it.name || game.id == it.id) {
+                if (game.name == it.name || game.gameId == it.gameId) {
                     throw SQLiteConstraintException()
                 }
             }
@@ -41,12 +41,5 @@ class ControllableGameDao : GameDao {
         }
     }
 
-    private fun idDescending() = compareBy(GameEntity::id).reversed()
+    private fun idDescending() = compareBy(GameEntity::gameId).reversed()
 }
-
-
-val dummyGameEntities = listOf(
-    GameEntity(1L, "My First Game", "It is the first one."),
-    GameEntity(2L, "My Second Game", "It is the second one."),
-    GameEntity(3L, "My Third Game", "It is the third one.")
-)
