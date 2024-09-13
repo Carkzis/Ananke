@@ -5,11 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChildren
@@ -17,6 +19,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.data.CurrentGame
 import com.carkzis.ananke.data.User
 import com.carkzis.ananke.data.toGame
@@ -35,6 +38,7 @@ import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,28 +57,28 @@ class TeamScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
+    private lateinit var gameRepository: ControllableGameRepository
+    private lateinit var teamRepository: ControllableTeamRepository
+
+    @Before
+    fun setUp() {
+        gameRepository = ControllableGameRepository()
+        teamRepository = ControllableTeamRepository()
+    }
+
     @Test
-    fun `display current game name`() {
+    fun `display title and current game name`() {
         composeTestRule.apply {
-            val gameRepository = ControllableGameRepository()
-            val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
+            gameRepository = ControllableGameRepository()
+            val viewModel = teamViewModel()
 
             val currentGame = CurrentGame("1", "A Game", "A Description")
             gameRepository.emitCurrentGame(currentGame)
 
-            composeTestRule.setContent {
-                val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
-                val actualCurrentGame = viewModel
-                    .currentGame
-                    .collectAsStateWithLifecycle(initialValue = CurrentGame.EMPTY)
-                    .value
-                TeamScreen(
-                    currentGame = actualCurrentGame,
-                    gamingState = gameState,
-                )
-            }
+            initialiseTeamScreen(viewModel)
 
+            onNodeWithTag("${AnankeDestination.TEAM}-title")
+                .assertExists()
             onNodeWithTag("${AnankeDestination.TEAM}-current-game")
                 .assertTextContains(currentGame.name)
         }
@@ -84,16 +88,9 @@ class TeamScreenTest {
     fun `redirects to game screen if enter team screen when out of game`() {
         composeTestRule.apply {
             var redirected = false
-            val gameRepository = ControllableGameRepository(initialCurrentGame = CurrentGame.EMPTY)
-            val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
+            val viewModel = teamViewModel()
 
-            composeTestRule.setContent {
-                TeamRoute(
-                    viewModel = viewModel,
-                    onOutOfGame = { redirected = true },
-                )
-            }
+            initialiseGameScreenViaGameRoute(viewModel) { redirected = true }
 
             assertTrue(redirected)
         }
@@ -102,18 +99,11 @@ class TeamScreenTest {
     @Test
     fun `redirects to game screen from team screen when going out of game`() = runTest {
         composeTestRule.apply {
-            var redirected = false
-            val game = CurrentGame("123")
-            val gameRepository = ControllableGameRepository(initialCurrentGame = game)
-            val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
+            gameRepository = ControllableGameRepository(initialCurrentGame = CurrentGame("123"))
+            val viewModel = teamViewModel()
 
-            composeTestRule.setContent {
-                TeamRoute(
-                    viewModel = viewModel,
-                    onOutOfGame = { redirected = true },
-                )
-            }
+            var redirected = false
+            initialiseGameScreenViaGameRoute(viewModel) { redirected = true }
 
             assertFalse(redirected)
 
@@ -129,21 +119,12 @@ class TeamScreenTest {
     @Test
     fun `displays list of potential team members`() = runTest {
         composeTestRule.apply {
-            val game = CurrentGame("123")
-            val gameRepository = ControllableGameRepository()
-            val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
+            val viewModel = teamViewModel()
 
+            val game = CurrentGame("123")
             gameRepository.emitCurrentGame(game)
 
-            composeTestRule.setContent {
-                val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
-                TeamScreen(
-                    currentGame = game,
-                    gamingState = gameState,
-                    users = dummyUsers()
-                )
-            }
+            initialiseTeamScreen(viewModel)
 
             onNodeWithTag("${AnankeDestination.TEAM}-team-column")
                 .assertExists()
@@ -157,52 +138,46 @@ class TeamScreenTest {
     }
 
     @Test
+    fun `displays message when no team members in game`() = runTest {
+        composeTestRule.apply {
+            val viewModel = teamViewModel()
+
+            val game = CurrentGame("123")
+            gameRepository.emitCurrentGame(game)
+
+            initialiseTeamScreen(viewModel)
+
+            onNodeWithTag("${AnankeDestination.TEAM}-no-team-members-text")
+                .assertIsDisplayed()
+        }
+    }
+
+    @Test
     fun `adds a team member from the potential list to the current list`() = runTest {
         composeTestRule.apply {
-            val game = CurrentGame("123")
-            val gameRepository = ControllableGameRepository()
-            val teamRepository = ControllableTeamRepository()
-            val viewModel = TeamViewModel(GameStateUseCase(gameRepository), CheckGameExistsUseCase(gameRepository), teamRepository)
+            val viewModel = teamViewModel()
 
+            val game = CurrentGame("123")
             gameRepository.emitCurrentGame(game)
             teamRepository.emitUsers(dummyUsers())
 
-            composeTestRule.setContent {
-                TeamRoute(
-                    viewModel = viewModel,
-                    onOutOfGame = {}
-                )
-            }
+            initialiseGameScreenViaGameRoute(viewModel)
 
             onNodeWithTag("${AnankeDestination.TEAM}-team-column")
                 .assertExists()
             onNodeWithTag("${AnankeDestination.TEAM}-team-member-title")
                 .assertExists()
 
-            val targetCard = onAllNodesWithTag("${AnankeDestination.TEAM}-user-card")
-                .filter(
-                    hasAnyChild(
-                        hasText(dummyUsers().first().name, substring = true)
-                    )
-                )
-                .assertCountEquals(1)
-                .onFirst()
-            val addTeamMemberButtonForTargetCard = targetCard.onChildren()
-                .filter(
-                    hasTestTag("${AnankeDestination.TEAM}-add-user-button")
-                )
-                .assertCountEquals(1)
-                .onFirst()
-
-            addTeamMemberButtonForTargetCard
-                .assertHasClickAction()
-                .performClick()
-
-            gameRepository.emitGames(listOf(game.toGame()))
+            addHighestUserInListToTeam(
+                onCompletion = {
+                    gameRepository.emitGames(listOf(game.toGame()))
+                }
+            )
 
             onNodeWithTag("${AnankeDestination.TEAM}-tm-card")
-                .assertExists()
-
+                .assertIsDisplayed()
+            onNodeWithTag("${AnankeDestination.TEAM}-no-team-members-text")
+                .assertDoesNotExist()
             onAllNodesWithTag("${AnankeDestination.TEAM}-tm-card").apply {
                 assertUsersInListHaveExpectedData(expectedUsers = listOf(dummyUsers().first()))
             }
@@ -220,6 +195,62 @@ class TeamScreenTest {
                 hasAnyChild(hasText(expectedUsers[index].name))
             }
         }
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.addHighestUserInListToTeam(onCompletion: () -> Unit) {
+        val targetCard = onAllNodesWithTag("${AnankeDestination.TEAM}-user-card")
+            .filter(
+                hasAnyChild(
+                    hasText(dummyUsers().first().name, substring = true)
+                )
+            )
+            .assertCountEquals(1)
+            .onFirst()
+        val addTeamMemberButtonForTargetCard = targetCard.onChildren()
+            .filter(
+                hasTestTag("${AnankeDestination.TEAM}-add-user-button")
+            )
+            .assertCountEquals(1)
+            .onFirst()
+
+        addTeamMemberButtonForTargetCard
+            .assertHasClickAction()
+            .performClick()
+
+        onCompletion()
+    }
+
+    private fun initialiseTeamScreen(viewModel: TeamViewModel) {
+        composeTestRule.setContent {
+            val gamingState by viewModel.gamingState.collectAsStateWithLifecycle()
+            val actualCurrentGame = viewModel
+                .currentGame
+                .collectAsStateWithLifecycle(initialValue = CurrentGame.EMPTY)
+                .value
+            TeamScreen(
+                currentGame = actualCurrentGame,
+                gamingState = gamingState,
+                users = dummyUsers()
+            )
+        }
+    }
+
+    private fun initialiseGameScreenViaGameRoute(viewModel: TeamViewModel, onOutOfGame: () -> Unit = {}) {
+        composeTestRule.setContent {
+            TeamRoute(
+                viewModel = viewModel,
+                onOutOfGame = onOutOfGame,
+            )
+        }
+    }
+
+    private fun teamViewModel(): TeamViewModel {
+        val viewModel = TeamViewModel(
+            GameStateUseCase(gameRepository),
+            CheckGameExistsUseCase(gameRepository),
+            teamRepository
+        )
+        return viewModel
     }
 
     private fun dummyUsers() = listOf(
