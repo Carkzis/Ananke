@@ -175,6 +175,35 @@ class TeamViewModelTest {
     }
 
     @Test
+    fun `view model does not contain same user in both current team members and potential team members lists`() = runTest {
+        val potentialUsers = listOf(
+            User(id = 1, name = "Zidun"),
+            User(id = 2, name = "Vivu"),
+            User(id = 3, name = "Steinur"),
+            User(id = 4, name = "Garnut")
+        )
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+
+        potentialUsers.take(2).forEach {
+            teamRepository.addTeamMember(it, currentGame.id.toLong())
+        }
+        gameRepository.updateCurrentGame(currentGame)
+
+        val users = mutableListOf<List<User>>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.potentialTeamMemberList.collect {
+                users.add(it)
+            }
+        }
+
+        teamRepository.emitUsers(potentialUsers)
+
+        assertEquals(potentialUsers.drop(2), users.last())
+
+        collection.cancel()
+    }
+
+    @Test
     fun `view model does not add users to non-existent game with message`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
         val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.")

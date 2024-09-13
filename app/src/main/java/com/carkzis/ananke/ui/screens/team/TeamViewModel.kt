@@ -17,8 +17,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.zip
@@ -44,7 +46,10 @@ class TeamViewModel @Inject constructor(
         }
     }
 
-    val potentialTeamMemberList: StateFlow<List<User>> = teamRepository.getUsers().stateIn(
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val potentialTeamMemberList: StateFlow<List<User>> = teamRepository.getUsers().flatMapLatest { userList ->
+        removeCurrentTeamMembersFromList(userList)
+    }.stateIn(
         viewModelScope,
         WhileSubscribed(5000L),
         listOf()
@@ -78,4 +83,11 @@ class TeamViewModel @Inject constructor(
             }
         }
     }
+
+    private fun removeCurrentTeamMembersFromList(userList: List<User>) =
+        currentTeamMembers.map { teamMembers ->
+            userList.filter { user ->
+                !teamMembers.contains(user)
+            }
+        }
 }
