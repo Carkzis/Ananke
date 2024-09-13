@@ -162,7 +162,7 @@ private fun LazyListScope.currentGameDescription(
                 .padding(8.dp),
         )
     }
-    item { Spacer(modifier = Modifier.height(8.dp)) }
+    item { Spacer(modifier = modifier.height(8.dp)) }
 }
 
 private fun LazyListScope.exitGameButton(
@@ -343,7 +343,7 @@ private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifi
 @Composable
 private fun GameScreenExitGameButton(onExitGame: () -> Unit, modifier: Modifier) {
     AnankeButton(
-        modifier = Modifier.testTag("${GameDestination.HOME}-exit-current-game"),
+        modifier = modifier.testTag("${GameDestination.HOME}-exit-current-game"),
         onClick = onExitGame
     ) {
         AnankeText(
