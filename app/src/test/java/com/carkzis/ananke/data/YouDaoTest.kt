@@ -9,6 +9,7 @@ import com.carkzis.ananke.data.database.YouDao
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -22,6 +23,13 @@ class YouDaoTest {
     private lateinit var youDao: YouDao
     private lateinit var database: AnankeDatabase
 
+    private val dummyCharacter = CharacterEntity(
+        1,
+        1,
+        "Dave",
+        "But my name is Jeff."
+    )
+
     @Before
     fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
@@ -30,6 +38,10 @@ class YouDaoTest {
             AnankeDatabase::class.java
         ).build()
         youDao = database.youDao()
+
+        runBlocking {
+            youDao.insertOrUpdateCharacter(dummyCharacter)
+        }
     }
 
     @After
@@ -39,17 +51,18 @@ class YouDaoTest {
 
     @Test
     fun `youDao retrieves current character data`() = runTest {
-        val characterId = 1L
-        val expectedCharacter = CharacterEntity(
-            characterId,
-            1,
-            "Dave",
-            "But my name is Jeff."
-        )
-        youDao.insertCharacter(expectedCharacter)
-        val retrievedCharacter = youDao.getCharacterForId(characterId).first()
+        val actualCharacter = youDao.getCharacterForId(dummyCharacter.characterId).first()
 
-        assertEquals(expectedCharacter, retrievedCharacter)
+        assertEquals(dummyCharacter, actualCharacter)
+    }
+
+    @Test
+    fun `youDao updates current character data`() = runTest {
+        val updatedCharacter = dummyCharacter.copy(characterName = "Jeff", characterBio = "Or was is Dave?")
+        youDao.insertOrUpdateCharacter(updatedCharacter)
+
+        val actualCharacter = youDao.getCharacterForId(dummyCharacter.characterId).first()
+        assertEquals(updatedCharacter, actualCharacter)
     }
 
 }
