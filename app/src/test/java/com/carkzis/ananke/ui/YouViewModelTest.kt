@@ -1,7 +1,7 @@
 package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.utils.MainDispatcherRule
-import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase

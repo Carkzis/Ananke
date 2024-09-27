@@ -1,17 +1,15 @@
 package com.carkzis.ananke.di
 
-import com.carkzis.ananke.data.DefaultAnankeDataStore
-import com.carkzis.ananke.data.AnankeDataStore
-import com.carkzis.ananke.data.DefaultGameRepository
-import com.carkzis.ananke.data.DefaultTeamRepository
-import com.carkzis.ananke.data.GameRepository
-import com.carkzis.ananke.data.TeamConfiguration
-import com.carkzis.ananke.data.TeamRepository
+import com.carkzis.ananke.data.database.DefaultAnankeDataStore
+import com.carkzis.ananke.data.database.AnankeDataStore
+import com.carkzis.ananke.data.repository.DefaultGameRepository
+import com.carkzis.ananke.data.repository.DefaultTeamRepository
+import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.network.DefaultNetworkDataSource
 import com.carkzis.ananke.data.network.NetworkDataSource
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 

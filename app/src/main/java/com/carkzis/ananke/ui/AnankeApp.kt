@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.ui.components.AnankeBottomBar
 import com.carkzis.ananke.navigation.AnankeNavHost
 import com.carkzis.ananke.ui.components.AnankeBackground

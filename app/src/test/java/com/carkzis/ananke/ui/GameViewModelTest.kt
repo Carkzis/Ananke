@@ -1,7 +1,7 @@
 package com.carkzis.ananke.ui
 
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.toCurrentGame
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException

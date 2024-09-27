@@ -1,10 +1,10 @@
 package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.utils.asGame
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.GameRepository
-import com.carkzis.ananke.data.NewGame
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.data.model.NewGame
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException

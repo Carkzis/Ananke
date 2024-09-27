@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.carkzis.ananke.data.NewGame
+import com.carkzis.ananke.data.model.NewGame
 import java.util.UUID
 
 @OptIn(ExperimentalComposeUiApi::class)

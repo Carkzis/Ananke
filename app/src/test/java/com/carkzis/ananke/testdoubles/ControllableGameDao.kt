@@ -1,8 +1,8 @@
 package com.carkzis.ananke.testdoubles
 
 import android.database.sqlite.SQLiteConstraintException
-import com.carkzis.ananke.data.GameDao
-import com.carkzis.ananke.data.GameEntity
+import com.carkzis.ananke.data.database.GameDao
+import com.carkzis.ananke.data.database.GameEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow

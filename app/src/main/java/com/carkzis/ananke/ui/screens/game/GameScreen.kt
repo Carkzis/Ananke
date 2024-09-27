@@ -38,9 +38,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.toCurrentGame
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText

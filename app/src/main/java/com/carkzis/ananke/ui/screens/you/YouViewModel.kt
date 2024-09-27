@@ -3,7 +3,7 @@ package com.carkzis.ananke.ui.screens.you
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.utils.GameStateUseCase
-import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.ui.screens.game.GamingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted

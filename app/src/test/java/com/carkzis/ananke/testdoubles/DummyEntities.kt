@@ -1,7 +1,7 @@
 package com.carkzis.ananke.testdoubles
 
-import com.carkzis.ananke.data.GameEntity
-import com.carkzis.ananke.data.UserEntity
+import com.carkzis.ananke.data.database.GameEntity
+import com.carkzis.ananke.data.database.UserEntity
 
 val dummyGameEntities = listOf(
     GameEntity(1L, "My First Game", "It is the first one."),

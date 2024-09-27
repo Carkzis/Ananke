@@ -6,11 +6,9 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.carkzis.ananke.data.CurrentGame
+import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.ui.screens.team.TeamRoute
-import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.ui.screens.you.YouRoute
 import com.carkzis.ananke.ui.screens.you.YouScreen
 import com.carkzis.ananke.ui.screens.you.YouViewModel

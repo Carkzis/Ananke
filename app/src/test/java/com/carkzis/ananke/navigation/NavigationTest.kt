@@ -10,9 +10,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.MainActivity
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.GameRepository
-import com.carkzis.ananke.data.TeamRepository
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.di.DataModule
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
