@@ -23,7 +23,7 @@ class ControllableGameDao : GameDao {
 
     override suspend fun upsertGames(gameEntities: List<GameEntity>) {
         games.update { previousValues ->
-            (previousValues + gameEntities)
+            (gameEntities + previousValues)
                 .distinctBy(GameEntity::gameId)
                 .sortedWith(idDescending())
         }

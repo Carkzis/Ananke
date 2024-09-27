@@ -15,6 +15,7 @@ class ControllableTeamDao : TeamDao {
     private val listOfGameIds = dummyGameEntities
     private var teamMembers = MutableStateFlow(listOf<UserEntity>())
     private val crossReferences = mutableListOf<Pair<Long, Long>>()
+
     override fun getTeamMembers(): Flow<List<UserEntity>> = teamMembers
 
     override suspend fun insertTeamMember(teamMember: UserEntity) {

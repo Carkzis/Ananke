@@ -26,8 +26,9 @@ class DefaultTeamRepository @Inject constructor(
         emit(networkDataSource.getUsers().map { it.toDomainUser() })
     }
 
-    override fun getTeamMembers(gameId: Long) = teamDao.getTeamMembersForGame(gameId).map { it.map(
-        UserEntityWithGames::toDomain) }
+    override fun getTeamMembers(gameId: Long) = teamDao.getTeamMembersForGame(gameId).map {
+        it.map(UserEntityWithGames::toDomain)
+    }
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         val teamMembersForGame = teamDao.getTeamMembersForGame(gameId).first()

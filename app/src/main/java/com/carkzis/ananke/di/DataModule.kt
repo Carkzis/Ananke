@@ -8,6 +8,8 @@ import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.network.DefaultNetworkDataSource
 import com.carkzis.ananke.data.network.NetworkDataSource
+import com.carkzis.ananke.data.repository.DefaultYouRepository
+import com.carkzis.ananke.data.repository.YouRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -21,6 +23,9 @@ interface DataModule {
 
     @Binds
     fun bindsTeamRepository(teamRepository: DefaultTeamRepository): TeamRepository
+
+    @Binds
+    fun bindsYouRepository(youRepository: DefaultYouRepository): YouRepository
 
     @Binds
     fun bindsAnankeDataStore(anankeDataStore: DefaultAnankeDataStore): AnankeDataStore
