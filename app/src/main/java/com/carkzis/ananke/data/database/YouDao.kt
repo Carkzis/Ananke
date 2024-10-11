@@ -11,5 +11,5 @@ interface YouDao {
     suspend fun insertOrUpdateCharacter(character: CharacterEntity)
 
     @Query(value = "SELECT * FROM characters WHERE characterId = :characterId")
-    fun getCharacterForId(characterId: Long): Flow<CharacterEntity>
+    fun getCharacterForId(characterId: Long): Flow<CharacterEntity?>
 }

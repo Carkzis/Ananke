@@ -20,9 +20,9 @@ class ControllableYouDao: YouDao {
         }
     }
 
-    override fun getCharacterForId(characterId: Long): Flow<CharacterEntity> = flow {
+    override fun getCharacterForId(characterId: Long): Flow<CharacterEntity?> = flow {
         emit(
-            characters.first().first {
+            characters.value.firstOrNull {
                 it.characterId == characterId
             }
         )
