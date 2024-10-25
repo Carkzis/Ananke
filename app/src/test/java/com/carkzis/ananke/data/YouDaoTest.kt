@@ -46,7 +46,12 @@ class YouDaoTest {
         youDao = database.youDao()
 
         runBlocking {
+            database.teamDao().insertTeamMember(dummyUser)
             youDao.insertOrUpdateCharacter(dummyCharacter)
+            youDao.insertOrIgnoreCharacterUserCrossRefEntities(UserCharacterCrossRef(
+                dummyCharacter.characterId,
+                dummyUser.userId
+            ))
         }
     }
 
@@ -59,7 +64,7 @@ class YouDaoTest {
     fun `youDao retrieves current character data`() = runTest {
         val actualCharacter = youDao.getCharactersForUserId(dummyUserId).first()
 
-        assertEquals(dummyCharacter, actualCharacter)
+        assertEquals(listOf(dummyCharacter), actualCharacter)
     }
 
     @Test
@@ -68,17 +73,11 @@ class YouDaoTest {
         youDao.insertOrUpdateCharacter(updatedCharacter)
 
         val actualCharacter = youDao.getCharactersForUserId(dummyUser.userId).first()
-        assertEquals(updatedCharacter, actualCharacter)
+        assertEquals(listOf(updatedCharacter), actualCharacter)
     }
 
     @Test
-    fun `youDao adds cross reference for character and user and retrieves user of particular character`() = runTest {
-        database.teamDao().insertTeamMember(dummyUser)
-        youDao.insertOrIgnoreCharacterUserCrossRefEntities(UserCharacterCrossRef(
-            dummyCharacter.characterId,
-            dummyUser.userId
-        ))
-
+    fun `youDao retrieves user of particular character`() = runTest {
         val actualUserName = youDao.getUserForCharacterId(dummyCharacter.characterId)
             .first()
             .userEntity
