@@ -9,10 +9,7 @@ import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.RandomUserNameGenerator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -40,7 +37,7 @@ class YouRepositoryTest {
         youRepository.addNewCharacter(newCharacter)
 
         val initialCharacterName = youRepository
-            .getCharacter(initialCharacterId)
+            .getCharacterForUser(initialCharacterId)
             .first()
             .character
 
@@ -54,7 +51,12 @@ class YouRepositoryTest {
 
     @Test
     fun `repository retrieves a character with username`() = runTest {
+        val newCharacter = NewCharacter(123L, 456L)
+        youRepository.addNewCharacter(newCharacter)
 
+        val retrievedCharacter = youRepository.getCharacterForUser(newCharacter.userId)
+
+        // TODO: Complete.
     }
 
     @Test

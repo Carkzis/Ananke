@@ -1,5 +1,6 @@
 package com.carkzis.ananke.testdoubles
 
+import com.carkzis.ananke.data.database.CharacterEntity
 import com.carkzis.ananke.data.database.GameEntity
 import com.carkzis.ananke.data.database.UserEntity
 
@@ -13,4 +14,10 @@ val dummyUserEntities = listOf(
     UserEntity(4L, "Alpha"),
     UserEntity(5L, "Beta"),
     UserEntity(6L, "Gamma")
+)
+
+val dummyCharacterEntities = listOf(
+    CharacterEntity(7L, "Beep", "It beeps."),
+    CharacterEntity(8L, "Boop", "It boops."),
+    CharacterEntity(9L, "Jeremy Stevens", "It hungers."),
 )

@@ -9,7 +9,6 @@ data class NewCharacter(
 )
 
 fun NewCharacter.toEntity() = CharacterEntity(
-    userId = userId,
     characterName = RandomUserNameGenerator.generateRandomUserName(),
     characterBio = ""
 )

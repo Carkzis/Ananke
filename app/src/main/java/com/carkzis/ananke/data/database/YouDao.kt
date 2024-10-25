@@ -13,11 +13,18 @@ interface YouDao {
     @Upsert
     suspend fun insertOrUpdateCharacter(character: CharacterEntity)
 
-    @Query(value = "SELECT * FROM characters WHERE characterId = :characterId")
-    fun getCharacterForId(characterId: Long): Flow<CharacterEntity?>
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertOrIgnoreCharacterUserCrossRefEntities(characterUserCrossRef: UserCharacterCrossRef)
+
+    @Transaction
+    @Query(value = """
+            SELECT * FROM characters
+            INNER JOIN UserCharacterCrossRef ON characters.characterId = UserCharacterCrossRef.characterId
+            INNER JOIN users ON users.userId = UserCharacterCrossRef.userId
+            WHERE users.userId = :userId
+        """
+    )
+    fun getCharactersForUserId(userId: Long): Flow<List<CharacterEntity>>
 
     @Transaction
     @Query(

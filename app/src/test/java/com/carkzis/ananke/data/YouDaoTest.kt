@@ -32,7 +32,6 @@ class YouDaoTest {
     )
     private val dummyCharacter = CharacterEntity(
         1,
-        dummyUserId,
         "Dave",
         "But my name is Jeff."
     )
@@ -58,7 +57,7 @@ class YouDaoTest {
 
     @Test
     fun `youDao retrieves current character data`() = runTest {
-        val actualCharacter = youDao.getCharacterForId(dummyCharacter.characterId).first()
+        val actualCharacter = youDao.getCharactersForUserId(dummyUserId).first()
 
         assertEquals(dummyCharacter, actualCharacter)
     }
@@ -68,7 +67,7 @@ class YouDaoTest {
         val updatedCharacter = dummyCharacter.copy(characterName = "Jeff", characterBio = "Or was is Dave?")
         youDao.insertOrUpdateCharacter(updatedCharacter)
 
-        val actualCharacter = youDao.getCharacterForId(dummyCharacter.characterId).first()
+        val actualCharacter = youDao.getCharactersForUserId(dummyUser.userId).first()
         assertEquals(updatedCharacter, actualCharacter)
     }
 

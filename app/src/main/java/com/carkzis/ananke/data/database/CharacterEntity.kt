@@ -13,7 +13,6 @@ import com.carkzis.ananke.data.model.GameCharacter
 data class CharacterEntity(
     @PrimaryKey(autoGenerate = true)
     val characterId: Long = 0L,
-    val userId: Long,
     val characterName: String,
     val characterBio: String
 )
