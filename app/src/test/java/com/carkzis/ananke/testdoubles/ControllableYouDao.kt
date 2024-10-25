@@ -2,6 +2,9 @@ package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.data.database.CharacterEntity
 import com.carkzis.ananke.data.database.GameEntity
+import com.carkzis.ananke.data.database.UserCharacterCrossRef
+import com.carkzis.ananke.data.database.UserEntity
+import com.carkzis.ananke.data.database.UserEntityWithCharacters
 import com.carkzis.ananke.data.database.YouDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +29,14 @@ class ControllableYouDao: YouDao {
                 it.characterId == characterId
             }
         )
+    }
+
+    override suspend fun insertOrIgnoreCharacterUserCrossRefEntities(characterUserCrossRef: UserCharacterCrossRef) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUserForCharacterId(characterId: Long): Flow<UserEntityWithCharacters> {
+        TODO("Not yet implemented")
     }
 
     private fun idDescending() = compareBy(CharacterEntity::characterId).reversed()

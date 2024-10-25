@@ -4,7 +4,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [GameEntity::class, UserEntity::class, UserGameCrossRef::class, CharacterEntity::class],
+    entities = [
+        GameEntity::class,
+        UserEntity::class,
+        UserGameCrossRef::class,
+        CharacterEntity::class,
+        UserCharacterCrossRef::class
+               ],
     version = 1,
     exportSchema = true
 )

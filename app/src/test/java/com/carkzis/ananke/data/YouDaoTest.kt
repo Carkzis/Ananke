@@ -5,6 +5,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.database.AnankeDatabase
 import com.carkzis.ananke.data.database.CharacterEntity
+import com.carkzis.ananke.data.database.UserCharacterCrossRef
+import com.carkzis.ananke.data.database.UserEntity
 import com.carkzis.ananke.data.database.YouDao
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,9 +25,14 @@ class YouDaoTest {
     private lateinit var youDao: YouDao
     private lateinit var database: AnankeDatabase
 
+    val dummyUserId = 1L
+    private val dummyUser = UserEntity(
+        dummyUserId,
+        "Mr User"
+    )
     private val dummyCharacter = CharacterEntity(
         1,
-        1,
+        dummyUserId,
         "Dave",
         "But my name is Jeff."
     )
@@ -65,4 +72,19 @@ class YouDaoTest {
         assertEquals(updatedCharacter, actualCharacter)
     }
 
+    @Test
+    fun `youDao adds cross reference for character and user and retrieves user of particular character`() = runTest {
+        database.teamDao().insertTeamMember(dummyUser)
+        youDao.insertOrIgnoreCharacterUserCrossRefEntities(UserCharacterCrossRef(
+            dummyCharacter.characterId,
+            dummyUser.userId
+        ))
+
+        val actualUserName = youDao.getUserForCharacterId(dummyCharacter.characterId)
+            .first()
+            .userEntity
+            .username
+
+        assertEquals(dummyUser.username, actualUserName)
+    }
 }
