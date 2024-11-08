@@ -1,15 +1,18 @@
 package com.carkzis.ananke.data
 
-import com.carkzis.ananke.data.database.YouDao
+import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.repository.DefaultYouRepository
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
+import com.carkzis.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.RandomUserNameGenerator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -21,7 +24,7 @@ class YouRepositoryTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var youDao: YouDao
+    private lateinit var youDao: ControllableYouDao
     private lateinit var youRepository: YouRepository
 
     @Before
@@ -33,14 +36,9 @@ class YouRepositoryTest {
     @Test
     fun `repository adds new character with randomised name`() = runTest {
         val newCharacter = NewCharacter(123L, 456L)
-        val initialCharacterId = 0L
         youRepository.addNewCharacter(newCharacter)
 
-        val initialCharacterName = youRepository
-            .getCharacterForUser(initialCharacterId)
-            .first()
-            .character
-
+        val initialCharacterName = youDao.characters.value.first().characterName
         val (characterNameAdjective, characterNameAnimal, characterNameNumber) = initialCharacterName
             .split("-", limit = 3)
 
@@ -51,12 +49,13 @@ class YouRepositoryTest {
 
     @Test
     fun `repository retrieves a character with username`() = runTest {
-        val newCharacter = NewCharacter(123L, 456L)
+        val userForCharacter = dummyUserEntities.first()
+        val newCharacter = NewCharacter(userForCharacter.userId, dummyGameEntities.first().gameId)
         youRepository.addNewCharacter(newCharacter)
 
-        val retrievedCharacter = youRepository.getCharacterForUser(newCharacter.userId)
+        val retrievedCharacter = youRepository.getCharacterForUser(userForCharacter.toDomain()).first()
 
-        // TODO: Complete.
+        assertEquals(dummyUserEntities.first().username, retrievedCharacter.userName)
     }
 
     @Test

@@ -33,9 +33,9 @@ data class UserEntityWithCharacters(
     val characterEntities: List<CharacterEntity>
 )
 
-fun CharacterEntity.toCharacter() = GameCharacter(
+fun CharacterEntity.toCharacter(userName: String) = GameCharacter(
     id = characterId.toString(),
-    userName = "",
+    userName = userName,
     character = characterName,
     bio = characterBio
 )

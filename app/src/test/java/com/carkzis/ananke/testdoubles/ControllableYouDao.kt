@@ -14,9 +14,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
 class ControllableYouDao: YouDao {
+    var characters = MutableStateFlow(listOf<CharacterEntity>())
+
     private val listOfUsers = dummyUserEntities
-    private var characters = MutableStateFlow(listOf<CharacterEntity>())
-    private val crossReferences = mutableListOf<Pair<Long, Long>>()
+    private val crossReferences = mutableListOf<UserCharacterCrossRef>()
 
     override suspend fun insertOrUpdateCharacter(character: CharacterEntity) {
         characters.update { previousValues ->
@@ -28,7 +29,7 @@ class ControllableYouDao: YouDao {
 
     override fun getCharactersForUserId(userId: Long): Flow<List<CharacterEntity>> = flow {
         val characterIdsForUserId = crossReferences.mapNotNull {
-            if (it.second == userId) it.second else null
+            if (it.userId == userId) it.characterId else null
         }
 
         val charactersForUserId = characters.value.filter {
@@ -41,18 +42,12 @@ class ControllableYouDao: YouDao {
     }
 
     override suspend fun insertOrIgnoreCharacterUserCrossRefEntities(characterUserCrossRef: UserCharacterCrossRef) {
-        val crossReferencesAsPairs = characterUserCrossRef.let {
-            Pair(
-                it.characterId,
-                it.userId
-            )
-        }
-        crossReferences.add(crossReferencesAsPairs)
+        crossReferences.add(characterUserCrossRef)
     }
 
     override fun getUserForCharacterId(characterId: Long): Flow<UserEntityWithCharacters> = flow {
         val userIdForCharacterId = crossReferences.map {
-            it.first
+            it.characterId
         }.first {
             it == characterId
         }
@@ -62,7 +57,7 @@ class ControllableYouDao: YouDao {
         }
 
         val characterIdsForUserId = crossReferences.mapNotNull {
-            if (it.second == userIdForCharacterId) it.second else null
+            if (it.userId == userIdForCharacterId) it.characterId else null
         }
 
         val charactersForUserId = characters.value.filter {
