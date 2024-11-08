@@ -6,6 +6,6 @@ import com.carkzis.ananke.data.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface YouRepository {
-    fun getCharacterForUser(user: User): Flow<GameCharacter>
+    fun getCharacterForUser(user: User, currentGameId: Long): Flow<GameCharacter>
     suspend fun addNewCharacter(character: NewCharacter)
 }

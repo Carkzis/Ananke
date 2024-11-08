@@ -53,7 +53,9 @@ class YouRepositoryTest {
         val newCharacter = NewCharacter(userForCharacter.userId, dummyGameEntities.first().gameId)
         youRepository.addNewCharacter(newCharacter)
 
-        val retrievedCharacter = youRepository.getCharacterForUser(userForCharacter.toDomain()).first()
+        val retrievedCharacter = youRepository.getCharacterForUser(
+            userForCharacter.toDomain(), dummyGameEntities.first().gameId
+        ).first()
 
         assertEquals(dummyUserEntities.first().username, retrievedCharacter.userName)
     }
@@ -70,9 +72,13 @@ class YouRepositoryTest {
         youRepository.addNewCharacter(newCharacterForCurrentGame)
         youRepository.addNewCharacter(newCharacterForOtherGame)
 
-        // TODO: YouDao first, then the following:
-        // 1. We need to add a cross-reference for the character and the game.
-        // 2. We should only retrieve a character for a user ID for a particular game.
+        val retrievedCharacter = youRepository.getCharacterForUser(
+            userForCharacter.toDomain(), currentGameForUser.gameId
+        ).first()
+
+        assertTrue(youDao.characterGameCrossReferences.size == 2)
+        assertEquals(currentGameForUser.gameId, youDao.characterGameCrossReferences.first().gameId)
+        assertEquals(retrievedCharacter.id, youDao.characterGameCrossReferences.first().characterId.toString())
     }
 
     @Test

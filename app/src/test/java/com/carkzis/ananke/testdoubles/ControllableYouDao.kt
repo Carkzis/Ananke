@@ -8,14 +8,17 @@ import com.carkzis.ananke.data.database.UserEntityWithCharacters
 import com.carkzis.ananke.data.database.YouDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
 class ControllableYouDao: YouDao {
     var characters = MutableStateFlow(listOf<CharacterEntity>())
+    val characterGameCrossReferences = mutableListOf<CharacterGameCrossRef>()
 
     private val listOfUsers = dummyUserEntities
-    private val crossReferences = mutableListOf<UserCharacterCrossRef>()
+    private val userCharacterCrossReferences = mutableListOf<UserCharacterCrossRef>()
 
     override suspend fun insertOrUpdateCharacter(character: CharacterEntity) {
         characters.update { previousValues ->
@@ -26,7 +29,7 @@ class ControllableYouDao: YouDao {
     }
 
     override fun getCharactersForUserId(userId: Long): Flow<List<CharacterEntity>> = flow {
-        val characterIdsForUserId = crossReferences.mapNotNull {
+        val characterIdsForUserId = userCharacterCrossReferences.mapNotNull {
             if (it.userId == userId) it.characterId else null
         }
 
@@ -40,15 +43,15 @@ class ControllableYouDao: YouDao {
     }
 
     override suspend fun insertOrIgnoreUserCharacterCrossRefEntities(userCharacterCrossRef: UserCharacterCrossRef) {
-        crossReferences.add(userCharacterCrossRef)
+        userCharacterCrossReferences.add(userCharacterCrossRef)
     }
 
     override suspend fun insertOrIgnoreCharacterGameCrossRefEntities(characterGameCrossRef: CharacterGameCrossRef) {
-        TODO("Not yet implemented")
+        characterGameCrossReferences.add(characterGameCrossRef)
     }
 
     override fun getUserForCharacterId(characterId: Long): Flow<UserEntityWithCharacters> = flow {
-        val userIdForCharacterId = crossReferences.map {
+        val userIdForCharacterId = userCharacterCrossReferences.map {
             it.characterId
         }.first {
             it == characterId
@@ -58,7 +61,7 @@ class ControllableYouDao: YouDao {
             it.userId == userIdForCharacterId
         }
 
-        val characterIdsForUserId = crossReferences.mapNotNull {
+        val characterIdsForUserId = userCharacterCrossReferences.mapNotNull {
             if (it.userId == userIdForCharacterId) it.characterId else null
         }
 
@@ -71,8 +74,24 @@ class ControllableYouDao: YouDao {
         )
     }
 
-    override fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters> {
-        TODO("Not yet implemented")
+    override fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters> = flow {
+        val characterIdsForGameId = characterGameCrossReferences.filter {
+            it.gameId == gameId
+        }.map {
+            it.characterId
+        }
+
+        val charactersForCharacterIds = characters.first().filter {
+            characterIdsForGameId.contains(it.characterId)
+        }
+
+        val gameForCharacters = dummyGameEntities.first {
+            it.gameId == gameId
+        }
+
+        emit(
+            GameEntityWithCharacters(gameForCharacters, charactersForCharacterIds)
+        )
     }
 
     private fun idDescending() = compareBy(CharacterEntity::characterId).reversed()
