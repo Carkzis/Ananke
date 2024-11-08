@@ -30,6 +30,4 @@ interface TeamDao {
         """,
     )
     fun getTeamMembersForGame(gameId: Long): Flow<List<UserEntityWithGames>>
-
-
 }

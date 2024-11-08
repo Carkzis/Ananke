@@ -8,7 +8,6 @@ import com.carkzis.ananke.data.database.UserEntityWithCharacters
 import com.carkzis.ananke.data.database.YouDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
@@ -74,7 +73,7 @@ class ControllableYouDao: YouDao {
         )
     }
 
-    override fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters> = flow {
+    override fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters?> = flow {
         val characterIdsForGameId = characterGameCrossReferences.filter {
             it.gameId == gameId
         }.map {
@@ -85,12 +84,12 @@ class ControllableYouDao: YouDao {
             characterIdsForGameId.contains(it.characterId)
         }
 
-        val gameForCharacters = dummyGameEntities.first {
+        val gameForCharacters = dummyGameEntities.firstOrNull {
             it.gameId == gameId
         }
 
         emit(
-            GameEntityWithCharacters(gameForCharacters, charactersForCharacterIds)
+            gameForCharacters?.let { GameEntityWithCharacters(it, charactersForCharacterIds) }
         )
     }
 

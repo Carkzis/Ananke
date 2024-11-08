@@ -2,8 +2,12 @@ package com.carkzis.ananke.utils
 
 import kotlin.random.Random
 
-object RandomUserNameGenerator {
-    fun generateRandomUserName(): String {
+interface CharacterNameGenerator {
+    fun generateCharacterName(): String
+}
+
+object RandomCharacterNameGenerator: CharacterNameGenerator {
+    override fun generateCharacterName(): String {
         val adjective = randomCharacterAdjectives.random()
         val animal = randomCharacterAnimals.random()
         val number = Random.nextInt(10_000, 100_000)

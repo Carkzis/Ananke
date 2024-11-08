@@ -49,5 +49,5 @@ interface YouDao {
             WHERE games.gameId = :gameId
         """
     )
-    fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters>
+    fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters?>
 }

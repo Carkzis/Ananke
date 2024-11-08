@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.database.AnankeDatabase
-import com.carkzis.ananke.data.database.CharacterEntity
 import com.carkzis.ananke.data.database.CharacterGameCrossRef
 import com.carkzis.ananke.data.database.UserCharacterCrossRef
-import com.carkzis.ananke.data.database.UserEntity
 import com.carkzis.ananke.data.database.YouDao
 import com.carkzis.ananke.testdoubles.dummyCharacterEntities
 import com.carkzis.ananke.testdoubles.dummyGameEntities
@@ -102,7 +100,7 @@ class YouDaoTest {
     fun `youDao retrieves characters of particular game`() = runTest {
         val actualCharacters = youDao.getCharactersForGameId(dummyGame.gameId)
             .first()
-            .characterEntities
+            ?.characterEntities
 
         assertEquals(dummyCharacters, actualCharacters)
     }

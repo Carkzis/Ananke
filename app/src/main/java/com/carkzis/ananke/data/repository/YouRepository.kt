@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface YouRepository {
     fun getCharacterForUser(user: User, currentGameId: Long): Flow<GameCharacter>
-    suspend fun addNewCharacter(character: NewCharacter)
+    suspend fun addNewCharacter(newCharacter: NewCharacter)
 }
