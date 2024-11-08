@@ -33,6 +33,22 @@ data class UserEntityWithCharacters(
     val characterEntities: List<CharacterEntity>
 )
 
+@Entity(primaryKeys = ["characterId", "gameId"])
+data class CharacterGameCrossRef(
+    val characterId: Long,
+    val gameId: Long
+)
+
+data class GameEntityWithCharacters(
+    @Embedded val gameEntity: GameEntity,
+    @Relation(
+        parentColumn = "gameId",
+        entityColumn = "characterId",
+        associateBy = Junction(CharacterGameCrossRef::class)
+    )
+    val characterEntities: List<CharacterEntity>
+)
+
 fun CharacterEntity.toCharacter(userName: String) = GameCharacter(
     id = characterId.toString(),
     userName = userName,

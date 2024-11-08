@@ -14,7 +14,10 @@ interface YouDao {
     suspend fun insertOrUpdateCharacter(character: CharacterEntity)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertOrIgnoreCharacterUserCrossRefEntities(characterUserCrossRef: UserCharacterCrossRef)
+    suspend fun insertOrIgnoreUserCharacterCrossRefEntities(userCharacterCrossRef: UserCharacterCrossRef)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOrIgnoreCharacterGameCrossRefEntities(characterGameCrossRef: CharacterGameCrossRef)
 
     @Transaction
     @Query(value = """
@@ -37,4 +40,14 @@ interface YouDao {
     )
     fun getUserForCharacterId(characterId: Long): Flow<UserEntityWithCharacters>
 
+    @Transaction
+    @Query(
+        value = """
+            SELECT * FROM characters
+            INNER JOIN CharacterGameCrossRef ON characters.characterId = CharacterGameCrossRef.characterId
+            INNER JOIN games ON games.gameId = CharacterGameCrossRef.gameId
+            WHERE games.gameId = :gameId
+        """
+    )
+    fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters>
 }

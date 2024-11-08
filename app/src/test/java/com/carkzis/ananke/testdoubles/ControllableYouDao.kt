@@ -1,15 +1,13 @@
 package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.data.database.CharacterEntity
-import com.carkzis.ananke.data.database.GameEntity
+import com.carkzis.ananke.data.database.CharacterGameCrossRef
+import com.carkzis.ananke.data.database.GameEntityWithCharacters
 import com.carkzis.ananke.data.database.UserCharacterCrossRef
-import com.carkzis.ananke.data.database.UserEntity
 import com.carkzis.ananke.data.database.UserEntityWithCharacters
-import com.carkzis.ananke.data.database.UserEntityWithGames
 import com.carkzis.ananke.data.database.YouDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
@@ -41,8 +39,12 @@ class ControllableYouDao: YouDao {
         )
     }
 
-    override suspend fun insertOrIgnoreCharacterUserCrossRefEntities(characterUserCrossRef: UserCharacterCrossRef) {
-        crossReferences.add(characterUserCrossRef)
+    override suspend fun insertOrIgnoreUserCharacterCrossRefEntities(userCharacterCrossRef: UserCharacterCrossRef) {
+        crossReferences.add(userCharacterCrossRef)
+    }
+
+    override suspend fun insertOrIgnoreCharacterGameCrossRefEntities(characterGameCrossRef: CharacterGameCrossRef) {
+        TODO("Not yet implemented")
     }
 
     override fun getUserForCharacterId(characterId: Long): Flow<UserEntityWithCharacters> = flow {
@@ -67,6 +69,10 @@ class ControllableYouDao: YouDao {
         emit(
             UserEntityWithCharacters(userForUserId, charactersForUserId)
         )
+    }
+
+    override fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters> {
+        TODO("Not yet implemented")
     }
 
     private fun idDescending() = compareBy(CharacterEntity::characterId).reversed()

@@ -9,7 +9,8 @@ import androidx.room.RoomDatabase
         UserEntity::class,
         UserGameCrossRef::class,
         CharacterEntity::class,
-        UserCharacterCrossRef::class
+        UserCharacterCrossRef::class,
+        CharacterGameCrossRef::class,
                ],
     version = 1,
     exportSchema = true

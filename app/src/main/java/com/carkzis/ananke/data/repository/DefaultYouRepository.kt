@@ -24,6 +24,6 @@ class DefaultYouRepository @Inject constructor(
     override suspend fun addNewCharacter(character: NewCharacter) {
         val characterEntity = character.toEntity()
         youDao.insertOrUpdateCharacter(characterEntity)
-        youDao.insertOrIgnoreCharacterUserCrossRefEntities(UserCharacterCrossRef(characterEntity.characterId, character.userId))
+        youDao.insertOrIgnoreUserCharacterCrossRefEntities(UserCharacterCrossRef(characterEntity.characterId, character.userId))
     }
 }

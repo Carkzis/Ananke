@@ -60,7 +60,19 @@ class YouRepositoryTest {
 
     @Test
     fun `repository adds new character to a particular game`() = runTest {
+        val userForCharacter = dummyUserEntities.first()
+        val currentGameForUser = dummyGameEntities.first()
+        val otherGameForUser = dummyGameEntities.last()
 
+        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameForUser.gameId)
+        val newCharacterForOtherGame = NewCharacter(userForCharacter.userId, otherGameForUser.gameId)
+
+        youRepository.addNewCharacter(newCharacterForCurrentGame)
+        youRepository.addNewCharacter(newCharacterForOtherGame)
+
+        // TODO: YouDao first, then the following:
+        // 1. We need to add a cross-reference for the character and the game.
+        // 2. We should only retrieve a character for a user ID for a particular game.
     }
 
     @Test
