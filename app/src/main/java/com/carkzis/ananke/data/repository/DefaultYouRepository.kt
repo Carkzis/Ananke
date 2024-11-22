@@ -8,6 +8,7 @@ import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.model.createCharacterEntity
+import com.carkzis.ananke.data.model.toCharacterEntity
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import com.carkzis.ananke.utils.CharacterNameGenerator
@@ -54,5 +55,9 @@ class DefaultYouRepository @Inject constructor(
                 break
             }
         }
+    }
+
+    override suspend fun updateCharacter(character: GameCharacter) {
+        youDao.insertOrUpdateCharacter(character.toCharacterEntity())
     }
 }

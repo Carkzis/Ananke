@@ -107,11 +107,36 @@ class YouRepositoryTest {
 
     @Test
     fun `repository updates particular character for current game`() = runTest {
+        val userForCharacter = dummyUserEntities.first()
+        val currentGameForUser = dummyGameEntities.first()
+        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameForUser.gameId)
+
+        youRepository.addNewCharacter(newCharacterForCurrentGame)
+
+        val currentCharacter = youRepository.getCharacterForUser(
+            userForCharacter.toDomain(), currentGameForUser.gameId
+        ).first()
+
+        val expectedUpdatedCharacter = currentCharacter.copy(
+            character = "New Name"
+        )
+
+        youRepository.updateCharacter(expectedUpdatedCharacter)
+
+        val retrievedCharacter = youRepository.getCharacterForUser(
+            userForCharacter.toDomain(), currentGameForUser.gameId
+        ).first()
+
+        assertEquals(expectedUpdatedCharacter, retrievedCharacter)
+    }
+
+    @Test
+    fun `repository does not update character if does not exist`() = runTest {
 
     }
 
     @Test
-    fun `repository does update character with a duplicate name within a game`() = runTest {
+    fun `repository does not update character with a duplicate name within a game`() = runTest {
 
     }
 }

@@ -1,5 +1,7 @@
 package com.carkzis.ananke.data.model
 
+import com.carkzis.ananke.data.database.CharacterEntity
+
 data class GameCharacter(
     val id: String,
     val userName: String,
@@ -14,4 +16,12 @@ data class GameCharacter(
             ""
         )
     }
+}
+
+fun GameCharacter.toCharacterEntity(): CharacterEntity {
+    return CharacterEntity(
+        characterId = id.toLong(),
+        characterName = character,
+        characterBio = bio
+    )
 }
