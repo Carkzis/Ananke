@@ -65,7 +65,7 @@ class NavigationTest {
 
     @Test
     fun `navigates to from game screen to team screen and you screens`() = runTest {
-        gameRepository.updateCurrentGame(CurrentGame("YeS", "No", "MaYbE"))
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
         composeTestRule.apply {
             assertScreenSelected(AnankeDestination.GAME, inGame = true)
 
@@ -83,7 +83,7 @@ class NavigationTest {
 
     @Test
     fun `screen prior to top level screens will always be games`() = runTest {
-        gameRepository.updateCurrentGame(CurrentGame("YeS", "No", "MaYbE"))
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
         composeTestRule.apply {
             onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()
