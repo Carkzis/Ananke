@@ -42,10 +42,12 @@ class ControllableYouDao: YouDao {
     }
 
     override suspend fun insertOrIgnoreUserCharacterCrossRefEntities(userCharacterCrossRef: UserCharacterCrossRef) {
+        if (userCharacterCrossReferences.contains(userCharacterCrossRef)) return
         userCharacterCrossReferences.add(userCharacterCrossRef)
     }
 
     override suspend fun insertOrIgnoreCharacterGameCrossRefEntities(characterGameCrossRef: CharacterGameCrossRef) {
+        if (characterGameCrossReferences.contains(characterGameCrossRef)) return
         characterGameCrossReferences.add(characterGameCrossRef)
     }
 

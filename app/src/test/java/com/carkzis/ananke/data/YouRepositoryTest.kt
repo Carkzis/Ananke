@@ -96,7 +96,13 @@ class YouRepositoryTest {
 
     @Test
     fun `repository does not add new character if user already exists in game`() = runTest {
+        val userForCharacter = dummyUserEntities.first()
+        val newCharacter = NewCharacter(userForCharacter.userId, dummyGameEntities.first().gameId)
 
+        youRepository.addNewCharacter(newCharacter)
+        youRepository.addNewCharacter(newCharacter)
+
+        assertEquals(1, youDao.characterGameCrossReferences.size)
     }
 
     @Test
