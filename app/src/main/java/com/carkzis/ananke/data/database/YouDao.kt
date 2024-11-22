@@ -5,13 +5,17 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface YouDao {
-    @Upsert
-    suspend fun insertOrUpdateCharacter(character: CharacterEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCharacter(character: CharacterEntity)
+
+    @Update
+    suspend fun updateCharacter(character: CharacterEntity)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertOrIgnoreUserCharacterCrossRefEntities(userCharacterCrossRef: UserCharacterCrossRef)

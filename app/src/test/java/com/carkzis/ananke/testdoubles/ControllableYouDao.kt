@@ -19,11 +19,19 @@ class ControllableYouDao: YouDao {
     private val listOfUsers = dummyUserEntities
     private val userCharacterCrossReferences = mutableListOf<UserCharacterCrossRef>()
 
-    override suspend fun insertOrUpdateCharacter(character: CharacterEntity) {
+    override suspend fun insertCharacter(character: CharacterEntity) {
         characters.update { previousValues ->
             (listOf(character) + previousValues)
                 .distinctBy(CharacterEntity::characterId)
                 .sortedWith(idDescending())
+        }
+    }
+
+    override suspend fun updateCharacter(character: CharacterEntity) {
+        characters.update { previousValues ->
+            previousValues.map { currentCharacter ->
+                if (currentCharacter.characterId == character.characterId) character else currentCharacter
+            }
         }
     }
 

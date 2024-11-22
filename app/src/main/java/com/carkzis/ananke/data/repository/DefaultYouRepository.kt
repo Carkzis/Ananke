@@ -49,7 +49,7 @@ class DefaultYouRepository @Inject constructor(
             if (characterNamesForGameId.contains(characterEntity.characterName)) {
                 continue
             } else {
-                youDao.insertOrUpdateCharacter(characterEntity)
+                youDao.insertCharacter(characterEntity)
                 youDao.insertOrIgnoreUserCharacterCrossRefEntities(UserCharacterCrossRef(characterEntity.characterId, newCharacter.userId))
                 youDao.insertOrIgnoreCharacterGameCrossRefEntities(CharacterGameCrossRef(characterEntity.characterId, newCharacter.gameId))
                 break
@@ -58,6 +58,6 @@ class DefaultYouRepository @Inject constructor(
     }
 
     override suspend fun updateCharacter(character: GameCharacter) {
-        youDao.insertOrUpdateCharacter(character.toCharacterEntity())
+        youDao.insertCharacter(character.toCharacterEntity())
     }
 }

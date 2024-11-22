@@ -130,9 +130,28 @@ class YouRepositoryTest {
         assertEquals(expectedUpdatedCharacter, retrievedCharacter)
     }
 
-    @Test
+    @Test(expected = NoSuchElementException::class)
     fun `repository does not update character if does not exist`() = runTest {
+        val userForCharacter = dummyUserEntities.first()
+        val currentGameForUser = dummyGameEntities.first()
+        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameForUser.gameId)
+        val nonExistentGameId = -1L
 
+        youRepository.addNewCharacter(newCharacterForCurrentGame)
+
+        val currentCharacter = youRepository.getCharacterForUser(
+            userForCharacter.toDomain(), currentGameForUser.gameId
+        ).first()
+
+        val nonExistentCharacter = currentCharacter.copy(
+            id = nonExistentGameId.toString()
+        )
+
+        youRepository.updateCharacter(nonExistentCharacter)
+
+        youRepository.getCharacterForUser(
+            userForCharacter.toDomain(), nonExistentGameId
+        ).first()
     }
 
     @Test

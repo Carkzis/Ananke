@@ -45,7 +45,7 @@ class YouDaoTest {
             database.gameDao().insertGame(dummyGame)
 
             dummyCharacters.forEach { dummyCharacter ->
-                youDao.insertOrUpdateCharacter(dummyCharacter)
+                youDao.insertCharacter(dummyCharacter)
                 youDao.insertOrIgnoreUserCharacterCrossRefEntities(
                     UserCharacterCrossRef(
                         dummyCharacter.characterId,
@@ -80,7 +80,7 @@ class YouDaoTest {
         val expectedCharacters = dummyCharacters.toMutableList().also {
             it[0] = updatedCharacter
         }
-        youDao.insertOrUpdateCharacter(updatedCharacter)
+        youDao.updateCharacter(updatedCharacter)
 
         val actualCharacters = youDao.getCharactersForUserId(dummyUser.userId).first()
         assertEquals(expectedCharacters, actualCharacters)
