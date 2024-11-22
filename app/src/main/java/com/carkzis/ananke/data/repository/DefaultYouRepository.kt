@@ -9,6 +9,8 @@ import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.model.createCharacterEntity
 import com.carkzis.ananke.data.model.toCharacterEntity
+import com.carkzis.ananke.ui.screens.you.CharacterDoesNotExistException
+import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import com.carkzis.ananke.utils.CharacterNameGenerator
@@ -57,7 +59,16 @@ class DefaultYouRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateCharacter(character: GameCharacter) {
-        youDao.insertCharacter(character.toCharacterEntity())
+    override suspend fun updateCharacter(character: GameCharacter, currentGameId: Long) {
+        val currentCharacters = youDao.getCharactersForGameId(currentGameId).first()
+            ?.characterEntities
+        val currentCharacterIds = currentCharacters?.map { it.characterId } ?: listOf()
+        val unavailableCharacterNames = currentCharacters?.map { it.characterName } ?: listOf()
+
+        when {
+            !currentCharacterIds.contains(character.id.toLong()) -> throw CharacterDoesNotExistException()
+            unavailableCharacterNames.contains(character.character) -> throw CharacterNameTakenException()
+            else -> youDao.updateCharacter(character.toCharacterEntity())
+        }
     }
 }

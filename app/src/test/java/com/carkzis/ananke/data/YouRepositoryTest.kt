@@ -8,6 +8,8 @@ import com.carkzis.ananke.testdoubles.ControllableYouDao
 import com.carkzis.ananke.testdoubles.DuplicatingCharacterNameGenerator
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.testdoubles.dummyUserEntities
+import com.carkzis.ananke.ui.screens.you.CharacterDoesNotExistException
+import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
@@ -108,54 +110,70 @@ class YouRepositoryTest {
     @Test
     fun `repository updates particular character for current game`() = runTest {
         val userForCharacter = dummyUserEntities.first()
-        val currentGameForUser = dummyGameEntities.first()
-        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameForUser.gameId)
+        val currentGameIdForUser = dummyGameEntities.first().gameId
+        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameIdForUser)
 
         youRepository.addNewCharacter(newCharacterForCurrentGame)
 
         val currentCharacter = youRepository.getCharacterForUser(
-            userForCharacter.toDomain(), currentGameForUser.gameId
+            userForCharacter.toDomain(), currentGameIdForUser
         ).first()
 
         val expectedUpdatedCharacter = currentCharacter.copy(
             character = "New Name"
         )
 
-        youRepository.updateCharacter(expectedUpdatedCharacter)
+        youRepository.updateCharacter(expectedUpdatedCharacter, currentGameIdForUser)
 
         val retrievedCharacter = youRepository.getCharacterForUser(
-            userForCharacter.toDomain(), currentGameForUser.gameId
+            userForCharacter.toDomain(), currentGameIdForUser
         ).first()
 
         assertEquals(expectedUpdatedCharacter, retrievedCharacter)
     }
 
-    @Test(expected = NoSuchElementException::class)
+    @Test(expected = CharacterDoesNotExistException::class)
     fun `repository does not update character if does not exist`() = runTest {
         val userForCharacter = dummyUserEntities.first()
-        val currentGameForUser = dummyGameEntities.first()
-        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameForUser.gameId)
+        val currentGameIdForUser = dummyGameEntities.first().gameId
+        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameIdForUser)
         val nonExistentGameId = -1L
 
         youRepository.addNewCharacter(newCharacterForCurrentGame)
 
         val currentCharacter = youRepository.getCharacterForUser(
-            userForCharacter.toDomain(), currentGameForUser.gameId
+            userForCharacter.toDomain(), currentGameIdForUser
         ).first()
 
         val nonExistentCharacter = currentCharacter.copy(
             id = nonExistentGameId.toString()
         )
 
-        youRepository.updateCharacter(nonExistentCharacter)
-
-        youRepository.getCharacterForUser(
-            userForCharacter.toDomain(), nonExistentGameId
-        ).first()
+        youRepository.updateCharacter(nonExistentCharacter, currentGameIdForUser)
     }
 
-    @Test
+    @Test(expected = CharacterNameTakenException::class)
     fun `repository does not update character with a duplicate name within a game`() = runTest {
+        val firstUserForCharacter = dummyUserEntities.first()
+        val secondUserForCharacter = dummyUserEntities.last()
+        val currentGameIdForUsers = dummyGameEntities.first().gameId
 
+        val firstNewCharacterForCurrentGame = NewCharacter(firstUserForCharacter.userId, currentGameIdForUsers)
+        val secondNewCharacterForCurrentGame = NewCharacter(secondUserForCharacter.userId, currentGameIdForUsers)
+
+        youRepository.addNewCharacter(firstNewCharacterForCurrentGame)
+        youRepository.addNewCharacter(secondNewCharacterForCurrentGame)
+
+        val firstCharacterName = youRepository.getCharacterForUser(
+            firstUserForCharacter.toDomain(), currentGameIdForUsers
+        ).first().character
+
+        val secondCharacterNamedAfterFirstCharacter = youRepository.getCharacterForUser(
+            secondUserForCharacter.toDomain(), currentGameIdForUsers
+        ).first().copy(
+            character = firstCharacterName
+        )
+
+        youRepository.updateCharacter(secondCharacterNamedAfterFirstCharacter, currentGameIdForUsers)
     }
 }
