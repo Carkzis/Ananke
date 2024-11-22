@@ -2,8 +2,8 @@
 buildscript {
     ext {
         core_ktx_version = "1.10.1"
-        kotlin_bom_version = "1.8.0"
-        compose_bom_version = "2023.06.01"
+        kotlin_bom_version = "1.9.25"
+        compose_bom_version = "2024.11.00"
         activity_compose_version = "1.7.2"
         navigation_compose_version = "2.6.0"
         icons_compose_version = "1.4.3"
@@ -11,7 +11,7 @@ buildscript {
 
         hilt_version = "2.47"
         timber_version = "5.0.1"
-        room_version = "2.5.2"
+        room_version = "2.6.1"
         datastore = "1.0.0"
 
         junit_version = "4.13.2"
@@ -31,8 +31,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.android.application' version '8.0.2' apply false
-    id 'com.android.library' version '8.0.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.7.20' apply false
+    id 'com.android.application' version '8.6.1' apply false
+    id 'com.android.library' version '8.6.1' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.25' apply false
     id 'com.google.dagger.hilt.android' version '2.46.1' apply false
 }
