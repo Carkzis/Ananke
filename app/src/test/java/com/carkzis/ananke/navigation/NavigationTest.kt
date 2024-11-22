@@ -13,6 +13,7 @@ import com.carkzis.ananke.MainActivity
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.data.repository.TeamRepository
+import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.di.DataModule
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
@@ -26,6 +27,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -43,6 +45,10 @@ class NavigationTest {
     @BindValue
     @JvmField
     val teamRepository: TeamRepository = ControllableTeamRepository()
+
+    @BindValue
+    @JvmField
+    val youRepository: YouRepository = mock()
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)

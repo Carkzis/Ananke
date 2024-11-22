@@ -1,5 +1,6 @@
 package com.carkzis.ananke.data.network
 
+import org.jetbrains.annotations.TestOnly
 import javax.inject.Inject
 
 class DefaultNetworkDataSource @Inject constructor() : NetworkDataSource {
@@ -13,5 +14,7 @@ class DefaultNetworkDataSource @Inject constructor() : NetworkDataSource {
         NetworkUser(id = 7, name = "Quinu"),
         NetworkUser(id = 8, name = "Eiku"),
     )
-
 }
+
+@TestOnly
+val userForTesting = NetworkUser(id = 35, name = "Murc")

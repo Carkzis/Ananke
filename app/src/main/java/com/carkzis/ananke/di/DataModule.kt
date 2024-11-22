@@ -10,6 +10,8 @@ import com.carkzis.ananke.data.network.DefaultNetworkDataSource
 import com.carkzis.ananke.data.network.NetworkDataSource
 import com.carkzis.ananke.data.repository.DefaultYouRepository
 import com.carkzis.ananke.data.repository.YouRepository
+import com.carkzis.ananke.utils.CharacterNameGenerator
+import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,6 +28,9 @@ interface DataModule {
 
     @Binds
     fun bindsYouRepository(youRepository: DefaultYouRepository): YouRepository
+
+    @Binds
+    fun bindsCharacterNameGenerator(characterNameGenerator: RandomCharacterNameGenerator): CharacterNameGenerator
 
     @Binds
     fun bindsAnankeDataStore(anankeDataStore: DefaultAnankeDataStore): AnankeDataStore

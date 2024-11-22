@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -39,7 +40,7 @@ class YouScreenTest {
     @Test
     fun `display current game name`() {
         val gameRepository = ControllableGameRepository()
-        val viewModel = YouViewModel(GameStateUseCase(gameRepository))
+        val viewModel = YouViewModel(GameStateUseCase(gameRepository), mock())
 
         val currentGame = CurrentGame("1", "A Game", "A Description")
         gameRepository.emitCurrentGame(currentGame)
@@ -68,7 +69,7 @@ class YouScreenTest {
         composeTestRule.apply {
             var redirected = false
             val gameRepository = ControllableGameRepository(initialCurrentGame = CurrentGame.EMPTY)
-            val viewModel = YouViewModel(GameStateUseCase(gameRepository))
+            val viewModel = YouViewModel(GameStateUseCase(gameRepository), mock())
 
             composeTestRule.setContent {
                 YouRoute(
