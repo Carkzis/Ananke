@@ -1,16 +1,14 @@
 package com.carkzis.ananke.ui
 
-import com.carkzis.ananke.data.database.CharacterEntity
-import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
-import com.carkzis.ananke.data.repository.DefaultYouRepository
-import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
-import com.carkzis.ananke.utils.RandomCharacterNameGenerator
+import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.assertNameHasExpectedFormat
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -33,14 +30,13 @@ class YouViewModelTest {
 
     private lateinit var viewModel: YouViewModel
     private lateinit var gameRepository: ControllableGameRepository
-    private lateinit var youRepository: YouRepository
+    private lateinit var youRepository: ControllableYouRepository
     private lateinit var youDao: ControllableYouDao
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        youDao = ControllableYouDao()
-        youRepository = DefaultYouRepository(youDao, RandomCharacterNameGenerator)
+        youRepository = ControllableYouRepository()
         viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository)
     }
 
@@ -83,17 +79,18 @@ class YouViewModelTest {
     fun `view model adds current user when initialised`() = runTest {
         val expectedUserId = userForTesting.id
         val currentGame = CurrentGame("1", "A Game", "A Description")
+        youRepository.currentUserId = expectedUserId
 
         gameRepository.emitCurrentGame(currentGame)
 
-        var charactersForUserId = listOf<CharacterEntity>()
+        var actualUserId = ""
         val collection = launch(UnconfinedTestDispatcher()) {
             viewModel.currentGame.collect {
-                charactersForUserId = youDao.getCharactersForUserId(expectedUserId).first()
+                actualUserId = youRepository.getCharacterForUser(userForTesting.toDomainUser(), it.id.toLong()).first().id
             }
         }
 
-        assertEquals(1, charactersForUserId.size)
+        assertEquals(expectedUserId, actualUserId.toLong())
 
         collection.cancel()
     }
@@ -130,6 +127,27 @@ class YouViewModelTest {
         }
 
         assertTrue(actualCharacterBio.isEmpty())
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model changes character name`() = runTest {
+        val expectedCharacterName = "A New Name"
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+
+        gameRepository.emitCurrentGame(currentGame)
+
+        var actualCharacterName = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.character.collect {
+                actualCharacterName = it.character
+            }
+        }
+
+        viewModel.changeCharacterName(expectedCharacterName)
+
+        assertEquals(expectedCharacterName, actualCharacterName)
 
         collection.cancel()
     }

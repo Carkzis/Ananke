@@ -44,7 +44,7 @@ class YouRepositoryTest {
         youRepository.addNewCharacter(newCharacter)
 
         val initialCharacterName = youDao.characters.value.first().characterName
-        
+
         assertNameHasExpectedFormat(initialCharacterName)
     }
 
