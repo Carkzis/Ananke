@@ -11,6 +11,7 @@ import com.carkzis.ananke.testdoubles.ControllableYouDao
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
+import com.carkzis.ananke.utils.assertNameHasExpectedFormat
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -93,6 +94,42 @@ class YouViewModelTest {
         }
 
         assertEquals(1, charactersForUserId.size)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model displays an initial character name`() = runTest {
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+
+        gameRepository.emitCurrentGame(currentGame)
+
+        var actualCharacterName = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.character.collect {
+                actualCharacterName = it.character
+            }
+        }
+
+        assertNameHasExpectedFormat(actualCharacterName)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model displays an empty initial biography`() = runTest {
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+
+        gameRepository.emitCurrentGame(currentGame)
+
+        var actualCharacterBio = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.character.collect {
+                actualCharacterBio = it.bio
+            }
+        }
+
+        assertTrue(actualCharacterBio.isEmpty())
 
         collection.cancel()
     }

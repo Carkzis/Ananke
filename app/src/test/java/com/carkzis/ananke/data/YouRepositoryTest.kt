@@ -13,6 +13,7 @@ import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
+import com.carkzis.ananke.utils.assertNameHasExpectedFormat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -43,12 +44,8 @@ class YouRepositoryTest {
         youRepository.addNewCharacter(newCharacter)
 
         val initialCharacterName = youDao.characters.value.first().characterName
-        val (characterNameAdjective, characterNameAnimal, characterNameNumber) = initialCharacterName
-            .split("-", limit = 3)
-
-        assertTrue(RandomCharacterNameGenerator.randomCharacterAdjectives.contains(characterNameAdjective))
-        assertTrue(RandomCharacterNameGenerator.randomCharacterAnimals.contains(characterNameAnimal))
-        assertTrue(characterNameNumber.toInt() in 10_000 until 100_000)
+        
+        assertNameHasExpectedFormat(initialCharacterName)
     }
 
     @Test

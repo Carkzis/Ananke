@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.NewCharacter
+import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.repository.YouRepository
@@ -32,6 +34,17 @@ class YouViewModel @Inject constructor(
         when (gamingState.value) {
             is GamingState.Loading, GamingState.OutOfGame -> CurrentGame.EMPTY
             is GamingState.InGame -> (gamingState.value as GamingState.InGame).currentGame
+        }
+    }
+
+    val character = currentGame.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        CurrentGame.EMPTY
+    ).map {
+        when (it.id.toLong()) {
+            -1L -> GameCharacter.EMPTY
+            else -> youRepository.getCharacterForUser(userForTesting.toDomainUser(), it.id.toLong()).first()
         }
     }
 
