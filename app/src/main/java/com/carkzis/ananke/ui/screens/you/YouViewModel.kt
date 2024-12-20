@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retry
@@ -45,11 +46,10 @@ class YouViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val character: StateFlow<GameCharacter> = currentGame.flatMapLatest {
-        when (it.id.toLong()) {
-            -1L -> flow { GameCharacter.EMPTY }
-            else -> youRepository.getCharacterForUser(userForTesting.toDomainUser(), it.id.toLong())
-        }
+    val character: StateFlow<GameCharacter> = currentGame.flatMapMerge {
+        youRepository.getCharacterForUser(
+            userForTesting.toDomainUser(), it.id.toLong()
+        )
     }.stateIn(
         viewModelScope,
         WhileSubscribed(5000L),

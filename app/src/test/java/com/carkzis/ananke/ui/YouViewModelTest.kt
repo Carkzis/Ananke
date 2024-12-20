@@ -1,6 +1,7 @@
 package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -98,6 +99,7 @@ class YouViewModelTest {
     @Test
     fun `view model displays an initial character name`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
+        youRepository.currentUserId = userForTesting.id
 
         gameRepository.emitCurrentGame(currentGame)
 
@@ -116,6 +118,7 @@ class YouViewModelTest {
     @Test
     fun `view model displays an empty initial biography`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
+        youRepository.currentUserId = userForTesting.id
 
         gameRepository.emitCurrentGame(currentGame)
 
