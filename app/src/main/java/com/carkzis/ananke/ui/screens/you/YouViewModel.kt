@@ -14,15 +14,20 @@ import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -72,6 +77,15 @@ class YouViewModel @Inject constructor(
         viewModelScope.launch {
             youRepository.updateCharacter(
                 character.first().copy(character = newName),
+                currentGame.first().id.toLong()
+            )
+        }
+    }
+
+    fun changeCharacterBio(bio: String) {
+        viewModelScope.launch {
+            youRepository.updateCharacter(
+                character.first().copy(bio = bio),
                 currentGame.first().id.toLong()
             )
         }

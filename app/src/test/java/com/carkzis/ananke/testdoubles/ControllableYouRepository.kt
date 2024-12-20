@@ -5,25 +5,20 @@ import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 
 class ControllableYouRepository : YouRepository {
     var currentUserId = 1L
 
-    private val _users = MutableSharedFlow<List<User>>(replay = 1)
-
     private val _characters = MutableSharedFlow<List<GameCharacter>>(replay = 1)
     private val characters get() = _characters.replayCache.firstOrNull() ?: listOf()
 
     private val userToCharacterMap = mutableMapOf<Long, List<GameCharacter>>()
 
-    override fun getCharacterForUser(user: User, currentGameId: Long): Flow<GameCharacter> {
-        return _characters.map { characters ->
-            characters.first {
-                userToCharacterMap.getOrDefault(currentGameId, listOf()).contains(it)
-            }
+    override fun getCharacterForUser(user: User, currentGameId: Long) = _characters.map { characters ->
+        characters.first {
+            userToCharacterMap.getOrDefault(currentGameId, listOf()).contains(it)
         }
     }
 
@@ -47,6 +42,11 @@ class ControllableYouRepository : YouRepository {
         _characters.tryEmit(
             characters.map {
                 if (it.id == character.id) {
+                    val currentCharactersForUser = userToCharacterMap[currentGameId] ?: listOf()
+                    val newCharactersForUser = (currentCharactersForUser + character).reversed().distinctBy {
+                        it.id
+                    }
+                    userToCharacterMap[currentGameId] = newCharactersForUser
                     character
                 } else {
                     it

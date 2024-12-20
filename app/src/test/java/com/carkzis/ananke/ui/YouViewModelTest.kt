@@ -1,7 +1,6 @@
 package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.data.model.CurrentGame
-import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -151,6 +150,27 @@ class YouViewModelTest {
         viewModel.changeCharacterName(expectedCharacterName)
 
         assertEquals(expectedCharacterName, actualCharacterName)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model changes character bio`() = runTest {
+        val expectedCharacterBio = "A bio for the character."
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+
+        gameRepository.emitCurrentGame(currentGame)
+
+        var actualCharacterBio = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.character.collect {
+                actualCharacterBio = it.bio
+            }
+        }
+
+        viewModel.changeCharacterBio(expectedCharacterBio)
+
+        assertEquals(expectedCharacterBio, actualCharacterBio)
 
         collection.cancel()
     }
