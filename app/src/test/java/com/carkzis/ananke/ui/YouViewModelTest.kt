@@ -4,7 +4,6 @@ import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
-import com.carkzis.ananke.testdoubles.ControllableYouDao
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.CharacterNotInEditModeException
 import com.carkzis.ananke.ui.screens.you.YouConstants
@@ -270,9 +269,17 @@ class YouViewModelTest {
         collection.cancel()
     }
 
-    @Test
+    @Test(expected = CharacterNotInEditModeException::class)
     fun `view model exits edit mode when changing character`() = runTest {
-        // TODO: Implement test
+        val newName = "A New Name"
+
+        collectInitialCharacterInformation()
+
+        viewModel.beginEditingCharacterName()
+        viewModel.editCharacterName("David")
+        viewModel.changeCharacterName(newName)
+
+        viewModel.editCharacterName("David Again")
     }
 
     private fun TestScope.collectInitialCharacterInformation() {
