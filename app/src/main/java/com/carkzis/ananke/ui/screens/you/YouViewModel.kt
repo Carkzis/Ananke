@@ -59,6 +59,9 @@ class YouViewModel @Inject constructor(
     private val _editableCharacterName = MutableStateFlow("")
     val editableCharacter = _editableCharacterName.asStateFlow()
 
+    private val _editableCharacterBio = MutableStateFlow("")
+    val editableCharacterBio = _editableCharacterBio.asStateFlow()
+
     private val _editMode = MutableStateFlow<EditMode>(EditMode.None)
     val editMode = _editMode.asStateFlow()
 
@@ -99,6 +102,10 @@ class YouViewModel @Inject constructor(
     fun beginEditingCharacterName() {
         _editMode.value = EditMode.CharacterName
         _editableCharacterName.value = character.value.character
+    }
+
+    fun beginEditingCharacterBio() {
+        _editableCharacterBio.value = character.value.bio
     }
 
     fun editCharacterName(newName: String) {

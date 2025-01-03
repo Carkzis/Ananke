@@ -282,14 +282,36 @@ class YouViewModelTest {
         viewModel.editCharacterName("David Again")
     }
 
-    private fun TestScope.collectInitialCharacterInformation() {
+    @Test
+    fun `view model initially displays character bio when editing`() = runTest {
+        val expectedCharacterBio = "A bio for the character."
+        collectInitialCharacterInformation(expectedCharacterBio = expectedCharacterBio)
+
+        var editableBio = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editableCharacterBio.collect {
+                editableBio = it
+            }
+        }
+
+        viewModel.beginEditingCharacterBio()
+
+        assertEquals(expectedCharacterBio, editableBio)
+
+        collection.cancel()
+    }
+
+    private fun TestScope.collectInitialCharacterInformation(expectedCharacterBio: String = "") {
         val currentGame = CurrentGame("1", "A Game", "A Description")
+
         youRepository.currentUserId = userForTesting.id
         gameRepository.emitCurrentGame(currentGame)
 
         val collection = launch(UnconfinedTestDispatcher()) {
             viewModel.character.collect {}
         }
+
+        viewModel.changeCharacterBio(expectedCharacterBio)
 
         collection.cancel()
     }
