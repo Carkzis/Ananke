@@ -9,7 +9,13 @@ data class NewCharacter(
     val gameId: Long
 )
 
-fun createCharacterEntity(characterNameGenerator: CharacterNameGenerator = RandomCharacterNameGenerator) = CharacterEntity(
+fun createCharacterEntity(
+    characterNameGenerator: CharacterNameGenerator = RandomCharacterNameGenerator,
+    userOwnerId: Long,
+    gameOwnerId: Long
+) = CharacterEntity(
     characterName = characterNameGenerator.generateCharacterName(),
+    userOwnerId = userOwnerId,
+    gameOwnerId = gameOwnerId,
     characterBio = ""
 )

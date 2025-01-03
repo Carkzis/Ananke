@@ -77,9 +77,8 @@ class YouRepositoryTest {
             userForCharacter.toDomain(), currentGameForUser.gameId
         ).first()
 
-        assertTrue(youDao.characterGameCrossReferences.size == 2)
-        assertEquals(currentGameForUser.gameId, youDao.characterGameCrossReferences.first().gameId)
-        assertEquals(retrievedCharacter.id, youDao.characterGameCrossReferences.first().characterId.toString())
+        assertTrue(youDao.characters.value.map { it.gameOwnerId }.contains(otherGameForUser.gameId))
+        assertTrue(youDao.characters.value.map { it.characterId }.contains(retrievedCharacter.id.toLong()))
     }
 
     @Test(expected = CharacterNamingException::class)
@@ -101,7 +100,7 @@ class YouRepositoryTest {
         youRepository.addNewCharacter(newCharacter)
         youRepository.addNewCharacter(newCharacter)
 
-        assertEquals(1, youDao.characterGameCrossReferences.size)
+        assertEquals(1, youDao.characters.value.size)
     }
 
     @Test

@@ -1,7 +1,5 @@
 package com.carkzis.ananke.data.repository
 
-import com.carkzis.ananke.data.database.CharacterGameCrossRef
-import com.carkzis.ananke.data.database.UserCharacterCrossRef
 import com.carkzis.ananke.data.database.YouDao
 import com.carkzis.ananke.data.database.toCharacter
 import com.carkzis.ananke.data.model.GameCharacter
@@ -17,7 +15,6 @@ import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class DefaultYouRepository @Inject constructor(
@@ -53,14 +50,12 @@ class DefaultYouRepository @Inject constructor(
         for (characterNamingAttempt in 0..10) {
             if (characterNamingAttempt == 10) throw CharacterNamingException()
 
-            val characterEntity = createCharacterEntity(characterNameGenerator)
+            val characterEntity = createCharacterEntity(characterNameGenerator, newCharacter.userId, newCharacter.gameId)
 
             if (characterNamesForGameId.contains(characterEntity.characterName)) {
                 continue
             } else {
                 youDao.insertCharacter(characterEntity)
-                youDao.insertOrIgnoreUserCharacterCrossRefEntities(UserCharacterCrossRef(characterEntity.characterId, newCharacter.userId))
-                youDao.insertOrIgnoreCharacterGameCrossRefEntities(CharacterGameCrossRef(characterEntity.characterId, newCharacter.gameId))
                 break
             }
         }
@@ -75,7 +70,10 @@ class DefaultYouRepository @Inject constructor(
         when {
             !currentCharacterIds.contains(character.id.toLong()) -> throw CharacterDoesNotExistException()
             unavailableCharacterNames.contains(character.character) -> throw CharacterNameTakenException()
-            else -> youDao.updateCharacter(character.toCharacterEntity())
+            else -> {
+                val userId = youDao.getUserForCharacterId(character.id.toLong()).first().userEntity.userId
+                youDao.updateCharacter(character.toCharacterEntity(userId, currentGameId))
+            }
         }
     }
 }

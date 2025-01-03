@@ -18,10 +18,12 @@ data class GameCharacter(
     }
 }
 
-fun GameCharacter.toCharacterEntity(): CharacterEntity {
+fun GameCharacter.toCharacterEntity(userId: Long = 0L, gameId: Long = 0L): CharacterEntity {
     return CharacterEntity(
         characterId = id.toLong(),
         characterName = character,
+        userOwnerId = userId,
+        gameOwnerId = gameId,
         characterBio = bio
     )
 }

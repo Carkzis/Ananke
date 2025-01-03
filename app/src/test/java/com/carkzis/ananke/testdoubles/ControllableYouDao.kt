@@ -1,9 +1,7 @@
 package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.data.database.CharacterEntity
-import com.carkzis.ananke.data.database.CharacterGameCrossRef
 import com.carkzis.ananke.data.database.GameEntityWithCharacters
-import com.carkzis.ananke.data.database.UserCharacterCrossRef
 import com.carkzis.ananke.data.database.UserEntityWithCharacters
 import com.carkzis.ananke.data.database.YouDao
 import kotlinx.coroutines.flow.Flow
@@ -14,17 +12,20 @@ import kotlinx.coroutines.flow.update
 
 class ControllableYouDao: YouDao {
     var characters = MutableStateFlow(listOf<CharacterEntity>())
-    val characterGameCrossReferences = mutableListOf<CharacterGameCrossRef>()
 
     private val listOfUsers = dummyUserEntities
-    private val userCharacterCrossReferences = mutableListOf<UserCharacterCrossRef>()
+    private val listOfGames = dummyGameEntities
+
+    private var idCounter = 0L
 
     override suspend fun insertCharacter(character: CharacterEntity) {
+        val characterIdIncreased = character.copy(characterId = idCounter)
         characters.update { previousValues ->
-            (listOf(character) + previousValues)
+            (listOf(characterIdIncreased) + previousValues)
                 .distinctBy(CharacterEntity::characterId)
                 .sortedWith(idDescending())
         }
+        idCounter++
     }
 
     override suspend fun updateCharacter(character: CharacterEntity) {
@@ -36,12 +37,8 @@ class ControllableYouDao: YouDao {
     }
 
     override fun getCharactersForUserId(userId: Long): Flow<List<CharacterEntity>> = flow {
-        val characterIdsForUserId = userCharacterCrossReferences.mapNotNull {
-            if (it.userId == userId) it.characterId else null
-        }
-
         val charactersForUserId = characters.value.filter {
-            characterIdsForUserId.contains(it.characterId)
+            it.userOwnerId == userId
         }
 
         emit(
@@ -49,57 +46,33 @@ class ControllableYouDao: YouDao {
         )
     }
 
-    override suspend fun insertOrIgnoreUserCharacterCrossRefEntities(userCharacterCrossRef: UserCharacterCrossRef) {
-        if (userCharacterCrossReferences.contains(userCharacterCrossRef)) return
-        userCharacterCrossReferences.add(userCharacterCrossRef)
-    }
-
-    override suspend fun insertOrIgnoreCharacterGameCrossRefEntities(characterGameCrossRef: CharacterGameCrossRef) {
-        if (characterGameCrossReferences.contains(characterGameCrossRef)) return
-        characterGameCrossReferences.add(characterGameCrossRef)
-    }
 
     override fun getUserForCharacterId(characterId: Long): Flow<UserEntityWithCharacters> = flow {
-        val userIdForCharacterId = userCharacterCrossReferences.map {
-            it.characterId
-        }.first {
-            it == characterId
+        val charactersForCharacterId = characters.value.filter {
+            it.characterId == characterId
         }
 
+        val userIdForCharacter = charactersForCharacterId.first().userOwnerId
         val userForUserId = listOfUsers.first {
-            it.userId == userIdForCharacterId
-        }
-
-        val characterIdsForUserId = userCharacterCrossReferences.mapNotNull {
-            if (it.userId == userIdForCharacterId) it.characterId else null
-        }
-
-        val charactersForUserId = characters.value.filter {
-            characterIdsForUserId.contains(it.characterId)
+            it.userId == userIdForCharacter
         }
 
         emit(
-            UserEntityWithCharacters(userForUserId, charactersForUserId)
+            UserEntityWithCharacters(userForUserId, charactersForCharacterId)
         )
     }
 
     override fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters?> = flow {
-        val characterIdsForGameId = characterGameCrossReferences.filter {
-            it.gameId == gameId
-        }.map {
-            it.characterId
-        }
-
-        val charactersForCharacterIds = characters.first().filter {
-            characterIdsForGameId.contains(it.characterId)
-        }
-
         val gameForCharacters = dummyGameEntities.firstOrNull {
             it.gameId == gameId
         }
 
+        val charactersForGame = characters.value.filter {
+            it.gameOwnerId == gameId
+        }
+
         emit(
-            gameForCharacters?.let { GameEntityWithCharacters(it, charactersForCharacterIds) }
+            gameForCharacters?.let { GameEntityWithCharacters(it, charactersForGame) }
         )
     }
 

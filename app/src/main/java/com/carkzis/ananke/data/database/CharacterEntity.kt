@@ -13,38 +13,27 @@ import com.carkzis.ananke.data.model.GameCharacter
 data class CharacterEntity(
     @PrimaryKey(autoGenerate = true)
     val characterId: Long = 0L,
+    val userOwnerId: Long,
+    val gameOwnerId: Long,
     val characterName: String,
     val characterBio: String
 )
 
-@Entity(primaryKeys = ["characterId", "userId"])
-data class UserCharacterCrossRef(
-    val characterId: Long,
-    val userId: Long
-)
 
 data class UserEntityWithCharacters(
     @Embedded val userEntity: UserEntity,
     @Relation(
         parentColumn = "userId",
-        entityColumn = "characterId",
-        associateBy = Junction(UserCharacterCrossRef::class)
+        entityColumn = "userOwnerId",
     )
     val characterEntities: List<CharacterEntity>
-)
-
-@Entity(primaryKeys = ["characterId", "gameId"])
-data class CharacterGameCrossRef(
-    val characterId: Long,
-    val gameId: Long
 )
 
 data class GameEntityWithCharacters(
     @Embedded val gameEntity: GameEntity,
     @Relation(
         parentColumn = "gameId",
-        entityColumn = "characterId",
-        associateBy = Junction(CharacterGameCrossRef::class)
+        entityColumn = "gameOwnerId",
     )
     val characterEntities: List<CharacterEntity>
 )

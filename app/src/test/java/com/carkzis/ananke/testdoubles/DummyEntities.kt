@@ -17,7 +17,7 @@ val dummyUserEntities = listOf(
 )
 
 val dummyCharacterEntities = listOf(
-    CharacterEntity(7L, "Beep", "It beeps."),
-    CharacterEntity(8L, "Boop", "It boops."),
-    CharacterEntity(9L, "Jeremy Stevens", "It hungers."),
+    CharacterEntity(7L, 4L, 1L,"Beep", "It beeps."),
+    CharacterEntity(8L, 4L, 1L, "Boop", "It boops."),
+    CharacterEntity(9L, 4L, 1L, "Jeremy Stevens", "It hungers."),
 )

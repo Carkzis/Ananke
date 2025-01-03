@@ -4,14 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.database.AnankeDatabase
-import com.carkzis.ananke.data.database.CharacterGameCrossRef
-import com.carkzis.ananke.data.database.UserCharacterCrossRef
 import com.carkzis.ananke.data.database.YouDao
 import com.carkzis.ananke.testdoubles.dummyCharacterEntities
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.testdoubles.dummyUserEntities
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -45,18 +42,6 @@ class YouDaoTest {
 
             dummyCharacters.forEach { dummyCharacter ->
                 youDao.insertCharacter(dummyCharacter)
-                youDao.insertOrIgnoreUserCharacterCrossRefEntities(
-                    UserCharacterCrossRef(
-                        dummyCharacter.characterId,
-                        dummyUser.userId
-                    )
-                )
-                youDao.insertOrIgnoreCharacterGameCrossRefEntities(
-                    CharacterGameCrossRef(
-                        dummyCharacter.characterId,
-                        dummyGame.gameId
-                    )
-                )
             }
         }
     }

@@ -17,17 +17,10 @@ interface YouDao {
     @Update
     suspend fun updateCharacter(character: CharacterEntity)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertOrIgnoreUserCharacterCrossRefEntities(userCharacterCrossRef: UserCharacterCrossRef)
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertOrIgnoreCharacterGameCrossRefEntities(characterGameCrossRef: CharacterGameCrossRef)
-
     @Transaction
     @Query(value = """
             SELECT * FROM characters
-            INNER JOIN UserCharacterCrossRef ON characters.characterId = UserCharacterCrossRef.characterId
-            INNER JOIN users ON users.userId = UserCharacterCrossRef.userId
+            INNER JOIN users ON characters.userOwnerId = users.userId
             WHERE users.userId = :userId
         """
     )
@@ -37,8 +30,7 @@ interface YouDao {
     @Query(
         value = """
             SELECT * FROM users
-            INNER JOIN UserCharacterCrossRef ON users.userId = UserCharacterCrossRef.userId
-            INNER JOIN characters ON characters.characterId = UserCharacterCrossRef.characterId
+            INNER JOIN characters ON users.userId = characters.userOwnerId
             WHERE characters.characterId = :characterId
         """
     )
@@ -48,8 +40,7 @@ interface YouDao {
     @Query(
         value = """
             SELECT * FROM characters
-            INNER JOIN CharacterGameCrossRef ON characters.characterId = CharacterGameCrossRef.characterId
-            INNER JOIN games ON games.gameId = CharacterGameCrossRef.gameId
+            INNER JOIN games ON characters.gameOwnerId = games.gameId
             WHERE games.gameId = :gameId
         """
     )
