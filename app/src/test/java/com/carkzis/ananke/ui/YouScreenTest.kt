@@ -10,6 +10,7 @@ import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.YouRoute
 import com.carkzis.ananke.ui.screens.you.YouScreen
 import com.carkzis.ananke.ui.screens.you.YouViewModel
@@ -18,7 +19,6 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import junit.framework.TestCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -65,18 +65,19 @@ class YouScreenTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `redirects to game screen when out of game`() = runTest {
         composeTestRule.apply {
             var redirected = false
             val gameRepository = ControllableGameRepository(initialCurrentGame = CurrentGame.EMPTY)
-            val viewModel = YouViewModel(GameStateUseCase(gameRepository), mock())
+            val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
 
             composeTestRule.setContent {
                 YouRoute(
                     viewModel = viewModel,
-                    onOutOfGame = { redirected = true },
+                    onOutOfGame = {
+                        redirected = true
+                                  },
                 )
             }
 

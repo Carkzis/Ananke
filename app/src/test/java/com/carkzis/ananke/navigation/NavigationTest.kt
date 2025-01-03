@@ -17,6 +17,7 @@ import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.di.DataModule
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -31,7 +32,6 @@ import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
@@ -48,7 +48,7 @@ class NavigationTest {
 
     @BindValue
     @JvmField
-    val youRepository: YouRepository = mock()
+    val youRepository: YouRepository = ControllableYouRepository()
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)

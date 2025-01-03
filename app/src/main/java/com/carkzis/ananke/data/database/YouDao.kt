@@ -20,8 +20,7 @@ interface YouDao {
     @Transaction
     @Query(value = """
             SELECT * FROM characters
-            INNER JOIN users ON characters.userOwnerId = users.userId
-            WHERE users.userId = :userId
+            WHERE userOwnerId = :userId
         """
     )
     fun getCharactersForUserId(userId: Long): Flow<List<CharacterEntity>>

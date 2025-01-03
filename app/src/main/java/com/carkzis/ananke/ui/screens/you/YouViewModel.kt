@@ -75,7 +75,9 @@ class YouViewModel @Inject constructor(
                 if (it != CurrentGame.EMPTY) {
                     val currentGameId = it.id
                     val newCharacter = NewCharacter(userId = userForTesting.id, gameId = currentGameId.toLong())
-                    youRepository.addNewCharacter(newCharacter)
+                    try {
+                        youRepository.addNewCharacter(newCharacter)
+                    } catch (_: CharacterAlreadyExistsForUserException) {}
                 }
             }
         }
