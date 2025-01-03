@@ -6,6 +6,7 @@ import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.CharacterNotInEditModeException
+import com.carkzis.ananke.ui.screens.you.EditMode
 import com.carkzis.ananke.ui.screens.you.YouConstants
 import com.carkzis.ananke.ui.screens.you.YouValidatorFailure
 import com.carkzis.ananke.ui.screens.you.YouViewModel
@@ -250,7 +251,7 @@ class YouViewModelTest {
     }
 
     @Test
-    fun `view model disallows edited names longer than 20 characters`() = runTest {
+    fun `view model sends toast when edited name longer than 20 characters`() = runTest {
         val newNameLength = YouConstants.MAXIMUM_CHARACTER_NAME_LENGTH + 1
         val expectedCharacterName = "A".repeat(newNameLength)
 
@@ -270,16 +271,26 @@ class YouViewModelTest {
     }
 
     @Test(expected = CharacterNotInEditModeException::class)
-    fun `view model exits edit mode when changing character`() = runTest {
-        val newName = "A New Name"
+    fun `view model exits edit mode when changing character name`() = runTest {
+        val firstNewName = "David"
+        val secondNewName = "David Again"
 
         collectInitialCharacterInformation()
 
         viewModel.beginEditingCharacterName()
-        viewModel.editCharacterName("David")
-        viewModel.changeCharacterName(newName)
+        viewModel.editCharacterName(firstNewName)
+        viewModel.changeCharacterName(firstNewName)
 
-        viewModel.editCharacterName("David Again")
+        var editMode: EditMode = EditMode.CharacterName
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editMode.collect { editMode = it }
+        }
+
+        assertEquals(EditMode.None, editMode)
+
+        viewModel.editCharacterName(secondNewName)
+
+        collection.cancel()
     }
 
     @Test
@@ -332,6 +343,49 @@ class YouViewModelTest {
         }
 
         viewModel.editCharacterBio(expectedCharacterBio)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast when edited bio longer than 20 characters`() = runTest {
+        val newNameLength = YouConstants.MAXIMUM_CHARACTER_NAME_LENGTH + 1
+        val expectedCharacterName = "A".repeat(newNameLength)
+
+        collectInitialCharacterInformation()
+
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        viewModel.beginEditingCharacterName()
+        viewModel.editCharacterName(expectedCharacterName)
+
+        Assert.assertEquals(YouValidatorFailure.NAME_TOO_LONG.message, message)
+
+        collection.cancel()
+    }
+
+    @Test(expected = CharacterNotInEditModeException::class)
+    fun `view model exits edit mode when changing character bio`() = runTest {
+        val firstNewBio = "A New Bio"
+        val secondNewBio = "Another New Bio"
+
+        collectInitialCharacterInformation()
+
+        viewModel.beginEditingCharacterBio()
+        viewModel.editCharacterBio(firstNewBio)
+        viewModel.changeCharacterName(firstNewBio)
+
+        var editMode: EditMode = EditMode.CharacterBio
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editMode.collect { editMode = it }
+        }
+
+        assertEquals(EditMode.None, editMode)
+
+        viewModel.editCharacterName(secondNewBio)
 
         collection.cancel()
     }

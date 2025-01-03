@@ -9,6 +9,9 @@ import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator
+import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.titleValidator
+import com.carkzis.ananke.ui.screens.you.YouTextValidator.Companion.characterBioValidator
 import com.carkzis.ananke.ui.screens.you.YouTextValidator.Companion.characterNameValidator
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
@@ -110,23 +113,40 @@ class YouViewModel @Inject constructor(
     }
 
     fun editCharacterName(newName: String) {
-        if (_editMode.value != EditMode.CharacterName) throw CharacterNotInEditModeException()
+        setText(
+            newName,
+            { _editableCharacterName.value = it },
+            EditMode.CharacterName,
+            characterNameValidator()
+        )
+    }
 
-        val validator = characterNameValidator()
-        val textValidation = validator.validateText(newName)
+    fun editCharacterBio(newBio: String) {
+        setText(
+            newBio,
+            { _editableCharacterBio.value = it },
+            EditMode.CharacterBio,
+            characterBioValidator()
+        )
+    }
+
+    private fun setText(
+        updatedText: String,
+        onValidatedText: (String) -> Unit,
+        editModeRequirement: EditMode,
+        textValidator: YouTextValidator
+    ) {
+        if (_editMode.value != editModeRequirement) throw CharacterNotInEditModeException()
+
+        val textValidation = textValidator.validateText(updatedText)
+
         if (textValidation is ValidatorResponse.Fail) {
             viewModelScope.launch {
                 _message.emit(textValidation.failureMessage)
             }
         } else {
-            _editableCharacterName.value = newName
+            onValidatedText(updatedText)
         }
-    }
-
-    fun editCharacterBio(bio: String) {
-        if (_editMode.value != EditMode.CharacterBio) throw CharacterNotInEditModeException()
-
-        _editableCharacterBio.value = bio
     }
 }
 
