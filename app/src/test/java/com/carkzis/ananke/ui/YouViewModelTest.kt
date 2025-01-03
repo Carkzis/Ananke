@@ -7,7 +7,7 @@ import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.CharacterNotInEditModeException
-import com.carkzis.ananke.ui.screens.you.YouTextValidator
+import com.carkzis.ananke.ui.screens.you.YouConstants
 import com.carkzis.ananke.ui.screens.you.YouValidatorFailure
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
@@ -35,7 +35,6 @@ class YouViewModelTest {
     private lateinit var viewModel: YouViewModel
     private lateinit var gameRepository: ControllableGameRepository
     private lateinit var youRepository: ControllableYouRepository
-    private lateinit var youDao: ControllableYouDao
 
     @Before
     fun setUp() {
@@ -233,7 +232,7 @@ class YouViewModelTest {
 
     @Test
     fun `view model sends toast when edited name is shorter than 3 characters`() = runTest {
-        val newNameLength = YouTextValidator.YouConstants.MINIMUM_CHARACTER_NAME_LENGTH - 1
+        val newNameLength = YouConstants.MINIMUM_CHARACTER_NAME_LENGTH - 1
         val expectedCharacterName = "A".repeat(newNameLength)
 
         collectInitialCharacterInformation()
@@ -253,7 +252,7 @@ class YouViewModelTest {
 
     @Test
     fun `view model disallows edited names longer than 20 characters`() = runTest {
-        val newNameLength = YouTextValidator.YouConstants.MAXIMUM_CHARACTER_NAME_LENGTH + 1
+        val newNameLength = YouConstants.MAXIMUM_CHARACTER_NAME_LENGTH + 1
         val expectedCharacterName = "A".repeat(newNameLength)
 
         collectInitialCharacterInformation()
