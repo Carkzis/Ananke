@@ -1,6 +1,5 @@
 package com.carkzis.ananke.ui
 
-import androidx.test.core.app.ActivityScenario.launch
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
@@ -8,6 +7,8 @@ import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.CharacterNotInEditModeException
+import com.carkzis.ananke.ui.screens.you.YouTextValidator
+import com.carkzis.ananke.ui.screens.you.YouValidatorFailure
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
@@ -231,20 +232,49 @@ class YouViewModelTest {
     }
 
     @Test
-    fun `view model disallows edited names shorter than 3 characters`() = runTest {
-        // TODO: Implement test
+    fun `view model sends toast when edited name is shorter than 3 characters`() = runTest {
+        val newNameLength = YouTextValidator.YouConstants.MINIMUM_CHARACTER_NAME_LENGTH - 1
+        val expectedCharacterName = "A".repeat(newNameLength)
+
+        collectInitialCharacterInformation()
+
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        viewModel.beginEditingCharacterName()
+        viewModel.editCharacterName(expectedCharacterName)
+
+        Assert.assertEquals(YouValidatorFailure.NAME_TOO_SHORT.message, message)
+
+        collection.cancel()
     }
 
     @Test
     fun `view model disallows edited names longer than 20 characters`() = runTest {
-        // TODO: Implement test
+        val newNameLength = YouTextValidator.YouConstants.MAXIMUM_CHARACTER_NAME_LENGTH + 1
+        val expectedCharacterName = "A".repeat(newNameLength)
+
+        collectInitialCharacterInformation()
+
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        viewModel.beginEditingCharacterName()
+        viewModel.editCharacterName(expectedCharacterName)
+
+        Assert.assertEquals(YouValidatorFailure.NAME_TOO_LONG.message, message)
+
+        collection.cancel()
     }
 
-    @Test(expected = CharacterNotInEditModeException::class)
+    @Test
     fun `view model exits edit mode when changing character`() = runTest {
         // TODO: Implement test
     }
-
 
     private fun TestScope.collectInitialCharacterInformation() {
         val currentGame = CurrentGame("1", "A Game", "A Description")

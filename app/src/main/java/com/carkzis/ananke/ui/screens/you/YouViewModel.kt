@@ -12,9 +12,11 @@ import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapMerge
@@ -58,6 +60,9 @@ class YouViewModel @Inject constructor(
     private val _editMode = MutableStateFlow<EditMode>(EditMode.None)
     val editMode = _editMode.asStateFlow()
 
+    private val _message = MutableSharedFlow<String>()
+    val message = _message.asSharedFlow()
+
     init {
         viewModelScope.launch {
             currentGame.collect {
@@ -95,7 +100,17 @@ class YouViewModel @Inject constructor(
 
     fun editCharacterName(newName: String) {
         if (_editMode.value == EditMode.CharacterName) {
-            _editableCharacterName.value = newName
+            if (newName.length < YouTextValidator.YouConstants.MINIMUM_CHARACTER_NAME_LENGTH) {
+                viewModelScope.launch {
+                    _message.emit(YouValidatorFailure.NAME_TOO_SHORT.message)
+                }
+            } else if (newName.length > YouTextValidator.YouConstants.MAXIMUM_CHARACTER_NAME_LENGTH) {
+                viewModelScope.launch {
+                    _message.emit(YouValidatorFailure.NAME_TOO_LONG.message)
+                }
+            } else {
+                _editableCharacterName.value = newName
+            }
         } else {
             throw CharacterNotInEditModeException()
         }
