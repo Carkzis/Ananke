@@ -7,6 +7,7 @@ import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.model.createCharacterEntity
 import com.carkzis.ananke.data.model.toCharacterEntity
+import com.carkzis.ananke.ui.screens.you.CharacterAlreadyExistsForUserException
 import com.carkzis.ananke.ui.screens.you.CharacterDoesNotExistException
 import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
@@ -40,12 +41,21 @@ class DefaultYouRepository @Inject constructor(
     }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
-        val characterNamesForGameId = youDao.getCharactersForGameId(newCharacter.gameId)
+        val charactersForGameId = youDao.getCharactersForGameId(newCharacter.gameId)
                 .first()
                 ?.characterEntities
-                ?.map {
-                    it.characterName
-                } ?: listOf()
+
+        val userIdsForGameId = charactersForGameId?.map {
+            it.userOwnerId
+        } ?: listOf()
+
+        if (userIdsForGameId.contains(newCharacter.userId)) {
+            throw CharacterAlreadyExistsForUserException()
+        }
+
+        val characterNamesForGameId = charactersForGameId?.map {
+            it.characterName
+        } ?: listOf()
 
         for (characterNamingAttempt in 0..10) {
             if (characterNamingAttempt == 10) throw CharacterNamingException()

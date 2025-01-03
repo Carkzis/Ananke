@@ -8,11 +8,11 @@ import com.carkzis.ananke.testdoubles.ControllableYouDao
 import com.carkzis.ananke.testdoubles.DuplicatingCharacterNameGenerator
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.testdoubles.dummyUserEntities
+import com.carkzis.ananke.ui.screens.you.CharacterAlreadyExistsForUserException
 import com.carkzis.ananke.ui.screens.you.CharacterDoesNotExistException
 import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.MainDispatcherRule
-import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import com.carkzis.ananke.utils.assertNameHasExpectedFormat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -74,9 +74,10 @@ class YouRepositoryTest {
         youRepository.addNewCharacter(newCharacterForOtherGame)
 
         val retrievedCharacter = youRepository.getCharacterForUser(
-            userForCharacter.toDomain(), currentGameForUser.gameId
+            userForCharacter.toDomain(), otherGameForUser.gameId
         ).first()
 
+        assertTrue(youDao.characters.value.size == 2)
         assertTrue(youDao.characters.value.map { it.gameOwnerId }.contains(otherGameForUser.gameId))
         assertTrue(youDao.characters.value.map { it.characterId }.contains(retrievedCharacter.id.toLong()))
     }
@@ -92,7 +93,7 @@ class YouRepositoryTest {
         youRepository.addNewCharacter(NewCharacter(userTwo.userId, dummyGameEntities.first().gameId))
     }
 
-    @Test
+    @Test(expected = CharacterAlreadyExistsForUserException::class)
     fun `repository does not add new character if user already exists in game`() = runTest {
         val userForCharacter = dummyUserEntities.first()
         val newCharacter = NewCharacter(userForCharacter.userId, dummyGameEntities.first().gameId)

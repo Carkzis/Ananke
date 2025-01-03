@@ -6,16 +6,14 @@ import com.carkzis.ananke.data.database.UserEntityWithCharacters
 import com.carkzis.ananke.data.database.YouDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
 class ControllableYouDao: YouDao {
     var characters = MutableStateFlow(listOf<CharacterEntity>())
 
     private val listOfUsers = dummyUserEntities
-    private val listOfGames = dummyGameEntities
-
     private var idCounter = 0L
 
     override suspend fun insertCharacter(character: CharacterEntity) {
