@@ -183,7 +183,7 @@ class YouViewModelTest {
 
         var editableCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacter.collect {
+            viewModel.editableCharacterName.collect {
                 editableCharacterName = it
             }
         }
@@ -202,7 +202,7 @@ class YouViewModelTest {
         val expectedCharacterName = "A New Name"
         var editableCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacter.collect {
+            viewModel.editableCharacterName.collect {
                 editableCharacterName = it
             }
         }
@@ -216,12 +216,12 @@ class YouViewModelTest {
     }
 
     @Test(expected = CharacterNotInEditModeException::class)
-    fun `view model disallows editing if not in edit mode`() = runTest {
+    fun `view model disallows editing of character name if not in edit mode`() = runTest {
         collectInitialCharacterInformation()
 
         val expectedCharacterName = "A New Name"
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacter.collect {}
+            viewModel.editableCharacterName.collect {}
         }
 
         viewModel.editCharacterName(expectedCharacterName)
@@ -297,6 +297,41 @@ class YouViewModelTest {
         viewModel.beginEditingCharacterBio()
 
         assertEquals(expectedCharacterBio, editableBio)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model edits displayed character bio`() = runTest {
+        val originalCharacterBio = "A bio for the character."
+        val expectedCharacterBio = "A new bio for the character."
+        collectInitialCharacterInformation(expectedCharacterBio = originalCharacterBio)
+
+        var editableBio = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editableCharacterBio.collect {
+                editableBio = it
+            }
+        }
+
+        viewModel.beginEditingCharacterBio()
+        viewModel.editCharacterBio(expectedCharacterBio)
+
+        assertEquals(expectedCharacterBio, editableBio)
+
+        collection.cancel()
+    }
+
+    @Test(expected = CharacterNotInEditModeException::class)
+    fun `view model disallows editing of bio if not in edit mode`() = runTest {
+        collectInitialCharacterInformation()
+
+        val expectedCharacterBio = "A character bio."
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editableCharacterBio.collect {}
+        }
+
+        viewModel.editCharacterBio(expectedCharacterBio)
 
         collection.cancel()
     }
