@@ -18,6 +18,8 @@ fun YouRoute(
     val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
     val currentCharacter by viewModel.character.collectAsStateWithLifecycle(GameCharacter.EMPTY)
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
+    val editMode by viewModel.editMode.collectAsStateWithLifecycle()
+    val editableCharacterName = viewModel.editableCharacterName.collectAsStateWithLifecycle()
 
     if (gameState == GamingState.OutOfGame) {
         onOutOfGame()
@@ -26,7 +28,19 @@ fun YouRoute(
     YouScreen(
         modifier = modifier,
         currentGame = currentGame,
-        currentCharacter = currentCharacter,
+        onTitleValueChanged = { newName, isEditable ->
+            if (isEditable) {
+                viewModel.editCharacterName(newName)
+            }
+        },
+        onEnableEditCharacterName = {
+            viewModel.beginEditingCharacterName()
+        },
+        characterName = if (editMode == EditMode.CharacterName) {
+            editableCharacterName.value
+        } else {
+            currentCharacter.character
+        },
         gamingState = gameState
     )
 }

@@ -7,7 +7,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.model.CurrentGame
-import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
@@ -55,8 +54,10 @@ class YouScreenTest {
                     .value
                 YouScreen(
                     currentGame = actualCurrentGame,
-                    currentCharacter = GameCharacter.EMPTY,
                     gamingState = gameState,
+                    characterName = "",
+                    onTitleValueChanged = { _, _ -> },
+                    onEnableEditCharacterName = { }
                 )
             }
 

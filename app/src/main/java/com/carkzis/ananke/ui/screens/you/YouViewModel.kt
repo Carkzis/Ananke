@@ -84,6 +84,7 @@ class YouViewModel @Inject constructor(
     }
 
     fun changeCharacterName(newName: String) {
+        // TODO: Need a final validation check here for the name length (not just empty).
         viewModelScope.launch {
             youRepository.updateCharacter(
                 character.first().copy(character = newName),
@@ -117,7 +118,7 @@ class YouViewModel @Inject constructor(
             newName,
             { _editableCharacterName.value = it },
             EditMode.CharacterName,
-            characterNameValidator()
+            characterNameValidator(minLength = 0)
         )
     }
 

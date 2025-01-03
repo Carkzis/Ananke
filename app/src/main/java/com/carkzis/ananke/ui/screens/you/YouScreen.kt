@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carkzis.ananke.data.model.CurrentGame
-import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
@@ -25,8 +24,10 @@ import com.carkzis.ananke.ui.theme.AnankeTheme
 fun YouScreen(
     currentGame: CurrentGame,
     gamingState: GamingState,
-    currentCharacter: GameCharacter,
-    modifier: Modifier = Modifier
+    characterName: String,
+    onTitleValueChanged: (String, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    onEnableEditCharacterName: () -> Unit
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
@@ -55,8 +56,10 @@ fun YouScreen(
                     text = "Character Name:",
                 )
                 AnankeTextField(
-                    value = currentCharacter.character,
-                    onValueChange = {},
+                    value = characterName,
+                    onValueChange = {
+                        onTitleValueChanged(it, characterNameIsEditable)
+                    },
                     readOnly = characterNameIsEditable,
                     modifier = Modifier
                         .testTag("${AnankeDestination.YOU}-character-name")
@@ -64,10 +67,13 @@ fun YouScreen(
                 AnankeButton(
                     modifier = Modifier
                         .testTag("${AnankeDestination.YOU}-edit-name-button"),
-                    onClick = { characterNameIsEditable = true }
+                    onClick = {
+                        onEnableEditCharacterName()
+                        characterNameIsEditable = true
+                    }
                 ) {
                     AnankeText(
-                        text = "Add Game",
+                        text = "Edit",
                         modifier = modifier
                     )
                 }
@@ -87,13 +93,10 @@ private fun YouScreenPreview() {
         )
         YouScreen(
             currentGame = currentGame,
-            currentCharacter = GameCharacter(
-                id = "1",
-                userName = "Test User",
-                character = "Test Character",
-                bio = "Test Bio"
-            ),
-            gamingState = GamingState.InGame(currentGame)
+            gamingState = GamingState.InGame(currentGame),
+            onTitleValueChanged = { _, _ -> },
+            characterName = "",
+            onEnableEditCharacterName = {}
         )
     }
 }

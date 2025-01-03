@@ -6,7 +6,7 @@ import com.carkzis.ananke.utils.ValidatorResponse
 class YouConstants {
     companion object {
         const val MINIMUM_CHARACTER_NAME_LENGTH = 3
-        const val MAXIMUM_CHARACTER_NAME_LENGTH = 20
+        const val MAXIMUM_CHARACTER_NAME_LENGTH = 30
         const val MAXIMUM_BIO_LENGTH = 200
     }
 }
