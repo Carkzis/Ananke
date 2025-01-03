@@ -13,6 +13,7 @@ class DefaultNetworkDataSource @Inject constructor() : NetworkDataSource {
         NetworkUser(id = 6, name = "Freyu"),
         NetworkUser(id = 7, name = "Quinu"),
         NetworkUser(id = 8, name = "Eiku"),
+        userForTesting
     )
 }
 

@@ -12,11 +12,12 @@ import com.carkzis.ananke.data.model.toCharacterEntity
 import com.carkzis.ananke.ui.screens.you.CharacterDoesNotExistException
 import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
-import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import com.carkzis.ananke.utils.CharacterNameGenerator
+import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class DefaultYouRepository @Inject constructor(
@@ -27,9 +28,15 @@ class DefaultYouRepository @Inject constructor(
         val charactersForUserId = youDao.getCharactersForUserId(user.id).first()
         val charactersForGameId = youDao.getCharactersForGameId(currentGameId).first()?.characterEntities ?: listOf()
 
+        if (charactersForGameId.isEmpty()) {
+            emit(GameCharacter.EMPTY)
+            return@flow
+        }
+
         val characterForUserInGame = charactersForUserId.first { character ->
             charactersForGameId.map { it.characterId }.contains(character.characterId)
         }
+
         emit(
             characterForUserInGame.toCharacter(userName = user.name)
         )

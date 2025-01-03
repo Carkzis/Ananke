@@ -9,8 +9,6 @@ import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
-import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator
-import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.titleValidator
 import com.carkzis.ananke.ui.screens.you.YouTextValidator.Companion.characterBioValidator
 import com.carkzis.ananke.ui.screens.you.YouTextValidator.Companion.characterNameValidator
 import com.carkzis.ananke.utils.GameStateUseCase

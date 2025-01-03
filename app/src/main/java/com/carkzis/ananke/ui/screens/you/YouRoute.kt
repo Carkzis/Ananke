@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.ui.screens.game.GamingState
 
 @Composable
@@ -15,6 +16,7 @@ fun YouRoute(
     onOutOfGame: () -> Unit,
 ) {
     val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
+    val currentCharacter by viewModel.character.collectAsStateWithLifecycle(GameCharacter.EMPTY)
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
 
     if (gameState == GamingState.OutOfGame) {
@@ -24,6 +26,7 @@ fun YouRoute(
     YouScreen(
         modifier = modifier,
         currentGame = currentGame,
+        currentCharacter = currentCharacter,
         gamingState = gameState
     )
 }
