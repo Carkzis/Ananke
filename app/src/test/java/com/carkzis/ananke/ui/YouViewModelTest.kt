@@ -7,6 +7,7 @@ import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
+import com.carkzis.ananke.ui.screens.you.CharacterNotInEditModeException
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
@@ -195,6 +196,56 @@ class YouViewModelTest {
         collection.cancel()
     }
 
+    @Test
+    fun `view model edits displayed character name`() = runTest {
+        collectInitialCharacterInformation()
+
+        val expectedCharacterName = "A New Name"
+        var editableCharacterName = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editableCharacter.collect {
+                editableCharacterName = it
+            }
+        }
+
+        viewModel.beginEditingCharacterName()
+        viewModel.editCharacterName(expectedCharacterName)
+
+        assertEquals(expectedCharacterName, editableCharacterName)
+
+        collection.cancel()
+    }
+
+    @Test(expected = CharacterNotInEditModeException::class)
+    fun `view model disallows editing if not in edit mode`() = runTest {
+        collectInitialCharacterInformation()
+
+        val expectedCharacterName = "A New Name"
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editableCharacter.collect {}
+        }
+
+        viewModel.editCharacterName(expectedCharacterName)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model disallows edited names shorter than 3 characters`() = runTest {
+        // TODO: Implement test
+    }
+
+    @Test
+    fun `view model disallows edited names longer than 20 characters`() = runTest {
+        // TODO: Implement test
+    }
+
+    @Test(expected = CharacterNotInEditModeException::class)
+    fun `view model exits edit mode when changing character`() = runTest {
+        // TODO: Implement test
+    }
+
+
     private fun TestScope.collectInitialCharacterInformation() {
         val currentGame = CurrentGame("1", "A Game", "A Description")
         youRepository.currentUserId = userForTesting.id
@@ -203,7 +254,7 @@ class YouViewModelTest {
         val collection = launch(UnconfinedTestDispatcher()) {
             viewModel.character.collect {}
         }
-        
+
         collection.cancel()
     }
 

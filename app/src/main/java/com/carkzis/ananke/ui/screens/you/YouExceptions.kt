@@ -11,3 +11,7 @@ class CharacterNameTakenException : Throwable() {
 class CharacterDoesNotExistException : Throwable() {
     override val message = "Cannot update a character that does not exist."
 }
+
+class CharacterNotInEditModeException : Throwable() {
+    override val message = "You cannot edit a character that is not in edit mode."
+}

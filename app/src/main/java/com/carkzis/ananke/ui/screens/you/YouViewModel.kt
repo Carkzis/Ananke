@@ -55,6 +55,9 @@ class YouViewModel @Inject constructor(
     private val _editableCharacterName = MutableStateFlow("")
     val editableCharacter = _editableCharacterName.asStateFlow()
 
+    private val _editMode = MutableStateFlow<EditMode>(EditMode.None)
+    val editMode = _editMode.asStateFlow()
+
     init {
         viewModelScope.launch {
             currentGame.collect {
@@ -86,6 +89,20 @@ class YouViewModel @Inject constructor(
     }
 
     fun beginEditingCharacterName() {
+        _editMode.value = EditMode.CharacterName
         _editableCharacterName.value = character.value.character
     }
+
+    fun editCharacterName(newName: String) {
+        if (_editMode.value == EditMode.CharacterName) {
+            _editableCharacterName.value = newName
+        } else {
+            throw CharacterNotInEditModeException()
+        }
+    }
+}
+
+sealed class EditMode {
+    object None : EditMode()
+    object CharacterName : EditMode()
 }
