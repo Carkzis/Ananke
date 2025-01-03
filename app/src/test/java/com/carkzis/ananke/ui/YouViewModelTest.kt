@@ -1,5 +1,6 @@
 package com.carkzis.ananke.ui
 
+import androidx.test.core.app.ActivityScenario.launch
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
@@ -15,6 +16,7 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -174,4 +176,35 @@ class YouViewModelTest {
 
         collection.cancel()
     }
+
+    @Test
+    fun `view model initially displays character name when editing`() = runTest {
+        collectInitialCharacterInformation()
+
+        var editableCharacterName = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editableCharacter.collect {
+                editableCharacterName = it
+            }
+        }
+
+        viewModel.beginEditingCharacterName()
+
+        assertNameHasExpectedFormat(editableCharacterName)
+
+        collection.cancel()
+    }
+
+    private fun TestScope.collectInitialCharacterInformation() {
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+        youRepository.currentUserId = userForTesting.id
+        gameRepository.emitCurrentGame(currentGame)
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.character.collect {}
+        }
+        
+        collection.cancel()
+    }
+
 }
