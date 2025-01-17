@@ -2,7 +2,6 @@ package com.carkzis.ananke.data.repository
 
 import com.carkzis.ananke.data.database.YouDao
 import com.carkzis.ananke.data.database.toCharacter
-import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
@@ -77,7 +76,7 @@ class DefaultYouRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateCharacter(character: GameCharacter, currentGameId: Long, formedCharacter: GameCharacter) {
+    override suspend fun updateCharacter(character: GameCharacter, currentGameId: Long, formerGameCharacter: GameCharacter) {
         val currentCharacters = youDao.getCharactersForGameId(currentGameId).first()
             ?.characterEntities
         val currentCharacterIds = currentCharacters?.map { it.characterId } ?: listOf()
@@ -85,7 +84,7 @@ class DefaultYouRepository @Inject constructor(
 
         when {
             !currentCharacterIds.contains(character.id.toLong()) -> throw CharacterDoesNotExistException()
-            unavailableCharacterNames.contains(character.character) && character.character != formedCharacter.character -> throw CharacterNameTakenException()
+            unavailableCharacterNames.contains(character.character) && character.character != formerGameCharacter.character -> throw CharacterNameTakenException()
             else -> {
                 val userId = youDao.getUserForCharacterId(character.id.toLong()).first().userEntity.userId
                 youDao.updateCharacter(character.toCharacterEntity(userId, currentGameId))

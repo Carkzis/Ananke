@@ -92,4 +92,29 @@ class YouScreenTest {
             TestCase.assertTrue(redirected)
         }
     }
+
+    @Test
+    fun `pressing edit causes cancel and confirm buttons to appear`() {
+
+    }
+
+    @Test
+    fun `pressing confirm causes edit button to appear`() {
+
+    }
+
+    @Test
+    fun `text boxes can be edited when edit mode enabled`() {
+
+    }
+
+    @Test
+    fun `text boxes cannot be edited when edit mode disabled`() {
+
+    }
+
+    @Test
+    fun `snack bar appears when expected`() {
+
+    }
 }
