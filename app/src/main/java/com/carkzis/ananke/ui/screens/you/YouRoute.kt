@@ -46,6 +46,9 @@ fun YouRoute(
         onEnableEditCharacterBio = {
             viewModel.beginEditingCharacterBio()
         },
+        onCancelEdit = {
+            viewModel.cancelEdit()
+        },
         characterName = if (editMode == EditMode.CharacterName) {
             editableCharacterName.value
         } else {

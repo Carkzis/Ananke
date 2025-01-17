@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carkzis.ananke.data.model.CurrentGame
@@ -36,6 +35,7 @@ fun YouScreen(
     onEnableEditCharacterBio: () -> Unit,
     onConfirmCharacterNameChange: () -> Unit,
     onConfirmCharacterBioChange: () -> Unit,
+    onCancelEdit: () -> Unit
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
@@ -63,6 +63,7 @@ fun YouScreen(
                     onTitleValueChanged,
                     onEnableEditCharacterName,
                     onConfirmCharacterNameChange,
+                    onCancelEdit,
                     modifier
                 )
 
@@ -71,6 +72,7 @@ fun YouScreen(
                     onBioValueChanged,
                     onEnableEditCharacterBio,
                     onConfirmCharacterBioChange,
+                    onCancelEdit,
                     modifier
                 )
             }
@@ -84,6 +86,7 @@ private fun CharacterName(
     onTitleValueChanged: (String, Boolean) -> Unit,
     onEnableEditCharacterName: () -> Unit,
     onConfirmCharacterNameChange: () -> Unit,
+    onCancelEdit: () -> Unit,
     modifier: Modifier
 ) {
     YouAttribute(
@@ -91,6 +94,7 @@ private fun CharacterName(
         attributeText = characterName,
         onValueChanged = onTitleValueChanged,
         onEnableEdit = onEnableEditCharacterName,
+        onCancelEdit = onCancelEdit,
         onConfirmChange = onConfirmCharacterNameChange,
         modifier = modifier
     )
@@ -102,6 +106,7 @@ private fun CharacterBio(
     onBioValueChanged: (String, Boolean) -> Unit,
     onEnableEditCharacterBio: () -> Unit,
     onConfirmCharacterBioChange: () -> Unit,
+    onCancelEdit: () -> Unit,
     modifier: Modifier
 ) {
     YouAttribute(
@@ -110,6 +115,7 @@ private fun CharacterBio(
         onValueChanged = onBioValueChanged,
         onEnableEdit = onEnableEditCharacterBio,
         onConfirmChange = onConfirmCharacterBioChange,
+        onCancelEdit = onCancelEdit,
         modifier = modifier,
         lines = 5
     )
@@ -121,11 +127,15 @@ private fun YouAttribute(
     attributeText: String,
     onValueChanged: (String, Boolean) -> Unit,
     onEnableEdit: () -> Unit,
+    onCancelEdit: () -> Unit,
     onConfirmChange: () -> Unit,
     modifier: Modifier,
     lines: Int = 1,
 ) {
     var characterAttributeIsEditable by remember { mutableStateOf(false) }
+    val changeCharacterAttributeIsEditable: (Boolean) -> Unit = { isEditable ->
+        characterAttributeIsEditable = isEditable
+    }
 
     AnankeText(
         text = "Character ${attributeType.capitalise()}:",
@@ -140,14 +150,51 @@ private fun YouAttribute(
         modifier = Modifier
             .testTag("${AnankeDestination.YOU}-character-$attributeType")
     )
+    EditButtons(
+        characterAttributeIsEditable,
+        attributeType,
+        onCancelEdit,
+        modifier,
+        onConfirmChange,
+        onEnableEdit,
+        changeCharacterAttributeIsEditable
+    )
+
+}
+
+@Composable
+private fun EditButtons(
+    characterAttributeIsEditable: Boolean,
+    attributeType: String,
+    onCancelEdit: () -> Unit,
+    modifier: Modifier,
+    onConfirmChange: () -> Unit,
+    onEnableEdit: () -> Unit,
+    changeCharacterAttributeIsEditable: (Boolean) -> Unit,
+) {
     Row {
         if (characterAttributeIsEditable) {
             AnankeButton(
                 modifier = Modifier
+                    .weight(1f)
+                    .testTag("${AnankeDestination.YOU}-cancel-$attributeType-button"),
+                onClick = {
+                    onCancelEdit()
+                    changeCharacterAttributeIsEditable(false)
+                }
+            ) {
+                AnankeText(
+                    text = "Cancel",
+                    modifier = modifier
+                )
+            }
+            AnankeButton(
+                modifier = Modifier
+                    .weight(1f)
                     .testTag("${AnankeDestination.YOU}-confirm-$attributeType-button"),
                 onClick = {
                     onConfirmChange()
-                    characterAttributeIsEditable = false
+                    changeCharacterAttributeIsEditable(false)
                 }
             ) {
                 AnankeText(
@@ -161,7 +208,7 @@ private fun YouAttribute(
                     .testTag("${AnankeDestination.YOU}-edit-$attributeType-button"),
                 onClick = {
                     onEnableEdit()
-                    characterAttributeIsEditable = true
+                    changeCharacterAttributeIsEditable(true)
                 }
             ) {
                 AnankeText(
@@ -171,7 +218,6 @@ private fun YouAttribute(
             }
         }
     }
-
 }
 
 @Preview(showBackground = true)
@@ -194,6 +240,21 @@ private fun YouScreenPreview() {
             onEnableEditCharacterBio = {},
             onConfirmCharacterNameChange = {},
             onConfirmCharacterBioChange = {},
+            onCancelEdit = {}
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EditButtonsPreview() {
+    EditButtons(
+        characterAttributeIsEditable = true,
+        attributeType = "Name",
+        onCancelEdit = {},
+        modifier = Modifier,
+        onConfirmChange = {},
+        onEnableEdit = {},
+        changeCharacterAttributeIsEditable = {}
+    )
 }

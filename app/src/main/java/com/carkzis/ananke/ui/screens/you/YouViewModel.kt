@@ -121,6 +121,10 @@ class YouViewModel @Inject constructor(
         _editableCharacterBio.value = character.value.bio
     }
 
+    fun cancelEdit() {
+        _editMode.value = EditMode.None
+    }
+
     fun editCharacterName(newName: String) {
         setText(
             newName,

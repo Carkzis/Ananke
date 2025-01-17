@@ -63,6 +63,7 @@ class YouScreenTest {
                     onEnableEditCharacterBio = {},
                     onConfirmCharacterNameChange = {},
                     onConfirmCharacterBioChange = {},
+                    onCancelEdit = {},
                 )
             }
 

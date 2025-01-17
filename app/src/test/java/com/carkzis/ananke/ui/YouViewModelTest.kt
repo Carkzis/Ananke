@@ -411,6 +411,23 @@ class YouViewModelTest {
         collection.cancel()
     }
 
+    @Test
+    fun `cancelling edit mode exits edit mode`() = runTest {
+        collectInitialCharacterInformation()
+
+        viewModel.beginEditingCharacterBio()
+        viewModel.cancelEdit()
+
+        var editMode: EditMode = EditMode.CharacterBio
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.editMode.collect { editMode = it }
+        }
+
+        assertEquals(EditMode.None, editMode)
+
+        collection.cancel()
+    }
+
     private fun TestScope.collectInitialCharacterInformation(expectedCharacterBio: String = "") {
         val currentGame = CurrentGame("1", "A Game", "A Description")
 
