@@ -25,9 +25,12 @@ fun YouScreen(
     currentGame: CurrentGame,
     gamingState: GamingState,
     characterName: String,
+    characterBio: String,
     onTitleValueChanged: (String, Boolean) -> Unit,
+    onBioValueChanged: (String, Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    onEnableEditCharacterName: () -> Unit
+    onEnableEditCharacterName: () -> Unit,
+    onEnableEditCharacterBio: () -> Unit,
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
@@ -50,35 +53,78 @@ fun YouScreen(
                     textStyle = MaterialTheme.typography.headlineSmall
                 )
 
-                var characterNameIsEditable by remember { mutableStateOf(false) }
+                CharacterName(
+                    characterName,
+                    onTitleValueChanged,
+                    onEnableEditCharacterName,
+                    modifier
+                )
 
-                AnankeText(
-                    text = "Character Name:",
+                CharacterBio(
+                    characterBio,
+                    onBioValueChanged,
+                    onEnableEditCharacterBio,
+                    modifier
                 )
-                AnankeTextField(
-                    value = characterName,
-                    onValueChange = {
-                        onTitleValueChanged(it, characterNameIsEditable)
-                    },
-                    readOnly = characterNameIsEditable,
-                    modifier = Modifier
-                        .testTag("${AnankeDestination.YOU}-character-name")
-                )
-                AnankeButton(
-                    modifier = Modifier
-                        .testTag("${AnankeDestination.YOU}-edit-name-button"),
-                    onClick = {
-                        onEnableEditCharacterName()
-                        characterNameIsEditable = true
-                    }
-                ) {
-                    AnankeText(
-                        text = "Edit",
-                        modifier = modifier
-                    )
-                }
             }
         }
+    }
+}
+
+@Composable
+private fun CharacterName(
+    characterName: String,
+    onTitleValueChanged: (String, Boolean) -> Unit,
+    onEnableEditCharacterName: () -> Unit,
+    modifier: Modifier
+) {
+    YouAttribute("name", characterName, onTitleValueChanged, onEnableEditCharacterName, modifier)
+}
+
+@Composable
+private fun CharacterBio(
+    characterBio: String,
+    onBioValueChanged: (String, Boolean) -> Unit,
+    onEnableEditCharacterBio: () -> Unit,
+    modifier: Modifier
+) {
+    YouAttribute("bio", characterBio, onBioValueChanged, onEnableEditCharacterBio, modifier)
+}
+
+@Composable
+private fun YouAttribute(
+    attributeType: String,
+    attributeText: String,
+    onValueChanged: (String, Boolean) -> Unit,
+    onEnableEdit: () -> Unit,
+    modifier: Modifier
+) {
+    var characterAttributeIsEditable by remember { mutableStateOf(false) }
+
+    AnankeText(
+        text = "Character Name:",
+    )
+    AnankeTextField(
+        value = attributeText,
+        onValueChange = {
+            onValueChanged(it, characterAttributeIsEditable)
+        },
+        readOnly = characterAttributeIsEditable,
+        modifier = Modifier
+            .testTag("${AnankeDestination.YOU}-character-$attributeType")
+    )
+    AnankeButton(
+        modifier = Modifier
+            .testTag("${AnankeDestination.YOU}-edit-$attributeType-button"),
+        onClick = {
+            onEnableEdit()
+            characterAttributeIsEditable = true
+        }
+    ) {
+        AnankeText(
+            text = "Edit",
+            modifier = modifier
+        )
     }
 }
 
@@ -95,8 +141,11 @@ private fun YouScreenPreview() {
             currentGame = currentGame,
             gamingState = GamingState.InGame(currentGame),
             onTitleValueChanged = { _, _ -> },
+            onBioValueChanged = { _, _ -> },
             characterName = "",
-            onEnableEditCharacterName = {}
+            characterBio = "",
+            onEnableEditCharacterName = {},
+            onEnableEditCharacterBio = {},
         )
     }
 }
