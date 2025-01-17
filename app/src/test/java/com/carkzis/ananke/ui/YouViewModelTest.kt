@@ -231,7 +231,26 @@ class YouViewModelTest {
     }
 
     @Test
-    fun `view model sends toast when edited name is shorter than 3 characters`() = runTest {
+    fun `view model does not send toast when edited name is empty but not confirmed`() = runTest {
+        val expectedCharacterName = ""
+
+        collectInitialCharacterInformation()
+
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        viewModel.beginEditingCharacterName()
+        viewModel.editCharacterName(expectedCharacterName)
+
+        Assert.assertEquals("", message)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast when edited name confirmed and is shorter than 3 characters`() = runTest {
         val newNameLength = YouConstants.MINIMUM_CHARACTER_NAME_LENGTH - 1
         val expectedCharacterName = "A".repeat(newNameLength)
 
@@ -245,13 +264,15 @@ class YouViewModelTest {
         viewModel.beginEditingCharacterName()
         viewModel.editCharacterName(expectedCharacterName)
 
+        viewModel.changeCharacterName(expectedCharacterName)
+
         Assert.assertEquals(YouValidatorFailure.NAME_TOO_SHORT.message, message)
 
         collection.cancel()
     }
 
     @Test
-    fun `view model sends toast when edited name longer than 20 characters`() = runTest {
+    fun `view model sends toast when edited name longer than 30 characters`() = runTest {
         val newNameLength = YouConstants.MAXIMUM_CHARACTER_NAME_LENGTH + 1
         val expectedCharacterName = "A".repeat(newNameLength)
 

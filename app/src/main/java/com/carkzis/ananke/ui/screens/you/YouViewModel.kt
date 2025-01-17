@@ -9,6 +9,7 @@ import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.ui.screens.you.YouConstants.Companion.MID_EDIT_MIN_LENGTH
 import com.carkzis.ananke.ui.screens.you.YouTextValidator.Companion.characterBioValidator
 import com.carkzis.ananke.ui.screens.you.YouTextValidator.Companion.characterNameValidator
 import com.carkzis.ananke.utils.GameStateUseCase
@@ -84,13 +85,19 @@ class YouViewModel @Inject constructor(
     }
 
     fun changeCharacterName(newName: String) {
-        // TODO: Need a final validation check here for the name length (not just empty).
-        viewModelScope.launch {
-            youRepository.updateCharacter(
-                character.first().copy(character = newName),
-                currentGame.first().id.toLong()
-            )
-            _editMode.value = EditMode.None
+        val newNameValidation = characterNameValidator().validateText(newName)
+        if (newNameValidation is ValidatorResponse.Fail) {
+            viewModelScope.launch {
+                _message.emit(newNameValidation.failureMessage)
+            }
+        } else {
+            viewModelScope.launch {
+                youRepository.updateCharacter(
+                    character.first().copy(character = newName),
+                    currentGame.first().id.toLong()
+                )
+                _editMode.value = EditMode.None
+            }
         }
     }
 
@@ -118,7 +125,7 @@ class YouViewModel @Inject constructor(
             newName,
             { _editableCharacterName.value = it },
             EditMode.CharacterName,
-            characterNameValidator(minLength = 0)
+            characterNameValidator(minLength = MID_EDIT_MIN_LENGTH)
         )
     }
 
