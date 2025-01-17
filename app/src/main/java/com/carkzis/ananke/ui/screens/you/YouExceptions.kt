@@ -17,5 +17,5 @@ class CharacterNotInEditModeException : Throwable() {
 }
 
 class CharacterAlreadyExistsForUserException : Throwable() {
-    override val message = "A user cannot edit have more than one character for a game."
+    override val message = "A user cannot have more than one character for a game."
 }

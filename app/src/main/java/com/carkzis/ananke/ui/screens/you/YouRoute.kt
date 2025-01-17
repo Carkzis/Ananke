@@ -14,6 +14,7 @@ fun YouRoute(
     modifier: Modifier = Modifier,
     viewModel: YouViewModel = hiltViewModel(),
     onOutOfGame: () -> Unit,
+    onShowSnackbar: suspend (String) -> Boolean,
 ) {
     val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
     val currentCharacter by viewModel.character.collectAsStateWithLifecycle(GameCharacter.EMPTY)
@@ -64,6 +65,11 @@ fun YouRoute(
         },
         onConfirmCharacterBioChange = {
             viewModel.changeCharacterBio(editableCharacterBio.value)
+        },
+        onShowSnackbar = {
+            viewModel.message.collect {
+                onShowSnackbar(it)
+            }
         },
         gamingState = gameState
     )

@@ -291,10 +291,9 @@ class YouViewModelTest {
         collection.cancel()
     }
 
-    @Test(expected = CharacterNotInEditModeException::class)
+    @Test
     fun `view model exits edit mode when changing character name`() = runTest {
         val firstNewName = "David"
-        val secondNewName = "David Again"
 
         collectInitialCharacterInformation()
 
@@ -308,8 +307,6 @@ class YouViewModelTest {
         }
 
         assertEquals(EditMode.None, editMode)
-
-        viewModel.editCharacterName(secondNewName)
 
         collection.cancel()
     }
@@ -388,7 +385,7 @@ class YouViewModelTest {
         collection.cancel()
     }
 
-    @Test(expected = CharacterNotInEditModeException::class)
+    @Test
     fun `view model exits edit mode when changing character bio`() = runTest {
         val firstNewBio = "A New Bio"
         val secondNewBio = "Another New Bio"
@@ -406,7 +403,23 @@ class YouViewModelTest {
 
         assertEquals(EditMode.None, editMode)
 
-        viewModel.editCharacterName(secondNewBio)
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends when changing character if not in edit mode`() = runTest {
+        val firstNewName = "David"
+
+        collectInitialCharacterInformation()
+
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { message = it }
+        }
+
+        viewModel.editCharacterName(firstNewName)
+
+        Assert.assertEquals(CharacterNotInEditModeException().message, message)
 
         collection.cancel()
     }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,8 +36,13 @@ fun YouScreen(
     onEnableEditCharacterBio: () -> Unit,
     onConfirmCharacterNameChange: () -> Unit,
     onConfirmCharacterBioChange: () -> Unit,
-    onCancelEdit: () -> Unit
+    onCancelEdit: () -> Unit,
+    onShowSnackbar: suspend () -> Unit = {},
 ) {
+    LaunchedEffect(Unit) {
+        onShowSnackbar()
+    }
+
     when (gamingState) {
         is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {}
@@ -248,13 +254,15 @@ private fun YouScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun EditButtonsPreview() {
-    EditButtons(
-        characterAttributeIsEditable = true,
-        attributeType = "Name",
-        onCancelEdit = {},
-        modifier = Modifier,
-        onConfirmChange = {},
-        onEnableEdit = {},
-        changeCharacterAttributeIsEditable = {}
-    )
+    AnankeTheme {
+        EditButtons(
+            characterAttributeIsEditable = true,
+            attributeType = "Name",
+            onCancelEdit = {},
+            modifier = Modifier,
+            onConfirmChange = {},
+            onEnableEdit = {},
+            changeCharacterAttributeIsEditable = {}
+        )
+    }
 }

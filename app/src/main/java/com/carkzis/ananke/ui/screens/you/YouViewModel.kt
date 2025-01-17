@@ -149,7 +149,13 @@ class YouViewModel @Inject constructor(
         editModeRequirement: EditMode,
         textValidator: YouTextValidator
     ) {
-        if (_editMode.value != editModeRequirement) throw CharacterNotInEditModeException()
+        try {
+            if (_editMode.value != editModeRequirement) throw CharacterNotInEditModeException()
+        } catch (e: CharacterNotInEditModeException) {
+            viewModelScope.launch {
+                _message.emit(e.message)
+            }
+        }
 
         val textValidation = textValidator.validateText(updatedText)
 
