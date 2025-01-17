@@ -2,6 +2,7 @@ package com.carkzis.ananke.data.repository
 
 import com.carkzis.ananke.data.database.YouDao
 import com.carkzis.ananke.data.database.toCharacter
+import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
@@ -33,11 +34,15 @@ class DefaultYouRepository @Inject constructor(
                     return@map GameCharacter.EMPTY
                 }
 
-                val characterForUserInGame = charactersForUserId.first { character ->
+                val characterForUserInGame = charactersForUserId.firstOrNull { character ->
                     charactersForGameId?.characterEntities?.map { it.characterId }?.contains(character.characterId) ?: false
                 }
 
-                return@map characterForUserInGame.toCharacter(userName = user.name)
+                val domainCharacter = characterForUserInGame?.let {
+                    characterForUserInGame.toCharacter(userName = user.name)
+                } ?: GameCharacter.EMPTY
+
+                return@map domainCharacter
             }
         }
 
