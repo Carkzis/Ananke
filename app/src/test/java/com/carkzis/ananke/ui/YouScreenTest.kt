@@ -85,6 +85,7 @@ class YouScreenTest {
                     onOutOfGame = {
                         redirected = true
                                   },
+                    onShowSnackbar = { true }
                 )
             }
 

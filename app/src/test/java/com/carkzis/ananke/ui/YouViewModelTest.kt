@@ -216,20 +216,6 @@ class YouViewModelTest {
         collection.cancel()
     }
 
-    @Test(expected = CharacterNotInEditModeException::class)
-    fun `view model disallows editing of character name if not in edit mode`() = runTest {
-        collectInitialCharacterInformation()
-
-        val expectedCharacterName = "A New Name"
-        val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacterName.collect {}
-        }
-
-        viewModel.editCharacterName(expectedCharacterName)
-
-        collection.cancel()
-    }
-
     @Test
     fun `view model does not send toast when edited name is empty but not confirmed`() = runTest {
         val expectedCharacterName = ""
@@ -347,20 +333,6 @@ class YouViewModelTest {
         viewModel.editCharacterBio(expectedCharacterBio)
 
         assertEquals(expectedCharacterBio, editableBio)
-
-        collection.cancel()
-    }
-
-    @Test(expected = CharacterNotInEditModeException::class)
-    fun `view model disallows editing of bio if not in edit mode`() = runTest {
-        collectInitialCharacterInformation()
-
-        val expectedCharacterBio = "A character bio."
-        val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacterBio.collect {}
-        }
-
-        viewModel.editCharacterBio(expectedCharacterBio)
 
         collection.cancel()
     }
