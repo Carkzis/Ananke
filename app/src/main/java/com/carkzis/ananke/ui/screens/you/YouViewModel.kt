@@ -107,6 +107,7 @@ class YouViewModel @Inject constructor(
                 character.first().copy(bio = bio),
                 currentGame.first().id.toLong()
             )
+            _editMode.value = EditMode.None
         }
     }
 

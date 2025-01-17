@@ -55,9 +55,14 @@ class YouScreenTest {
                 YouScreen(
                     currentGame = actualCurrentGame,
                     gamingState = gameState,
-                    characterName = "",
                     onTitleValueChanged = { _, _ -> },
-                    onEnableEditCharacterName = { }
+                    onBioValueChanged = { _, _ -> },
+                    characterName = "",
+                    characterBio = "",
+                    onEnableEditCharacterName = {},
+                    onEnableEditCharacterBio = {},
+                    onConfirmCharacterNameChange = {},
+                    onConfirmCharacterBioChange = {},
                 )
             }
 

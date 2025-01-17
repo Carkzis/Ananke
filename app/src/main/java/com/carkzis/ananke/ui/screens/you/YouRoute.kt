@@ -56,6 +56,12 @@ fun YouRoute(
         } else {
             currentCharacter.bio
         },
+        onConfirmCharacterNameChange = {
+            viewModel.changeCharacterName(editableCharacterName.value)
+        },
+        onConfirmCharacterBioChange = {
+            viewModel.changeCharacterBio(editableCharacterBio.value)
+        },
         gamingState = gameState
     )
 }

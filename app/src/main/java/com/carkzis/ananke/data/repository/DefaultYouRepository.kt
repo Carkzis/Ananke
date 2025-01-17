@@ -13,32 +13,33 @@ import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.CharacterNameGenerator
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DefaultYouRepository @Inject constructor(
     private val youDao: YouDao,
     private val characterNameGenerator: CharacterNameGenerator = RandomCharacterNameGenerator
 ) : YouRepository {
-    override fun getCharacterForUser(user: User, currentGameId: Long): Flow<GameCharacter> = flow {
-        val charactersForUserId = youDao.getCharactersForUserId(user.id).first()
-        val charactersForGameId = youDao.getCharactersForGameId(currentGameId).first()?.characterEntities ?: listOf()
 
-        if (charactersForGameId.isEmpty()) {
-            emit(GameCharacter.EMPTY)
-            return@flow
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getCharacterForUser(user: User, currentGameId: Long): Flow<GameCharacter> =
+        youDao.getCharactersForUserId(user.id).flatMapLatest { charactersForUserId ->
+            youDao.getCharactersForGameId(currentGameId).map { charactersForGameId ->
+                if (charactersForUserId.isEmpty()) {
+                    return@map GameCharacter.EMPTY
+                }
+
+                val characterForUserInGame = charactersForUserId.first { character ->
+                    charactersForGameId?.characterEntities?.map { it.characterId }?.contains(character.characterId) ?: false
+                }
+
+                return@map characterForUserInGame.toCharacter(userName = user.name)
+            }
         }
-
-        val characterForUserInGame = charactersForUserId.first { character ->
-            charactersForGameId.map { it.characterId }.contains(character.characterId)
-        }
-
-        emit(
-            characterForUserInGame.toCharacter(userName = user.name)
-        )
-    }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
         val charactersForGameId = youDao.getCharactersForGameId(newCharacter.gameId)
