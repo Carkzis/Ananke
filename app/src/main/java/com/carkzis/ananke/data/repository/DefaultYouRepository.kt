@@ -72,7 +72,7 @@ class DefaultYouRepository @Inject constructor(
         }
     }
 
-    override suspend fun updateCharacter(character: GameCharacter, currentGameId: Long) {
+    override suspend fun updateCharacter(character: GameCharacter, currentGameId: Long, formedCharacter: GameCharacter) {
         val currentCharacters = youDao.getCharactersForGameId(currentGameId).first()
             ?.characterEntities
         val currentCharacterIds = currentCharacters?.map { it.characterId } ?: listOf()
@@ -80,7 +80,7 @@ class DefaultYouRepository @Inject constructor(
 
         when {
             !currentCharacterIds.contains(character.id.toLong()) -> throw CharacterDoesNotExistException()
-            unavailableCharacterNames.contains(character.character) -> throw CharacterNameTakenException()
+            unavailableCharacterNames.contains(character.character) && character.character != formedCharacter.character -> throw CharacterNameTakenException()
             else -> {
                 val userId = youDao.getUserForCharacterId(character.id.toLong()).first().userEntity.userId
                 youDao.updateCharacter(character.toCharacterEntity(userId, currentGameId))

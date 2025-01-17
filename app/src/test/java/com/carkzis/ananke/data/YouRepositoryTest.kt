@@ -120,7 +120,7 @@ class YouRepositoryTest {
             character = "New Name"
         )
 
-        youRepository.updateCharacter(expectedUpdatedCharacter, currentGameIdForUser)
+        youRepository.updateCharacter(expectedUpdatedCharacter, currentGameIdForUser, currentCharacter)
 
         val retrievedCharacter = youRepository.getCharacterForUser(
             userForCharacter.toDomain(), currentGameIdForUser
@@ -146,7 +146,7 @@ class YouRepositoryTest {
             id = nonExistentGameId.toString()
         )
 
-        youRepository.updateCharacter(nonExistentCharacter, currentGameIdForUser)
+        youRepository.updateCharacter(nonExistentCharacter, currentGameIdForUser, currentCharacter)
     }
 
     @Test(expected = CharacterNameTakenException::class)
@@ -167,10 +167,34 @@ class YouRepositoryTest {
 
         val secondCharacterNamedAfterFirstCharacter = youRepository.getCharacterForUser(
             secondUserForCharacter.toDomain(), currentGameIdForUsers
-        ).first().copy(
+        ).first()
+        val secondCharacterNamedAfterFirstCharacterWithNewName = secondCharacterNamedAfterFirstCharacter.copy(
             character = firstCharacterName
         )
 
-        youRepository.updateCharacter(secondCharacterNamedAfterFirstCharacter, currentGameIdForUsers)
+        youRepository.updateCharacter(
+            secondCharacterNamedAfterFirstCharacterWithNewName,
+            currentGameIdForUsers,
+            secondCharacterNamedAfterFirstCharacter
+        )
+    }
+
+    @Test
+    fun `repository still updates character if name is the same as their current one`() = runTest {
+        val userForCharacter = dummyUserEntities.first()
+        val currentGameIdForUser = dummyGameEntities.first().gameId
+        val newCharacterForCurrentGame = NewCharacter(userForCharacter.userId, currentGameIdForUser)
+
+        youRepository.addNewCharacter(newCharacterForCurrentGame)
+
+        val currentCharacter = youRepository.getCharacterForUser(
+            userForCharacter.toDomain(), currentGameIdForUser
+        ).first()
+
+        youRepository.updateCharacter(
+            character = currentCharacter,
+            currentGameId = currentGameIdForUser,
+            formerGameCharacter = currentCharacter
+        )
     }
 }

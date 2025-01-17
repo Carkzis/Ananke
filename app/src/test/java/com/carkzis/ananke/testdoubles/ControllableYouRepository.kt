@@ -4,6 +4,7 @@ import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.YouRepository
+import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
@@ -17,9 +18,9 @@ class ControllableYouRepository : YouRepository {
     private val userToCharacterMap = mutableMapOf<Long, List<GameCharacter>>()
 
     override fun getCharacterForUser(user: User, currentGameId: Long) = _characters.map { characters ->
-        characters.first {
+        characters.firstOrNull() {
             userToCharacterMap.getOrDefault(currentGameId, listOf()).contains(it)
-        }
+        } ?: GameCharacter.EMPTY
     }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
@@ -38,7 +39,14 @@ class ControllableYouRepository : YouRepository {
         }
     }
 
-    override suspend fun updateCharacter(character: GameCharacter, currentGameId: Long) {
+    override suspend fun updateCharacter(
+        character: GameCharacter,
+        currentGameId: Long,
+        formerGameCharacter: GameCharacter
+    ) {
+        val characterNames = characters.map { it.character }
+        if (characterNames.contains(character.character) && character.character != formerGameCharacter.character) throw CharacterNameTakenException()
+
         _characters.tryEmit(
             characters.map {
                 if (it.id == character.id) {

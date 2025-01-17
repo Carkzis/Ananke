@@ -92,11 +92,16 @@ class YouViewModel @Inject constructor(
             }
         } else {
             viewModelScope.launch {
-                youRepository.updateCharacter(
-                    character.first().copy(character = newName),
-                    currentGame.first().id.toLong()
-                )
-                _editMode.value = EditMode.None
+                try {
+                    youRepository.updateCharacter(
+                        character.first().copy(character = newName),
+                        currentGame.first().id.toLong(),
+                        character.first()
+                    )
+                    _editMode.value = EditMode.None
+                } catch (e: CharacterNameTakenException) {
+                    _message.emit(e.message)
+                }
             }
         }
     }
@@ -105,7 +110,8 @@ class YouViewModel @Inject constructor(
         viewModelScope.launch {
             youRepository.updateCharacter(
                 character.first().copy(bio = bio),
-                currentGame.first().id.toLong()
+                currentGame.first().id.toLong(),
+                character.first()
             )
             _editMode.value = EditMode.None
         }

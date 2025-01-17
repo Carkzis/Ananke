@@ -1,6 +1,7 @@
 package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -379,7 +380,7 @@ class YouViewModelTest {
     }
 
     @Test
-    fun `view model sends when changing character if not in edit mode`() = runTest {
+    fun `view model sends message when changing character if not in edit mode`() = runTest {
         val firstNewName = "David"
 
         collectInitialCharacterInformation()
@@ -409,6 +410,30 @@ class YouViewModelTest {
         }
 
         assertEquals(EditMode.None, editMode)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `changing character to a name that already exists sends a message`() = runTest {
+        val newName = "David"
+
+        var message = ""
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect {
+                message = it
+            }
+        }
+
+        collectInitialCharacterInformation()
+
+        youRepository.emitCharacters(listOf(GameCharacter("1", "Dave", "David", "")))
+
+        viewModel.beginEditingCharacterName()
+        viewModel.editCharacterName(newName)
+        viewModel.changeCharacterName(newName)
+
+        assertEquals("Character name already taken.", message)
 
         collection.cancel()
     }
