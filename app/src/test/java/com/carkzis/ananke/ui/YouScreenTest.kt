@@ -8,12 +8,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -26,7 +28,6 @@ import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
-import junit.framework.TestCase
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -102,18 +103,14 @@ class YouScreenTest {
                 )
             }
 
-            TestCase.assertTrue(redirected)
+            assertTrue(redirected)
         }
     }
 
     @Test
     fun `pressing edit causes cancel and confirm buttons to appear`() = runTest {
         composeTestRule.apply {
-            val gameRepository = ControllableGameRepository()
-            val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
-
-            val currentGame = CurrentGame("1", "A Game", "A Description")
-            gameRepository.emitCurrentGame(currentGame)
+            val viewModel = setUpViewModel()
 
             composeTestRule.setContent {
                 YouRoute(
@@ -125,8 +122,10 @@ class YouScreenTest {
 
             val attributeType = "name"
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
+
             onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").assertExists()
             onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").assertExists()
+
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertDoesNotExist()
         }
     }
@@ -134,11 +133,7 @@ class YouScreenTest {
     @Test
     fun `pressing confirm causes edit button to appear`() {
         composeTestRule.apply {
-            val gameRepository = ControllableGameRepository()
-            val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
-
-            val currentGame = CurrentGame("1", "A Game", "A Description")
-            gameRepository.emitCurrentGame(currentGame)
+            val viewModel = setUpViewModel()
 
             composeTestRule.setContent {
                 YouRoute(
@@ -149,9 +144,12 @@ class YouScreenTest {
             }
 
             val attributeType = "name"
+
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").performClick()
+
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertExists()
+
             onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").assertDoesNotExist()
             onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").assertDoesNotExist()
         }
@@ -161,11 +159,7 @@ class YouScreenTest {
     @Config(sdk = [33])
     fun `pressing cancel causes edit button to appear`() {
         composeTestRule.apply {
-            val gameRepository = ControllableGameRepository()
-            val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
-
-            val currentGame = CurrentGame("1", "A Game", "A Description")
-            gameRepository.emitCurrentGame(currentGame)
+            val viewModel = setUpViewModel()
 
             composeTestRule.setContent {
                 YouRoute(
@@ -176,26 +170,21 @@ class YouScreenTest {
             }
 
             val attributeType = "name"
+
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").performClick()
+
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertExists()
+
             onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").assertDoesNotExist()
             onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").assertDoesNotExist()
         }
     }
 
-
     @Test
     fun `text boxes can be edited when edit mode enabled`() {
         composeTestRule.apply {
-            val gameRepository = ControllableGameRepository()
-            val viewModel = YouViewModel(
-                GameStateUseCase(gameRepository),
-                youRepository = ControllableYouRepository()
-            )
-
-            val currentGame = CurrentGame("1", "A Game", "A Description")
-            gameRepository.emitCurrentGame(currentGame)
+            val viewModel = setUpViewModel()
 
             composeTestRule.setContent {
                 YouRoute(
@@ -206,11 +195,13 @@ class YouScreenTest {
             }
 
             val attributeType = "name"
+
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
                 .performTextClearance()
             onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
                 .performTextInput("Something")
+
             onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType", useUnmergedTree = true)
                 .assertTextContains("Something")
         }
@@ -219,14 +210,7 @@ class YouScreenTest {
     @Test
     fun `text boxes cannot be edited when edit mode disabled`() {
         composeTestRule.apply {
-            val gameRepository = ControllableGameRepository()
-            val viewModel = YouViewModel(
-                GameStateUseCase(gameRepository),
-                youRepository = ControllableYouRepository()
-            )
-
-            val currentGame = CurrentGame("1", "A Game", "A Description")
-            gameRepository.emitCurrentGame(currentGame)
+            val viewModel = setUpViewModel()
 
             composeTestRule.setContent {
                 YouRoute(
@@ -237,14 +221,11 @@ class YouScreenTest {
             }
 
             val attributeType = "name"
+
             onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
                 .performTextClearance()
-            val textFieldNode = onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType", useUnmergedTree = true)
-                .fetchSemanticsNode()
-            for ((key, value) in textFieldNode.config) {
-                if (key.name =="EditableText")
-                    assertTrue(value.toString().isNotEmpty())
-            }
+
+            assertTextFieldEmpty(attributeType)
         }
     }
 
@@ -252,14 +233,7 @@ class YouScreenTest {
     fun `snack bar appears when expected`() {
         composeTestRule.apply {
             var snackbarHostState: SnackbarHostState? = null
-            val gameRepository = ControllableGameRepository()
-            val viewModel = YouViewModel(
-                GameStateUseCase(gameRepository),
-                youRepository = ControllableYouRepository()
-            )
-
-            val currentGame = CurrentGame("1", "A Game", "A Description")
-            gameRepository.emitCurrentGame(currentGame)
+            val viewModel = setUpViewModel()
 
             composeTestRule.setContent {
                 snackbarHostState = remember { SnackbarHostState() }
@@ -280,12 +254,42 @@ class YouScreenTest {
                 .performTextClearance()
             onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").performClick()
 
-            runBlocking {
-                val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
-                    .first()?.visuals?.message
-                val expectedSnackbarText = YouValidatorFailure.NAME_TOO_SHORT.message
-                Assert.assertEquals(expectedSnackbarText, actualSnackbarText)
-            }
+            snackbarHostState?.assertSnackbarDisplays(YouValidatorFailure.NAME_TOO_SHORT.message)
+        }
+    }
+
+    private fun setUpViewModel(): YouViewModel {
+        val gameRepository = ControllableGameRepository()
+        val viewModel = YouViewModel(
+            GameStateUseCase(gameRepository),
+            youRepository = ControllableYouRepository()
+        )
+
+        val currentGame = CurrentGame("1", "A Game", "A Description")
+        gameRepository.emitCurrentGame(currentGame)
+
+        return viewModel
+    }
+
+    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.assertTextFieldEmpty(
+        attributeType: String
+    ) {
+        val textFieldNode = onNodeWithTag(
+            "${AnankeDestination.YOU}-character-$attributeType",
+            useUnmergedTree = true
+        )
+            .fetchSemanticsNode()
+        for ((key, value) in textFieldNode.config) {
+            if (key.name == "EditableText")
+                assertTrue(value.toString().isNotEmpty())
+        }
+    }
+
+    private fun SnackbarHostState.assertSnackbarDisplays(expectedSnackbarText: String) {
+        runBlocking {
+            val actualSnackbarText = snapshotFlow { this@assertSnackbarDisplays.currentSnackbarData }
+                .first()?.visuals?.message
+            Assert.assertEquals(expectedSnackbarText, actualSnackbarText)
         }
     }
 }
