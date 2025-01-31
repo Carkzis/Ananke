@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
@@ -36,6 +37,8 @@ class YouScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val attributeTypes = listOf("name", "bio")
 
     @Test
     fun `display current game name`() {
@@ -95,13 +98,81 @@ class YouScreenTest {
 
     @Test
     fun `pressing edit causes cancel and confirm buttons to appear`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository()
+            val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
 
+            val currentGame = CurrentGame("1", "A Game", "A Description")
+            gameRepository.emitCurrentGame(currentGame)
+
+            composeTestRule.setContent {
+                YouRoute(
+                    viewModel = viewModel,
+                    onOutOfGame = {},
+                    onShowSnackbar = { true }
+                )
+            }
+
+            val attributeType = attributeTypes.random()
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
+            onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").assertExists()
+            onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").assertExists()
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertDoesNotExist()
+        }
     }
 
     @Test
     fun `pressing confirm causes edit button to appear`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository()
+            val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
 
+            val currentGame = CurrentGame("1", "A Game", "A Description")
+            gameRepository.emitCurrentGame(currentGame)
+
+            composeTestRule.setContent {
+                YouRoute(
+                    viewModel = viewModel,
+                    onOutOfGame = {},
+                    onShowSnackbar = { true }
+                )
+            }
+
+            val attributeType = attributeTypes.random()
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
+            onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").performClick()
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertExists()
+            onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").assertDoesNotExist()
+            onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").assertDoesNotExist()
+        }
     }
+
+    @Test
+    fun `pressing cancel causes edit button to appear`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository()
+            val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
+
+            val currentGame = CurrentGame("1", "A Game", "A Description")
+            gameRepository.emitCurrentGame(currentGame)
+
+            composeTestRule.setContent {
+                YouRoute(
+                    viewModel = viewModel,
+                    onOutOfGame = {},
+                    onShowSnackbar = { true }
+                )
+            }
+
+            val attributeType = attributeTypes.random()
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
+            onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").performClick()
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertExists()
+            onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").assertDoesNotExist()
+            onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").assertDoesNotExist()
+        }
+    }
+
 
     @Test
     fun `text boxes can be edited when edit mode enabled`() {
