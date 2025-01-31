@@ -22,6 +22,7 @@ import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.YouRoute
 import com.carkzis.ananke.ui.screens.you.YouScreen
+import com.carkzis.ananke.ui.screens.you.YouUiState
 import com.carkzis.ananke.ui.screens.you.YouValidatorFailure
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
@@ -63,9 +64,10 @@ class YouScreenTest {
             composeTestRule.setContent {
                 val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
                 val actualCurrentGame = viewModel
-                    .currentGame
-                    .collectAsStateWithLifecycle(initialValue = CurrentGame.EMPTY)
+                    .uiState
+                    .collectAsStateWithLifecycle(initialValue = YouUiState.EMPTY)
                     .value
+                    .currentGame
                 YouScreen(
                     currentGame = actualCurrentGame,
                     gamingState = gameState,

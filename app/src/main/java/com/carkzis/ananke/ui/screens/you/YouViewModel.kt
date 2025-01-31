@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
@@ -40,7 +40,7 @@ class YouViewModel @Inject constructor(
         GamingState.Loading
     )
 
-    val currentGame = gamingState.map {
+    private val currentGame = gamingState.map {
         when (gamingState.value) {
             is GamingState.Loading, GamingState.OutOfGame -> CurrentGame.EMPTY
             is GamingState.InGame -> (gamingState.value as GamingState.InGame).currentGame
@@ -48,7 +48,7 @@ class YouViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val character: StateFlow<GameCharacter> = currentGame.flatMapMerge {
+    private val character: StateFlow<GameCharacter> = currentGame.flatMapMerge {
         youRepository.getCharacterForUser(
             userForTesting.toDomainUser(), it.id.toLong()
         )
@@ -58,14 +58,27 @@ class YouViewModel @Inject constructor(
         GameCharacter.EMPTY
     )
 
-    private val _editableCharacterName = MutableStateFlow("")
-    val editableCharacterName = _editableCharacterName.asStateFlow()
+    private val editableCharacterName = MutableStateFlow("")
 
-    private val _editableCharacterBio = MutableStateFlow("")
-    val editableCharacterBio = _editableCharacterBio.asStateFlow()
+    private val editableCharacterBio = MutableStateFlow("")
 
-    private val _editMode = MutableStateFlow<EditMode>(EditMode.None)
-    val editMode = _editMode.asStateFlow()
+    private val editMode = MutableStateFlow<EditMode>(EditMode.None)
+
+    val uiState = combine(
+        currentGame,
+        character,
+        editableCharacterName,
+        editableCharacterBio,
+        editMode
+    ) { currentGame, character, editableCharacterName, editableCharacterBio, editMode ->
+        YouUiState(
+            currentGame = currentGame,
+            currentCharacter = character,
+            editableCharacterName = editableCharacterName,
+            editableCharacterBio = editableCharacterBio,
+            editMode = editMode
+        )
+    }
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
@@ -98,7 +111,7 @@ class YouViewModel @Inject constructor(
                         currentGame.first().id.toLong(),
                         character.first()
                     )
-                    _editMode.value = EditMode.None
+                    editMode.value = EditMode.None
                 } catch (e: CharacterNameTakenException) {
                     _message.emit(e.message)
                 }
@@ -113,28 +126,28 @@ class YouViewModel @Inject constructor(
                 currentGame.first().id.toLong(),
                 character.first()
             )
-            _editMode.value = EditMode.None
+            editMode.value = EditMode.None
         }
     }
 
     fun beginEditingCharacterName() {
-        _editMode.value = EditMode.CharacterName
-        _editableCharacterName.value = character.value.character
+        editMode.value = EditMode.CharacterName
+        editableCharacterName.value = character.value.character
     }
 
     fun beginEditingCharacterBio() {
-        _editMode.value = EditMode.CharacterBio
-        _editableCharacterBio.value = character.value.bio
+        editMode.value = EditMode.CharacterBio
+        editableCharacterBio.value = character.value.bio
     }
 
     fun cancelEdit() {
-        _editMode.value = EditMode.None
+        editMode.value = EditMode.None
     }
 
     fun editCharacterName(newName: String) {
         setText(
             newName,
-            { _editableCharacterName.value = it },
+            { editableCharacterName.value = it },
             EditMode.CharacterName,
             characterNameValidator(minLength = MID_EDIT_MIN_LENGTH)
         )
@@ -143,7 +156,7 @@ class YouViewModel @Inject constructor(
     fun editCharacterBio(newBio: String) {
         setText(
             newBio,
-            { _editableCharacterBio.value = it },
+            { editableCharacterBio.value = it },
             EditMode.CharacterBio,
             characterBioValidator()
         )
@@ -156,7 +169,7 @@ class YouViewModel @Inject constructor(
         textValidator: YouTextValidator
     ) {
         try {
-            if (_editMode.value != editModeRequirement) throw CharacterNotInEditModeException()
+            if (editMode.value != editModeRequirement) throw CharacterNotInEditModeException()
         } catch (e: CharacterNotInEditModeException) {
             viewModelScope.launch {
                 _message.emit(e.message)

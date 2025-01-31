@@ -50,8 +50,8 @@ class YouViewModelTest {
 
         var actualGameTitle = "NOT EMPTY"
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.currentGame.collect {
-                actualGameTitle = it.name
+            viewModel.uiState.collect {
+                actualGameTitle = it.currentGame.name
             }
         }
 
@@ -67,8 +67,8 @@ class YouViewModelTest {
 
         var actualGameTitle = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.currentGame.collect {
-                actualGameTitle = it.name
+            viewModel.uiState.collect {
+                actualGameTitle = it.currentGame.name
             }
         }
 
@@ -89,8 +89,8 @@ class YouViewModelTest {
 
         var actualUserId = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.currentGame.collect {
-                actualUserId = youRepository.getCharacterForUser(userForTesting.toDomainUser(), it.id.toLong()).first().id
+            viewModel.uiState.collect {
+                actualUserId = youRepository.getCharacterForUser(userForTesting.toDomainUser(), it.currentGame.id.toLong()).first().id
             }
         }
 
@@ -108,8 +108,8 @@ class YouViewModelTest {
 
         var actualCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.character.collect {
-                actualCharacterName = it.character
+            viewModel.uiState.collect {
+                actualCharacterName = it.currentCharacter.character
             }
         }
 
@@ -127,8 +127,8 @@ class YouViewModelTest {
 
         var actualCharacterBio = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.character.collect {
-                actualCharacterBio = it.bio
+            viewModel.uiState.collect {
+                actualCharacterBio = it.currentCharacter.bio
             }
         }
 
@@ -146,8 +146,8 @@ class YouViewModelTest {
 
         var actualCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.character.collect {
-                actualCharacterName = it.character
+            viewModel.uiState.collect {
+                actualCharacterName = it.currentCharacter.character
             }
         }
 
@@ -167,8 +167,8 @@ class YouViewModelTest {
 
         var actualCharacterBio = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.character.collect {
-                actualCharacterBio = it.bio
+            viewModel.uiState.collect {
+                actualCharacterBio = it.currentCharacter.bio
             }
         }
 
@@ -185,8 +185,8 @@ class YouViewModelTest {
 
         var editableCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacterName.collect {
-                editableCharacterName = it
+            viewModel.uiState.collect {
+                editableCharacterName = it.editableCharacterName
             }
         }
 
@@ -204,8 +204,8 @@ class YouViewModelTest {
         val expectedCharacterName = "A New Name"
         var editableCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacterName.collect {
-                editableCharacterName = it
+            viewModel.uiState.collect {
+                editableCharacterName = it.editableCharacterName
             }
         }
 
@@ -290,7 +290,7 @@ class YouViewModelTest {
 
         var editMode: EditMode = EditMode.CharacterName
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editMode.collect { editMode = it }
+            viewModel.uiState.collect { editMode = it.editMode }
         }
 
         assertEquals(EditMode.None, editMode)
@@ -305,8 +305,8 @@ class YouViewModelTest {
 
         var editableBio = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacterBio.collect {
-                editableBio = it
+            viewModel.uiState.collect {
+                editableBio = it.editableCharacterBio
             }
         }
 
@@ -325,8 +325,8 @@ class YouViewModelTest {
 
         var editableBio = ""
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editableCharacterBio.collect {
-                editableBio = it
+            viewModel.uiState.collect {
+                editableBio = it.editableCharacterBio
             }
         }
 
@@ -371,7 +371,7 @@ class YouViewModelTest {
 
         var editMode: EditMode = EditMode.CharacterBio
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editMode.collect { editMode = it }
+            viewModel.uiState.collect { editMode = it.editMode }
         }
 
         assertEquals(EditMode.None, editMode)
@@ -406,7 +406,7 @@ class YouViewModelTest {
 
         var editMode: EditMode = EditMode.CharacterBio
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.editMode.collect { editMode = it }
+            viewModel.uiState.collect { editMode = it.editMode }
         }
 
         assertEquals(EditMode.None, editMode)
@@ -445,7 +445,7 @@ class YouViewModelTest {
         gameRepository.emitCurrentGame(currentGame)
 
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.character.collect {}
+            viewModel.uiState.collect {}
         }
 
         viewModel.changeCharacterBio(expectedCharacterBio)

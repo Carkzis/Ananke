@@ -5,8 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.carkzis.ananke.data.model.CurrentGame
-import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.ui.screens.game.GamingState
 
 @Composable
@@ -16,13 +14,9 @@ fun YouRoute(
     onOutOfGame: () -> Unit,
     onShowSnackbar: suspend (String) -> Boolean,
 ) {
-    val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
-    val currentCharacter by viewModel.character.collectAsStateWithLifecycle(GameCharacter.EMPTY)
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
 
-    val editMode by viewModel.editMode.collectAsStateWithLifecycle()
-    val editableCharacterName = viewModel.editableCharacterName.collectAsStateWithLifecycle()
-    val editableCharacterBio = viewModel.editableCharacterBio.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle(YouUiState.EMPTY)
 
     if (gameState == GamingState.OutOfGame) {
         onOutOfGame()
@@ -30,7 +24,7 @@ fun YouRoute(
 
     YouScreen(
         modifier = modifier,
-        currentGame = currentGame,
+        currentGame = uiState.currentGame,
         onTitleValueChanged = { newName, isEditable ->
             if (isEditable) {
                 viewModel.editCharacterName(newName)
@@ -50,21 +44,21 @@ fun YouRoute(
         onCancelEdit = {
             viewModel.cancelEdit()
         },
-        characterName = if (editMode == EditMode.CharacterName) {
-            editableCharacterName.value
+        characterName = if (uiState.editMode == EditMode.CharacterName) {
+            uiState.editableCharacterName
         } else {
-            currentCharacter.character
+            uiState.currentCharacter.character
         },
-        characterBio = if (editMode == EditMode.CharacterBio) {
-            editableCharacterBio.value
+        characterBio = if (uiState.editMode == EditMode.CharacterBio) {
+            uiState.editableCharacterBio
         } else {
-            currentCharacter.bio
+            uiState.currentCharacter.bio
         },
         onConfirmCharacterNameChange = {
-            viewModel.changeCharacterName(editableCharacterName.value)
+            viewModel.changeCharacterName(uiState.editableCharacterName)
         },
         onConfirmCharacterBioChange = {
-            viewModel.changeCharacterBio(editableCharacterBio.value)
+            viewModel.changeCharacterBio(uiState.editableCharacterBio)
         },
         onShowSnackbar = {
             viewModel.message.collect {
