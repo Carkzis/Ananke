@@ -1,7 +1,7 @@
 package com.carkzis.ananke.testdoubles
 
-import com.carkzis.ananke.data.TeamRepository
-import com.carkzis.ananke.data.User
+import com.carkzis.ananke.data.repository.TeamRepository
+import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import kotlinx.coroutines.flow.Flow

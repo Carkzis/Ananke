@@ -24,9 +24,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.toCurrentGame
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException

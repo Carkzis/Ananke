@@ -1,7 +1,7 @@
 package com.carkzis.ananke.utils
 
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.NewGame
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.NewGame
 
 fun NewGame.asGame(id: Long = 0L) = Game(
     id = id.toString(),

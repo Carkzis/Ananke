@@ -10,12 +10,14 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.MainActivity
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.GameRepository
-import com.carkzis.ananke.data.TeamRepository
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.data.repository.TeamRepository
+import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.di.DataModule
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -26,10 +28,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
@@ -43,6 +45,10 @@ class NavigationTest {
     @BindValue
     @JvmField
     val teamRepository: TeamRepository = ControllableTeamRepository()
+
+    @BindValue
+    @JvmField
+    val youRepository: YouRepository = ControllableYouRepository()
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
@@ -59,7 +65,7 @@ class NavigationTest {
 
     @Test
     fun `navigates to from game screen to team screen and you screens`() = runTest {
-        gameRepository.updateCurrentGame(CurrentGame("YeS", "No", "MaYbE"))
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
         composeTestRule.apply {
             assertScreenSelected(AnankeDestination.GAME, inGame = true)
 
@@ -77,7 +83,7 @@ class NavigationTest {
 
     @Test
     fun `screen prior to top level screens will always be games`() = runTest {
-        gameRepository.updateCurrentGame(CurrentGame("YeS", "No", "MaYbE"))
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
         composeTestRule.apply {
             onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
                 .performClick()

@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'com.carkzis.ananke'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId 'com.carkzis.ananke'
@@ -44,7 +44,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.3.2'
+        kotlinCompilerExtensionVersion '1.5.15'
     }
     packagingOptions {
         resources {

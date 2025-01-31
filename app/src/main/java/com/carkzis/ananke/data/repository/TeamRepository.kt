@@ -1,5 +1,6 @@
-package com.carkzis.ananke.data
+package com.carkzis.ananke.data.repository
 
+import com.carkzis.ananke.data.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface TeamRepository {

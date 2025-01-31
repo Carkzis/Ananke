@@ -1,8 +1,10 @@
-package com.carkzis.ananke.data
+package com.carkzis.ananke.data.database
 
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.Game
 
 @Entity(
     tableName = "games",

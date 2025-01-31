@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.toGame
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.toGame
 import com.carkzis.ananke.ui.screens.game.GamingState
 
 @Composable

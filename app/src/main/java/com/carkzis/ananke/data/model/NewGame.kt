@@ -1,4 +1,6 @@
-package com.carkzis.ananke.data
+package com.carkzis.ananke.data.model
+
+import com.carkzis.ananke.data.database.GameEntity
 
 data class NewGame(
     val name: String,

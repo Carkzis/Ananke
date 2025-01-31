@@ -20,9 +20,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.User
-import com.carkzis.ananke.data.toGame
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.User
+import com.carkzis.ananke.data.model.toGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
@@ -45,7 +45,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)

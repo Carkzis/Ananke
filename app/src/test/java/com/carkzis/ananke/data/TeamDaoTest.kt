@@ -4,6 +4,9 @@ import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.carkzis.ananke.data.database.AnankeDatabase
+import com.carkzis.ananke.data.database.TeamDao
+import com.carkzis.ananke.data.database.UserGameCrossRef
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.testdoubles.dummyUserEntities
 import junit.framework.TestCase.assertEquals

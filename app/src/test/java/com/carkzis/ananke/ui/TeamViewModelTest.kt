@@ -1,9 +1,9 @@
 package com.carkzis.ananke.ui
 
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.User
-import com.carkzis.ananke.data.toDomain
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.User
+import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.dummyUserEntities

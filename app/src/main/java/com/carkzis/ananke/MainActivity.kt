@@ -3,7 +3,7 @@ package com.carkzis.ananke
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.ui.AnankeApp
 import com.carkzis.ananke.ui.theme.AnankeTheme
 import dagger.hilt.android.AndroidEntryPoint

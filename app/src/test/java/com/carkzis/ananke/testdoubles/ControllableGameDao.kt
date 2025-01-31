@@ -1,8 +1,8 @@
 package com.carkzis.ananke.testdoubles
 
 import android.database.sqlite.SQLiteConstraintException
-import com.carkzis.ananke.data.GameDao
-import com.carkzis.ananke.data.GameEntity
+import com.carkzis.ananke.data.database.GameDao
+import com.carkzis.ananke.data.database.GameEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
@@ -23,7 +23,7 @@ class ControllableGameDao : GameDao {
 
     override suspend fun upsertGames(gameEntities: List<GameEntity>) {
         games.update { previousValues ->
-            (previousValues + gameEntities)
+            (gameEntities + previousValues)
                 .distinctBy(GameEntity::gameId)
                 .sortedWith(idDescending())
         }

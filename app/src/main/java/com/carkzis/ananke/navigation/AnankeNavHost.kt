@@ -60,7 +60,8 @@ fun AnankeNavHost(
             YouRoute(
                 onOutOfGame = {
                     navController.navigateUp()
-                }
+                },
+                onShowSnackbar = onShowSnackbar
             )
         }
     }

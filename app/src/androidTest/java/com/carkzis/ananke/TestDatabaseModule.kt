@@ -2,7 +2,7 @@ package com.carkzis.ananke
 
 import android.content.Context
 import androidx.room.Room
-import com.carkzis.ananke.data.AnankeDatabase
+import com.carkzis.ananke.data.database.AnankeDatabase
 import com.carkzis.ananke.di.DatabaseModule
 import dagger.Module
 import dagger.Provides

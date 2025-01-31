@@ -2,8 +2,8 @@ package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.asGame
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.NewGame
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.NewGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure

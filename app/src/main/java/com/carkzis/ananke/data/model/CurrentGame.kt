@@ -1,4 +1,4 @@
-package com.carkzis.ananke.data
+package com.carkzis.ananke.data.model
 
 data class CurrentGame(
     val id: String,

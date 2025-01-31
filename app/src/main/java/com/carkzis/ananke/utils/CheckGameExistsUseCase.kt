@@ -1,7 +1,7 @@
 package com.carkzis.ananke.utils
 
-import com.carkzis.ananke.data.Game
-import com.carkzis.ananke.data.GameRepository
+import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

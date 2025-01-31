@@ -1,4 +1,4 @@
-package com.carkzis.ananke.data
+package com.carkzis.ananke.data.database
 
 import kotlinx.coroutines.flow.Flow
 

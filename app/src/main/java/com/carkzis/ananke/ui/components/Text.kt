@@ -36,7 +36,8 @@ fun AnankeTextField(
     modifier: Modifier = Modifier,
     lines: Int = 1,
     value: String,
-    onValueChange: (String) -> Unit
+    readOnly: Boolean = false,
+    onValueChange: (String) -> Unit,
 ) {
     TextField(
         value = value,

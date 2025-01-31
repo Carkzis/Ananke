@@ -1,17 +1,19 @@
 package com.carkzis.ananke.di
 
-import com.carkzis.ananke.data.DefaultAnankeDataStore
-import com.carkzis.ananke.data.AnankeDataStore
-import com.carkzis.ananke.data.DefaultGameRepository
-import com.carkzis.ananke.data.DefaultTeamRepository
-import com.carkzis.ananke.data.GameRepository
-import com.carkzis.ananke.data.TeamConfiguration
-import com.carkzis.ananke.data.TeamRepository
+import com.carkzis.ananke.data.database.DefaultAnankeDataStore
+import com.carkzis.ananke.data.database.AnankeDataStore
+import com.carkzis.ananke.data.repository.DefaultGameRepository
+import com.carkzis.ananke.data.repository.DefaultTeamRepository
+import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.network.DefaultNetworkDataSource
 import com.carkzis.ananke.data.network.NetworkDataSource
+import com.carkzis.ananke.data.repository.DefaultYouRepository
+import com.carkzis.ananke.data.repository.YouRepository
+import com.carkzis.ananke.utils.CharacterNameGenerator
+import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
@@ -23,6 +25,12 @@ interface DataModule {
 
     @Binds
     fun bindsTeamRepository(teamRepository: DefaultTeamRepository): TeamRepository
+
+    @Binds
+    fun bindsYouRepository(youRepository: DefaultYouRepository): YouRepository
+
+    @Binds
+    fun bindsCharacterNameGenerator(characterNameGenerator: RandomCharacterNameGenerator): CharacterNameGenerator
 
     @Binds
     fun bindsAnankeDataStore(anankeDataStore: DefaultAnankeDataStore): AnankeDataStore

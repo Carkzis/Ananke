@@ -23,8 +23,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.carkzis.ananke.data.CurrentGame
-import com.carkzis.ananke.data.User
+import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.screens.game.GamingState
