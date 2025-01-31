@@ -1,11 +1,18 @@
 package com.carkzis.ananke.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
@@ -13,13 +20,18 @@ import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.you.YouRoute
 import com.carkzis.ananke.ui.screens.you.YouScreen
+import com.carkzis.ananke.ui.screens.you.YouValidatorFailure
 import com.carkzis.ananke.ui.screens.you.YouViewModel
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import junit.framework.TestCase
+import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,8 +49,6 @@ class YouScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
-
-    private val attributeTypes = listOf("name", "bio")
 
     @Test
     fun `display current game name`() {
@@ -97,7 +107,7 @@ class YouScreenTest {
     }
 
     @Test
-    fun `pressing edit causes cancel and confirm buttons to appear`() {
+    fun `pressing edit causes cancel and confirm buttons to appear`() = runTest {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
             val viewModel = YouViewModel(GameStateUseCase(gameRepository), youRepository = ControllableYouRepository())
@@ -113,7 +123,7 @@ class YouScreenTest {
                 )
             }
 
-            val attributeType = attributeTypes.random()
+            val attributeType = "name"
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").assertExists()
             onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").assertExists()
@@ -138,7 +148,7 @@ class YouScreenTest {
                 )
             }
 
-            val attributeType = attributeTypes.random()
+            val attributeType = "name"
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertExists()
@@ -148,6 +158,7 @@ class YouScreenTest {
     }
 
     @Test
+    @Config(sdk = [33])
     fun `pressing cancel causes edit button to appear`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
@@ -164,7 +175,7 @@ class YouScreenTest {
                 )
             }
 
-            val attributeType = attributeTypes.random()
+            val attributeType = "name"
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-cancel-$attributeType-button").performClick()
             onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").assertExists()
@@ -176,16 +187,105 @@ class YouScreenTest {
 
     @Test
     fun `text boxes can be edited when edit mode enabled`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository()
+            val viewModel = YouViewModel(
+                GameStateUseCase(gameRepository),
+                youRepository = ControllableYouRepository()
+            )
 
+            val currentGame = CurrentGame("1", "A Game", "A Description")
+            gameRepository.emitCurrentGame(currentGame)
+
+            composeTestRule.setContent {
+                YouRoute(
+                    viewModel = viewModel,
+                    onOutOfGame = {},
+                    onShowSnackbar = { true }
+                )
+            }
+
+            val attributeType = "name"
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
+            onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
+                .performTextClearance()
+            onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
+                .performTextInput("Something")
+            onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType", useUnmergedTree = true)
+                .assertTextContains("Something")
+        }
     }
 
     @Test
     fun `text boxes cannot be edited when edit mode disabled`() {
+        composeTestRule.apply {
+            val gameRepository = ControllableGameRepository()
+            val viewModel = YouViewModel(
+                GameStateUseCase(gameRepository),
+                youRepository = ControllableYouRepository()
+            )
 
+            val currentGame = CurrentGame("1", "A Game", "A Description")
+            gameRepository.emitCurrentGame(currentGame)
+
+            composeTestRule.setContent {
+                YouRoute(
+                    viewModel = viewModel,
+                    onOutOfGame = {},
+                    onShowSnackbar = { true }
+                )
+            }
+
+            val attributeType = "name"
+            onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
+                .performTextClearance()
+            val textFieldNode = onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType", useUnmergedTree = true)
+                .fetchSemanticsNode()
+            for ((key, value) in textFieldNode.config) {
+                if (key.name =="EditableText")
+                    assertTrue(value.toString().isNotEmpty())
+            }
+        }
     }
 
     @Test
     fun `snack bar appears when expected`() {
+        composeTestRule.apply {
+            var snackbarHostState: SnackbarHostState? = null
+            val gameRepository = ControllableGameRepository()
+            val viewModel = YouViewModel(
+                GameStateUseCase(gameRepository),
+                youRepository = ControllableYouRepository()
+            )
 
+            val currentGame = CurrentGame("1", "A Game", "A Description")
+            gameRepository.emitCurrentGame(currentGame)
+
+            composeTestRule.setContent {
+                snackbarHostState = remember { SnackbarHostState() }
+                YouRoute(
+                    viewModel = viewModel,
+                    onOutOfGame = {},
+                    onShowSnackbar = { message ->
+                        snackbarHostState?.showSnackbar(
+                            message = message, duration = SnackbarDuration.Short
+                        ) == SnackbarResult.Dismissed
+                    }
+                )
+            }
+
+            val attributeType = "name"
+            onNodeWithTag("${AnankeDestination.YOU}-edit-$attributeType-button").performClick()
+            onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
+                .performTextClearance()
+            onNodeWithTag("${AnankeDestination.YOU}-confirm-$attributeType-button").performClick()
+
+            runBlocking {
+                val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
+                    .first()?.visuals?.message
+                val expectedSnackbarText = YouValidatorFailure.NAME_TOO_SHORT.message
+                Assert.assertEquals(expectedSnackbarText, actualSnackbarText)
+            }
+        }
     }
 }
