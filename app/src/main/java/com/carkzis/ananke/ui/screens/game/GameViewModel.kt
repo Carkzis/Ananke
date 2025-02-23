@@ -6,6 +6,7 @@ import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.utils.OnboardUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GameViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
+    onboardUserUseCase: OnboardUserUseCase,
     private val gameRepository: GameRepository
 ) : ViewModel() {
 
@@ -35,6 +37,12 @@ class GameViewModel @Inject constructor(
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            onboardUserUseCase()
+        }
+    }
 
     fun enterGame(currentGame: CurrentGame) {
         viewModelScope.launch {

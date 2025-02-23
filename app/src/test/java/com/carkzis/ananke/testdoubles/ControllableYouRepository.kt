@@ -1,5 +1,6 @@
 package com.carkzis.ananke.testdoubles
 
+import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
@@ -8,14 +9,15 @@ import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class ControllableYouRepository : YouRepository {
     var currentUserId = 1L
+    var currentUser: User? = null
 
     private val _characters = MutableSharedFlow<List<GameCharacter>>(replay = 1)
     private val characters get() = _characters.replayCache.firstOrNull() ?: listOf()
-
     private val userToCharacterMap = mutableMapOf<Long, List<GameCharacter>>()
 
     override fun getCharacterForUser(user: User, currentGameId: Long) = _characters.map { characters ->
@@ -24,8 +26,9 @@ class ControllableYouRepository : YouRepository {
         } ?: GameCharacter.EMPTY
     }
 
-    override fun getCurrentUser(): Flow<User> {
-        TODO("Not yet implemented")
+    override fun getCurrentUser(): Flow<User> = flow {
+        currentUser = dummyUserEntities.first().toDomain()
+        emit(dummyUserEntities.first().toDomain())
     }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
