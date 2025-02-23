@@ -21,11 +21,13 @@ data class GameEntity(
 fun GameEntity.toDomainListing() = Game(
     id = gameId.toString(),
     name = name,
-    description = description
+    description = description,
+    creatorId = creatorId.toString()
 )
 
 fun GameEntity.toDomainCurrent() = CurrentGame(
     id = gameId.toString(),
     name = name,
-    description = description
+    description = description,
+    creatorId = creatorId.toString()
 )

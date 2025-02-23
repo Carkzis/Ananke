@@ -365,6 +365,7 @@ private fun GameCardPreview() {
                 id = "",
                 name = "The Game",
                 description = "This is a game.",
+                creatorId = "",
             )
         )
     }
@@ -403,6 +404,7 @@ private fun GameEnterDialogPreview() {
                 id = "",
                 name = "The Game",
                 description = "This is a game.",
+                creatorId = "",
             )
         )
     }
@@ -418,11 +420,13 @@ private fun OutOfGameScreenPreview() {
                     id = "1",
                     name = "Game 1",
                     description = "This is a game.",
+                    creatorId = "",
                 ),
                 Game(
                     id = "2",
                     name = "Game 2",
                     description = "This is another game.",
+                    creatorId = "",
                 )
             ),
             gamingState = GamingState.OutOfGame

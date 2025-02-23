@@ -7,6 +7,7 @@ import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
@@ -25,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TeamViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
+    addCurrentUserToTheirEmptyGameUseCase: AddCurrentUserToTheirEmptyGameUseCase,
     private val checkGameExistsUseCase: CheckGameExistsUseCase,
     private val teamRepository: TeamRepository
 ) : ViewModel() {
@@ -61,6 +63,16 @@ class TeamViewModel @Inject constructor(
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            currentGame.collect {
+                if (it != CurrentGame.EMPTY) {
+                    addCurrentUserToTheirEmptyGameUseCase(it)
+                }
+            }
+        }
+    }
 
     fun addTeamMember(teamMember: User, game: Game) {
         viewModelScope.launch {
