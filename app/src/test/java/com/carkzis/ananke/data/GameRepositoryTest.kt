@@ -12,6 +12,7 @@ import com.carkzis.ananke.data.repository.DefaultGameRepository
 import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.testdoubles.ControllableGameDao
 import com.carkzis.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
@@ -73,15 +74,15 @@ class GameRepositoryTest {
 
     @Test
     fun `repository adds game to database`() = runTest {
-        val newGame = NewGame("aName", "aDescription")
+        val newGame = NewGame("aName", "aDescription", dummyUserEntities.first().userId)
         gameRepository.addNewGame(newGame)
         assertTrue(getGamesEntitiesAsDomainObjects().contains(newGame.asGame()))
     }
 
     @Test(expected = GameAlreadyExistsException::class)
     fun `repository does not add duplicate game with exception`() = runTest {
-        val newGame = NewGame("aName", "aDescription")
-        val newGameSameName = NewGame("aName", "aDescription")
+        val newGame = NewGame("aName", "aDescription", dummyUserEntities.first().userId)
+        val newGameSameName = NewGame("aName", "aDescription", dummyUserEntities.first().userId)
         gameRepository.addNewGame(newGame)
         gameRepository.addNewGame(newGameSameName)
     }

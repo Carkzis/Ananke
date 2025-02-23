@@ -13,10 +13,13 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.navigation.GameDestination
+import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
 import com.carkzis.ananke.ui.screens.nugame.NewGameScreen
 import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure
 import com.carkzis.ananke.ui.screens.nugame.NewGameViewModel
+import com.carkzis.ananke.utils.CurrentUserUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -28,7 +31,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -43,7 +45,9 @@ class NewGameScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val viewModel = NewGameViewModel(mock())
+    private val gameRepository = ControllableGameRepository()
+    private val currentUserUseCase = CurrentUserUseCase(ControllableYouRepository())
+    private val viewModel = NewGameViewModel(currentUserUseCase, gameRepository)
 
     @Test
     fun `text box for new game title takes in typed characters`() {

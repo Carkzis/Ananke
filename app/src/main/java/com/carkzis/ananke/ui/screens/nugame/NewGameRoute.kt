@@ -22,6 +22,7 @@ fun NewGameRoute(
 
     val gameTitle by viewModel.gameTitle.collectAsStateWithLifecycle()
     val gameDescription by viewModel.gameDescription.collectAsStateWithLifecycle()
+    val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
 
     NewGameScreen(
         modifier = modifier,
@@ -33,7 +34,8 @@ fun NewGameRoute(
             viewModel.addNewGame(
                 NewGame(
                     gameTitle,
-                    gameDescription
+                    gameDescription,
+                    currentUser.id
                 )
             )
         },
@@ -42,7 +44,8 @@ fun NewGameRoute(
             viewModel.addNewGame(
                 NewGame(
                     "Marc's Game #$shortDummyGameUUID",
-                    "It is indescribable."
+                    "It is indescribable.",
+                    currentUser.id
                 )
             )
         },

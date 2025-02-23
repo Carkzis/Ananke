@@ -1,13 +1,18 @@
 package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.asGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.NewGame
+import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
+import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import com.carkzis.ananke.ui.screens.nugame.NewGameValidatorFailure
 import com.carkzis.ananke.ui.screens.nugame.NewGameViewModel
+import com.carkzis.ananke.utils.CurrentUserUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -26,11 +31,15 @@ class NewGameViewModelTest {
 
     private lateinit var viewModel: NewGameViewModel
     private lateinit var gameRepository: ControllableGameRepository
+    private lateinit var youRepository: ControllableYouRepository
+    private val dummyCurrentUser = dummyUserEntities.first().toDomain()
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        viewModel = NewGameViewModel(gameRepository)
+        youRepository = ControllableYouRepository()
+        youRepository.currentUser = dummyCurrentUser
+        viewModel = NewGameViewModel(CurrentUserUseCase(youRepository), gameRepository)
     }
 
     @Test
@@ -40,7 +49,7 @@ class NewGameViewModelTest {
             gameRepository.getGames().collect { games.add(it.last()) }
         }
 
-        val newGame = NewGame("aName", "aDescription")
+        val newGame = NewGame("aName", "aDescription", dummyCurrentUser.id)
         viewModel.addNewGame(newGame)
 
         assertTrue(games.contains(newGame.asGame()))
@@ -55,7 +64,7 @@ class NewGameViewModelTest {
             viewModel.addGameSuccessEvent.collect { success = it }
         }
 
-        val newGame = NewGame("aName", "aDescription")
+        val newGame = NewGame("aName", "aDescription", dummyCurrentUser.id)
         viewModel.addNewGame(newGame)
 
         assertTrue(success)
@@ -70,7 +79,7 @@ class NewGameViewModelTest {
             viewModel.addGameSuccessEvent.collect { success = it }
         }
 
-        val invalidNewGame = NewGame("", "")
+        val invalidNewGame = NewGame("", "", dummyCurrentUser.id)
         viewModel.addNewGame(invalidNewGame)
 
         assertFalse(success)
@@ -135,7 +144,7 @@ class NewGameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        viewModel.addNewGame(NewGame("", ""))
+        viewModel.addNewGame(NewGame("", "", dummyCurrentUser.id))
 
         assertEquals(NewGameValidatorFailure.TITLE_EMPTY.message, messages.firstOrNull())
         assertEquals(1, messages.size)
@@ -150,7 +159,7 @@ class NewGameViewModelTest {
             viewModel.message.collect { messages.add(it) }
         }
 
-        viewModel.addNewGame(NewGame("Shor", ""))
+        viewModel.addNewGame(NewGame("Shor", "", dummyCurrentUser.id))
 
         assertEquals(NewGameValidatorFailure.TITLE_TOO_SHORT.message, messages.firstOrNull())
         assertEquals(1, messages.size)
@@ -166,7 +175,7 @@ class NewGameViewModelTest {
         }
 
         val longGameDescription = "LONG".repeat(51) // 204 characters
-        viewModel.addNewGame(NewGame("A Game With No Description", longGameDescription))
+        viewModel.addNewGame(NewGame("A Game With No Description", longGameDescription, dummyCurrentUser.id))
 
         assertEquals(NewGameValidatorFailure.DESCRIPTION_TOO_LONG.message, messages.firstOrNull())
         assertEquals(1, messages.size)
@@ -183,7 +192,7 @@ class NewGameViewModelTest {
         }
 
         gameRepository.ADD_GAME_EXISTS = true
-        viewModel.addNewGame(NewGame("A Game That Already Exists", "It already exists."))
+        viewModel.addNewGame(NewGame("A Game That Already Exists", "It already exists.", dummyCurrentUser.id))
 
         assertEquals(GameAlreadyExistsException().message, messages.firstOrNull())
         assertEquals(1, messages.size)
@@ -223,5 +232,18 @@ class NewGameViewModelTest {
         val longGameTitle = "LONG".repeat(51) // 204 characters
         viewModel.updateGameDescription(longGameTitle)
         assertEquals("", viewModel.gameDescription.value)
+    }
+
+    @Test
+    fun `view model shows current user`() = runTest {
+        var currentUser: User? = null
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.currentUser.collect {
+                currentUser = it
+            }
+        }
+        assertEquals(dummyCurrentUser, currentUser)
+
+        collection.cancel()
     }
 }
