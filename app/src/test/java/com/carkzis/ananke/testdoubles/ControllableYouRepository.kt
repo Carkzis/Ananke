@@ -6,6 +6,7 @@ import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.utils.RandomCharacterNameGenerator
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 
@@ -21,6 +22,10 @@ class ControllableYouRepository : YouRepository {
         characters.firstOrNull() {
             userToCharacterMap.getOrDefault(currentGameId, listOf()).contains(it)
         } ?: GameCharacter.EMPTY
+    }
+
+    override fun getCurrentUser(): Flow<User> {
+        TODO("Not yet implemented")
     }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {

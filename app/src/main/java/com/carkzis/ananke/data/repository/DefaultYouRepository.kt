@@ -1,7 +1,10 @@
 package com.carkzis.ananke.data.repository
 
+import com.carkzis.ananke.data.database.AnankeDataStore
+import com.carkzis.ananke.data.database.UserEntity
 import com.carkzis.ananke.data.database.YouDao
 import com.carkzis.ananke.data.database.toCharacter
+import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
@@ -17,12 +20,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 import javax.inject.Inject
 
 class DefaultYouRepository @Inject constructor(
     private val youDao: YouDao,
-    private val characterNameGenerator: CharacterNameGenerator = RandomCharacterNameGenerator
+    private val characterNameGenerator: CharacterNameGenerator = RandomCharacterNameGenerator,
+    private val anankeDataStore: AnankeDataStore? = null
 ) : YouRepository {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,6 +50,28 @@ class DefaultYouRepository @Inject constructor(
                 return@map domainCharacter
             }
         }
+
+    override fun getCurrentUser(): Flow<User> = flow {
+        val currentUserId = anankeDataStore?.currentUserId()?.first()
+
+        if (currentUserId == null) {
+            // TODO: This won't be unique enough, but it's just a placeholder for now.
+            val userId = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
+            val userName = "User-10000"
+
+            val newUser = UserEntity(userId, userName)
+
+            youDao.insertUser(newUser)
+
+            anankeDataStore?.setCurrentUserId(userId.toString())
+
+            emit(newUser.toDomain())
+        } else {
+            // TODO: This should throw an error if it fail.
+            val user = youDao.getUserForUserId(currentUserId.toLong()).first()
+            user?.let { emit(it.toDomain()) }
+        }
+    }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
         val charactersForGameId = youDao.getCharactersForGameId(newCharacter.gameId)

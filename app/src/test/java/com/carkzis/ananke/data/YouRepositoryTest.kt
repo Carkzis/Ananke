@@ -1,7 +1,11 @@
 package com.carkzis.ananke.data
 
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.carkzis.ananke.data.database.AnankeDataStore
+import com.carkzis.ananke.data.database.DefaultAnankeDataStore
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.NewCharacter
+import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.DefaultYouRepository
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
@@ -14,28 +18,47 @@ import com.carkzis.ananke.ui.screens.you.CharacterNameTakenException
 import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.assertNameHasExpectedFormat
+import com.carkzis.ananke.utils.assertUserHasExpectedFormat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class YouRepositoryTest {
+    private val testScope = TestScope(UnconfinedTestDispatcher())
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    @get:Rule
+    val tmpFolder: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
+
     private lateinit var youDao: ControllableYouDao
     private lateinit var youRepository: YouRepository
+    private lateinit var anankeDataStore: AnankeDataStore
 
     @Before
     fun setUp() {
+        val testDataStore = PreferenceDataStoreFactory.create(
+            scope = testScope,
+            produceFile = { tmpFolder.newFile("test_data_store.preferences_pb") }
+        )
+        anankeDataStore = DefaultAnankeDataStore(testDataStore)
+
         youDao = ControllableYouDao()
-        youRepository = DefaultYouRepository(youDao)
+        youRepository = DefaultYouRepository(
+            youDao = youDao,
+            anankeDataStore = anankeDataStore
+        )
     }
 
     @Test
@@ -196,5 +219,12 @@ class YouRepositoryTest {
             currentGameId = currentGameIdForUser,
             formerGameCharacter = currentCharacter
         )
+    }
+
+    @Test
+    fun `repository creates current user if not exist on request and adds to preferences`() = runTest {
+        val currentUser: User = youRepository.getCurrentUser().first()
+
+        assertUserHasExpectedFormat(currentUser.name)
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.database.AnankeDatabase
+import com.carkzis.ananke.data.database.UserEntity
 import com.carkzis.ananke.data.database.YouDao
 import com.carkzis.ananke.testdoubles.dummyCharacterEntities
 import com.carkzis.ananke.testdoubles.dummyGameEntities
@@ -87,5 +88,14 @@ class YouDaoTest {
             ?.characterEntities
 
         assertEquals(dummyCharacters, actualCharacters)
+    }
+
+    @Test
+    fun `youDao retrieves user for user id`() = runTest {
+        youDao.insertUser(dummyUser)
+
+        val actualUser = youDao.getUserForUserId(dummyUser.userId).first()
+
+        assertEquals(dummyUser, actualUser)
     }
 }

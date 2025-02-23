@@ -55,7 +55,8 @@ class YouScreenTest {
     @Test
     fun `display current game name`() {
         val gameRepository = ControllableGameRepository()
-        val viewModel = YouViewModel(GameStateUseCase(gameRepository), mock())
+        val controllableYouRepository = ControllableYouRepository()
+        val viewModel = YouViewModel(GameStateUseCase(gameRepository), controllableYouRepository)
 
         val currentGame = CurrentGame("1", "A Game", "A Description")
         gameRepository.emitCurrentGame(currentGame)

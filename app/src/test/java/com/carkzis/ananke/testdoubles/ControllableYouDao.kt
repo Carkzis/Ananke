@@ -2,6 +2,7 @@ package com.carkzis.ananke.testdoubles
 
 import com.carkzis.ananke.data.database.CharacterEntity
 import com.carkzis.ananke.data.database.GameEntityWithCharacters
+import com.carkzis.ananke.data.database.UserEntity
 import com.carkzis.ananke.data.database.UserEntityWithCharacters
 import com.carkzis.ananke.data.database.YouDao
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.update
 class ControllableYouDao: YouDao {
     var characters = MutableStateFlow(listOf<CharacterEntity>())
 
-    private val listOfUsers = dummyUserEntities
+    private val listOfUsers = dummyUserEntities.toMutableList()
     private var idCounter = 0L
 
     override suspend fun insertCharacter(character: CharacterEntity) {
@@ -32,6 +33,18 @@ class ControllableYouDao: YouDao {
                 if (currentCharacter.characterId == character.characterId) character else currentCharacter
             }
         }
+    }
+
+    override fun getUserForUserId(userId: Long): Flow<UserEntity?> = listOfUsers.filter {
+        it.userId == userId
+    }.let { user ->
+        flow {
+            emit(user.firstOrNull())
+        }
+    }
+
+    override suspend fun insertUser(user: UserEntity) {
+        listOfUsers.add(user)
     }
 
     override fun getCharactersForUserId(userId: Long): Flow<List<CharacterEntity>> = flow {

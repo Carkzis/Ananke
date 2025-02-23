@@ -17,6 +17,12 @@ interface YouDao {
     @Update
     suspend fun updateCharacter(character: CharacterEntity)
 
+    @Query(value = "SELECT * FROM users WHERE userId = :userId")
+    fun getUserForUserId(userId: Long): Flow<UserEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertUser(user: UserEntity)
+
     @Transaction
     @Query(value = """
             SELECT * FROM characters
