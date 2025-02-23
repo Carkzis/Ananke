@@ -5,7 +5,6 @@ import com.carkzis.ananke.data.database.AnankeDataStore
 import com.carkzis.ananke.data.database.DefaultAnankeDataStore
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.NewCharacter
-import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.DefaultYouRepository
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
@@ -223,8 +222,18 @@ class YouRepositoryTest {
 
     @Test
     fun `repository creates current user if not exist on request and adds to preferences`() = runTest {
-        val currentUser: User = youRepository.getCurrentUser().first()
+        val currentUser = youRepository.getCurrentUser().first()
 
         assertUserHasExpectedFormat(currentUser.name)
+    }
+
+    @Test
+    fun `repository returns current user if exist on request`() = runTest {
+        val expectedUser = dummyUserEntities.first()
+        anankeDataStore.setCurrentUserId(expectedUser.userId.toString())
+        youDao.insertUser(expectedUser)
+
+        val actualUser = youRepository.getCurrentUser().first()
+        assertEquals(expectedUser.toDomain(), actualUser)
     }
 }
