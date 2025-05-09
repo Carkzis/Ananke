@@ -1,7 +1,6 @@
 package com.carkzis.ananke.ui.screens.team
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,7 +19,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -32,13 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.theme.AnankeTheme
-import timber.log.Timber
 
 @Composable
 fun TeamScreen(
@@ -82,46 +80,7 @@ private fun InGameTeamScreen(
     event: TeamEvent = TeamEvent.TeamMemberDialogueHidden
 ) {
     if (event is TeamEvent.TeamMemberDialogueShow) {
-        // TODO: Make this look good.
-        Timber.e("TeamMemberDialogueShow: ${event.teamMember.name} - ${event.character.character}")
-        Dialog(
-            onDismissRequest = onDismissDialogue,
-            properties = DialogProperties(
-                usePlatformDefaultWidth = false
-            )
-        ) {
-            Card(
-                modifier = modifier
-                    .padding(16.dp)
-                    .fillMaxSize()
-                    .testTag("${AnankeDestination.TEAM}-team-member-dialogue"),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text("Name: ${event.teamMember.name}")
-                    Text("Character: ${event.character.character}")
-                    Text("Bio: ${event.character.bio}")
-                    AnankeButton(onClick = onDismissDialogue) {
-                        AnankeText(
-                            text = "Close",
-                            modifier = modifier
-                                .padding(8.dp)
-                                .testTag("${AnankeDestination.TEAM}-team-member-dialogue-close-button"),
-                            textStyle = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-            }
-        }
+        TeamMemberDialogue(onDismissDialogue, modifier, event)
     }
 
     val lazyListState = rememberLazyListState()
@@ -133,6 +92,92 @@ private fun InGameTeamScreen(
         currentGameTitle(currentGame, modifier)
         teamMembers(modifier, teamMembers, onViewTeamMember)
         availableUsers(modifier, users, onAddUser)
+    }
+}
+
+@Composable
+private fun TeamMemberDialogue(
+    onDismissDialogue: () -> Unit,
+    modifier: Modifier,
+    event: TeamEvent.TeamMemberDialogueShow
+) {
+    Dialog(
+        onDismissRequest = onDismissDialogue,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Card(
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
+                .testTag("${AnankeDestination.TEAM}-team-member-dialogue"),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+        ) {
+            AnankeText(
+                text = "Team Member",
+                modifier = modifier
+                    .padding(top = 32.dp)
+                    .testTag("${AnankeDestination.TEAM}-team-member-dialogue-title"),
+                textStyle = MaterialTheme.typography.headlineLarge
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AnankeText(
+                    text = "Name",
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.titleLarge
+                )
+                AnankeText(
+                    text = event.teamMember.name,
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge
+                )
+                AnankeText(
+                    text = "Character",
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.titleLarge
+                )
+                AnankeText(
+                    text = event.character.character,
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge
+                )
+                AnankeText(
+                    text = "Bio",
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.titleLarge
+                )
+                AnankeText(
+                    text = event.character.bio.ifEmpty { "No bio available." },
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge
+                )
+
+                AnankeButton(onClick = onDismissDialogue) {
+                    AnankeText(
+                        text = "Close",
+                        modifier = modifier
+                            .padding(8.dp)
+                            .testTag("${AnankeDestination.TEAM}-team-member-dialogue-close-button"),
+                        textStyle = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -391,6 +436,26 @@ private fun TeamScreenWithTeamMembersPreview() {
             teamMembers = listOf(
                 User(id = 1, name = "Zidun"),
                 User(id = 2, name = "Vivu")
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TeamMemberDialoguePreview() {
+    AnankeTheme {
+        TeamMemberDialogue(
+            onDismissDialogue = {},
+            modifier = Modifier,
+            event = TeamEvent.TeamMemberDialogueShow(
+                teamMember = User(id = 1, name = "Zidun"),
+                character = GameCharacter(
+                    id = "1",
+                    userName = "Marc",
+                    character = "Zidun",
+                    bio = "This is a test character.",
+                )
             )
         )
     }
