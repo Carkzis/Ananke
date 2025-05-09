@@ -26,9 +26,11 @@ import com.carkzis.ananke.data.model.toGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.team.TeamScreen
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
+import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -58,11 +60,13 @@ class TeamScreenTest {
 
     private lateinit var gameRepository: ControllableGameRepository
     private lateinit var teamRepository: ControllableTeamRepository
+    private lateinit var youRepository: ControllableYouRepository
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
         teamRepository = ControllableTeamRepository()
+        youRepository = ControllableYouRepository()
     }
 
     @Test
@@ -246,6 +250,7 @@ class TeamScreenTest {
     private fun teamViewModel(): TeamViewModel {
         val viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
+            AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )

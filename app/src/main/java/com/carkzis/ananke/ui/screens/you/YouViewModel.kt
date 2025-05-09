@@ -50,7 +50,7 @@ class YouViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val character: StateFlow<GameCharacter> = currentGame.flatMapMerge {
         youRepository.getCharacterForUser(
-            userForTesting.toDomainUser(), it.id.toLong()
+            youRepository.getCurrentUser().first(), it.id.toLong()
         )
     }.stateIn(
         viewModelScope,
@@ -82,20 +82,6 @@ class YouViewModel @Inject constructor(
 
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
-
-    init {
-        viewModelScope.launch {
-            currentGame.collect {
-                if (it != CurrentGame.EMPTY) {
-                    val currentGameId = it.id
-                    val newCharacter = NewCharacter(userId = userForTesting.id, gameId = currentGameId.toLong())
-                    try {
-                        youRepository.addNewCharacter(newCharacter)
-                    } catch (_: CharacterAlreadyExistsForUserException) {}
-                }
-            }
-        }
-    }
 
     fun changeCharacterName(newName: String) {
         val newNameValidation = characterNameValidator().validateText(newName)

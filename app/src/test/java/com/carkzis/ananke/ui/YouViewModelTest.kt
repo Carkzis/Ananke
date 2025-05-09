@@ -2,7 +2,7 @@ package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.GameCharacter
-import com.carkzis.ananke.data.network.toDomainUser
+import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.network.userForTesting
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
@@ -17,7 +17,6 @@ import com.carkzis.ananke.utils.assertNameHasExpectedFormat
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -80,31 +79,16 @@ class YouViewModelTest {
     }
 
     @Test
-    fun `view model adds current user when initialised`() = runTest {
-        val expectedUserId = userForTesting.id
-        val currentGame = CurrentGame("1", "A Game", "A Description")
-        youRepository.currentUserId = expectedUserId
-
-        gameRepository.emitCurrentGame(currentGame)
-
-        var actualUserId = ""
-        val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.uiState.collect {
-                actualUserId = youRepository.getCharacterForUser(userForTesting.toDomainUser(), it.currentGame.id.toLong()).first().id
-            }
-        }
-
-        assertEquals(expectedUserId, actualUserId.toLong())
-
-        collection.cancel()
-    }
-
-    @Test
     fun `view model displays an initial character name`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
-        youRepository.currentUserId = userForTesting.id
 
         gameRepository.emitCurrentGame(currentGame)
+        youRepository.addNewCharacter(
+            NewCharacter(
+                userId = userForTesting.id,
+                gameId = currentGame.id.toLong(),
+            )
+        )
 
         var actualCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -121,7 +105,6 @@ class YouViewModelTest {
     @Test
     fun `view model displays an empty initial biography`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
-        youRepository.currentUserId = userForTesting.id
 
         gameRepository.emitCurrentGame(currentGame)
 
@@ -143,6 +126,12 @@ class YouViewModelTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
 
         gameRepository.emitCurrentGame(currentGame)
+        youRepository.addNewCharacter(
+            NewCharacter(
+                userId = userForTesting.id,
+                gameId = currentGame.id.toLong(),
+            )
+        )
 
         var actualCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -164,6 +153,12 @@ class YouViewModelTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
 
         gameRepository.emitCurrentGame(currentGame)
+        youRepository.addNewCharacter(
+            NewCharacter(
+                userId = userForTesting.id,
+                gameId = currentGame.id.toLong(),
+            )
+        )
 
         var actualCharacterBio = ""
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -182,6 +177,13 @@ class YouViewModelTest {
     @Test
     fun `view model initially displays character name when editing`() = runTest {
         collectInitialCharacterInformation()
+
+        youRepository.addNewCharacter(
+            NewCharacter(
+                userId = userForTesting.id,
+                gameId = 1L,
+            )
+        )
 
         var editableCharacterName = ""
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -301,6 +303,14 @@ class YouViewModelTest {
     @Test
     fun `view model initially displays character bio when editing`() = runTest {
         val expectedCharacterBio = "A bio for the character."
+
+        youRepository.addNewCharacter(
+            NewCharacter(
+                userId = userForTesting.id,
+                gameId = 1L,
+            )
+        )
+
         collectInitialCharacterInformation(expectedCharacterBio = expectedCharacterBio)
 
         var editableBio = ""
@@ -441,7 +451,6 @@ class YouViewModelTest {
     private fun TestScope.collectInitialCharacterInformation(expectedCharacterBio: String = "") {
         val currentGame = CurrentGame("1", "A Game", "A Description")
 
-        youRepository.currentUserId = userForTesting.id
         gameRepository.emitCurrentGame(currentGame)
 
         val collection = launch(UnconfinedTestDispatcher()) {

@@ -4,20 +4,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.data.model.NewGame
+import com.carkzis.ananke.data.model.User
+import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.descriptionValidator
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.titleValidator
+import com.carkzis.ananke.utils.CurrentUserUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class NewGameViewModel @Inject constructor(private val gameRepository: GameRepository) :
-    ViewModel() {
+class NewGameViewModel @Inject constructor(
+    currentUserUseCase: CurrentUserUseCase,
+    private val gameRepository: GameRepository
+) : ViewModel() {
+
+    val currentUser = currentUserUseCase().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        User.EMPTY
+    )
 
     private val _gameTitle = MutableStateFlow("")
     val gameTitle = _gameTitle.asStateFlow()

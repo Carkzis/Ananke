@@ -1,8 +1,12 @@
 package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.toCurrentGame
+import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
+import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
@@ -11,8 +15,10 @@ import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.screens.game.InvalidGameException
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.OnboardUserUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -29,11 +35,17 @@ class GameViewModelTest {
 
     private lateinit var viewModel: GameViewModel
     private lateinit var gameRepository: ControllableGameRepository
+    private lateinit var youRepository: ControllableYouRepository
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
-        viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+        youRepository = ControllableYouRepository()
+        viewModel = GameViewModel(
+            gameStateUseCase = GameStateUseCase(gameRepository),
+            onboardUserUseCase = OnboardUserUseCase(youRepository),
+            gameRepository = gameRepository
+        )
     }
 
     @Test
@@ -175,9 +187,14 @@ class GameViewModelTest {
         collection.cancel()
     }
 
+    @Test
+    fun `view model creates a new user for the device if unavailable`() = runTest {
+        assertEquals(youRepository.currentUser, dummyUserEntities.first().toDomain())
+    }
+
     fun dummyGames() = listOf(
-        Game("abc", "My First Game", "It is the first one."),
-        Game("def", "My Second Game", "It is the second one."),
-        Game("ghi", "My Third Game", "It is the third one.")
+        Game("abc", "My First Game", "It is the first one.", "1"),
+        Game("def", "My Second Game", "It is the second one.", "1"),
+        Game("ghi", "My Third Game", "It is the third one.", "1")
     )
 }

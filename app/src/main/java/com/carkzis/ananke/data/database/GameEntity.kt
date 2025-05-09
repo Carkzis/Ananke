@@ -14,17 +14,20 @@ data class GameEntity(
     @PrimaryKey(autoGenerate = true)
     val gameId: Long = 0L,
     val name: String,
-    val description: String
+    val description: String,
+    val creatorId: Long
 )
 
 fun GameEntity.toDomainListing() = Game(
     id = gameId.toString(),
     name = name,
-    description = description
+    description = description,
+    creatorId = creatorId.toString()
 )
 
 fun GameEntity.toDomainCurrent() = CurrentGame(
     id = gameId.toString(),
     name = name,
-    description = description
+    description = description,
+    creatorId = creatorId.toString()
 )

@@ -8,6 +8,7 @@ import com.carkzis.ananke.data.database.AnankeDatabase
 import com.carkzis.ananke.data.database.GameDao
 import com.carkzis.ananke.data.database.GameEntity
 import com.carkzis.ananke.testdoubles.dummyGameEntities
+import com.carkzis.ananke.testdoubles.dummyUserEntities
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -70,15 +71,15 @@ class GameDaoTest {
 
     @Test
     fun `gameDao inserts new game entity`() = runTest {
-        val newGame = GameEntity(1L, "aName", "aDescription")
+        val newGame = GameEntity(1L, "aName", "aDescription", dummyUserEntities.first().userId)
         gameDao.insertGame(newGame)
         assertTrue(gameDao.getGames().first().contains(newGame))
     }
 
     @Test(expected = SQLiteConstraintException::class)
     fun `gameDao cannot insert new game entity with existing name`() = runTest {
-        val newGame = GameEntity(1L, "aName", "aDescription")
-        val newGameSameName = GameEntity(2L, "aName", "aDescription")
+        val newGame = GameEntity(1L, "aName", "aDescription", dummyUserEntities.first().userId)
+        val newGameSameName = GameEntity(2L, "aName", "aDescription", dummyUserEntities.first().userId)
         gameDao.insertGame(newGame)
         gameDao.insertGame(newGameSameName)
     }

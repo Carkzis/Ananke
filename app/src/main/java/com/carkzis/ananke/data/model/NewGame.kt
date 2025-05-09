@@ -4,10 +4,12 @@ import com.carkzis.ananke.data.database.GameEntity
 
 data class NewGame(
     val name: String,
-    val description: String
+    val description: String,
+    val creatorId: Long
 )
 
 fun NewGame.toEntity() = GameEntity(
     name = name,
-    description = description
+    description = description,
+    creatorId = creatorId
 )

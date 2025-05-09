@@ -1,16 +1,19 @@
 package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.User
-import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
+import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
@@ -19,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -33,13 +37,16 @@ class TeamViewModelTest {
     private lateinit var viewModel: TeamViewModel
     private lateinit var gameRepository: ControllableGameRepository
     private lateinit var teamRepository: ControllableTeamRepository
+    private lateinit var youRepository: ControllableYouRepository
 
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
         teamRepository = ControllableTeamRepository()
+        youRepository = ControllableYouRepository()
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
+            AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -83,7 +90,7 @@ class TeamViewModelTest {
     @Test
     fun `view model adds new team mate to game`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
-        val expectedGame = Game("1", "A Game", "A Description")
+        val expectedGame = Game("1", "A Game", "A Description", "1")
         gameRepository.emitGames(listOf(expectedGame))
 
         val users = mutableListOf<User>()
@@ -206,7 +213,7 @@ class TeamViewModelTest {
     @Test
     fun `view model does not add users to non-existent game with message`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
-        val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.")
+        val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.", "1")
 
         var message = ""
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -214,7 +221,7 @@ class TeamViewModelTest {
         }
 
         viewModel.addTeamMember(expectedTeamMember, nonExistentGame)
-        gameRepository.emitGames(listOf(Game("1", "A Game", "A Description")))
+        gameRepository.emitGames(listOf(Game("1", "A Game", "A Description", "1")))
 
         assertEquals(UserAddedToNonExistentGameException(nonExistentGame.name).message, message)
 
@@ -257,7 +264,7 @@ class TeamViewModelTest {
     fun `view model sends message if attempt to add user to game user with id that already exists`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
         val teamMemberWithIdenticalId = User(1, "Zudin")
-        val expectedGame = Game("1", "A Game", "A Description")
+        val expectedGame = Game("1", "A Game", "A Description", "1")
         teamRepository.addTeamMember(expectedTeamMember, expectedGame.id.toLong())
         gameRepository.emitGames(listOf(expectedGame))
 
@@ -275,6 +282,105 @@ class TeamViewModelTest {
         collection.cancel()
     }
 
-    private fun CurrentGame.toGame() = Game(this.id, this.name, this.description)
+    @Test
+    fun `view model adds current user to game as a team member with character on initialisation if game is empty and they are the creator`() = runTest {
+        val gameId = 1L
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame(gameId.toString(), "A Title", "A Description", currentUser.userId.toString())
+
+        gameRepository.emitCurrentGame(currentGame)
+        teamRepository.emitUsers(listOf())
+
+        viewModel = TeamViewModel(
+            GameStateUseCase(gameRepository),
+            AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            CheckGameExistsUseCase(gameRepository),
+            teamRepository
+        )
+
+        val users = mutableListOf<User>()
+
+        val collection1 = launch(UnconfinedTestDispatcher()) {
+            teamRepository.getTeamMembers(gameId).collect { users.add(it.last()) }
+        }
+
+        assertTrue(users.contains(currentUser.toDomain()))
+
+        collection1.cancel()
+
+        val characters = mutableListOf<GameCharacter>()
+        val collection2 = launch(UnconfinedTestDispatcher()) {
+            youRepository.getCharacterForUser(currentUser.toDomain(), gameId).collect {
+                characters.add(it)
+            }
+        }
+
+        assertTrue(characters.map { it.id }.contains(currentUser.userId.toString()))
+
+        collection2.cancel()
+    }
+
+    @Test
+    fun `view model does not adds current user to game as a team member on initialisation if not the creator`() = runTest {
+        val gameId = 1L
+        val currentGame = CurrentGame(gameId.toString(), "A Title", "A Description", "12345")
+
+        gameRepository.emitCurrentGame(currentGame)
+        teamRepository.emitUsers(listOf())
+
+        viewModel = TeamViewModel(
+            GameStateUseCase(gameRepository),
+            AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            CheckGameExistsUseCase(gameRepository),
+            teamRepository
+        )
+
+        val users = mutableListOf<User>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            teamRepository.getTeamMembers(gameId).collect {
+                if (it.isNotEmpty()) {
+                    users.add(it.last())
+                }
+            }
+        }
+
+        assertTrue(users.isEmpty())
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model does not adds current user to game as a team member on initialisation if game is not empty`() = runTest {
+        val gameId = 1L
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame(gameId.toString(), "A Title", "A Description", currentUser.userId.toString())
+        val existingUser = User(gameId, "Zidun")
+
+        gameRepository.emitCurrentGame(currentGame)
+        teamRepository.addTeamMember(existingUser, 1)
+        teamRepository.emitUsers(listOf(User(1, "Zidun")))
+
+        viewModel = TeamViewModel(
+            GameStateUseCase(gameRepository),
+            AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            CheckGameExistsUseCase(gameRepository),
+            teamRepository
+        )
+
+        val users = mutableListOf<User>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            teamRepository.getTeamMembers(gameId).collect {
+                if (it.isNotEmpty()) {
+                    users.add(it.last())
+                }
+            }
+        }
+
+        assertFalse(users.contains(currentUser.toDomain()))
+
+        collection.cancel()
+    }
+
+    private fun CurrentGame.toGame() = Game(this.id, this.name, this.description, this.creatorId)
 
 }

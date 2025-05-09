@@ -8,4 +8,8 @@ interface AnankeDataStore {
     suspend fun setCurrentGameId(gameId: String)
 
     suspend fun removeCurrentGameId()
+
+    suspend fun currentUserId(): Flow<String?>
+
+    suspend fun setCurrentUserId(userId: String)
 }

@@ -29,6 +29,7 @@ import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameRoute
@@ -36,6 +37,7 @@ import com.carkzis.ananke.ui.screens.game.GameScreen
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
+import com.carkzis.ananke.utils.OnboardUserUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -61,6 +63,7 @@ class GameScreenTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private var snackbarHostState: SnackbarHostState? = null
+    private val onboardUseCase = OnboardUserUseCase(ControllableYouRepository())
 
     @After
     fun tearDown() {
@@ -97,7 +100,8 @@ class GameScreenTest {
     fun `enter expected game via dialog`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -122,7 +126,7 @@ class GameScreenTest {
     fun `exit a game so that a list of games displays again`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame())
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
             var actualCurrentGame = dummyGames().first().toCurrentGame()
 
             initialiseGameScreen(
@@ -149,7 +153,7 @@ class GameScreenTest {
     fun `dismiss an enter game dialog to remove it`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -174,7 +178,7 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository(initialGames = dummyGames()).apply {
                 ENTRY_GENERIC_FAIL = true
             }
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
 
             initialiseGameScreenViaGameRoute(viewModel)
 
@@ -193,7 +197,7 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame()).apply {
                 FAIL_EXIT = true
             }
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), gameRepository)
+            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
 
             initialiseGameScreenViaGameRoute(viewModel)
 
@@ -335,9 +339,9 @@ class GameScreenTest {
     }
 
     private fun dummyGames() = listOf(
-        Game("abc", "My First Game", "It is the first one."),
-        Game("def", "My Second Game", "It is the second one."),
-        Game("ghi", "My Third Game", "It is the third one.")
+        Game("abc", "My First Game", "It is the first one.", "1"),
+        Game("def", "My Second Game", "It is the second one.", "2"),
+        Game("ghi", "My Third Game", "It is the third one.", "3")
     )
 
 }

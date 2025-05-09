@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
-import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.model.User
-import com.carkzis.ananke.data.network.toDomainUser
-import com.carkzis.ananke.data.network.userForTesting
+import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
@@ -18,11 +17,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TeamViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
+    addCurrentUserToTheirEmptyGameUseCase: AddCurrentUserToTheirEmptyGameUseCase,
     private val checkGameExistsUseCase: CheckGameExistsUseCase,
     private val teamRepository: TeamRepository
 ) : ViewModel() {
@@ -69,7 +66,11 @@ class TeamViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            teamRepository.addTeamMember(userForTesting.toDomainUser(), currentGame.first().id.toLong())
+            currentGame.collect {
+                if (it != CurrentGame.EMPTY) {
+                    addCurrentUserToTheirEmptyGameUseCase(it)
+                }
+            }
         }
     }
 

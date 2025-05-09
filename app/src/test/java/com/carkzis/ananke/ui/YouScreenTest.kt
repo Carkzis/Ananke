@@ -8,14 +8,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.assertTextContains
-import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -37,7 +36,6 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -55,7 +53,8 @@ class YouScreenTest {
     @Test
     fun `display current game name`() {
         val gameRepository = ControllableGameRepository()
-        val viewModel = YouViewModel(GameStateUseCase(gameRepository), mock())
+        val controllableYouRepository = ControllableYouRepository()
+        val viewModel = YouViewModel(GameStateUseCase(gameRepository), controllableYouRepository)
 
         val currentGame = CurrentGame("1", "A Game", "A Description")
         gameRepository.emitCurrentGame(currentGame)
@@ -225,9 +224,10 @@ class YouScreenTest {
             val attributeType = "name"
 
             onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
-                .performTextClearance()
+                .performTextInput("Something")
 
-            assertTextFieldEmpty(attributeType)
+            onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType", useUnmergedTree = true)
+                .assertTextEquals("")
         }
     }
 
@@ -271,20 +271,6 @@ class YouScreenTest {
         gameRepository.emitCurrentGame(currentGame)
 
         return viewModel
-    }
-
-    private fun AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>.assertTextFieldEmpty(
-        attributeType: String
-    ) {
-        val textFieldNode = onNodeWithTag(
-            "${AnankeDestination.YOU}-character-$attributeType",
-            useUnmergedTree = true
-        )
-            .fetchSemanticsNode()
-        for ((key, value) in textFieldNode.config) {
-            if (key.name == "EditableText")
-                assertTrue(value.toString().isNotEmpty())
-        }
     }
 
     private fun SnackbarHostState.assertSnackbarDisplays(expectedSnackbarText: String) {
