@@ -54,7 +54,6 @@ class DefaultAnankeDataStore @Inject constructor(
                 preferences[USER_ID] = userId
             }
         } catch (exception: IOException) {
-            // TODO: Throw a unique exception.
             throw exception
         }
     }

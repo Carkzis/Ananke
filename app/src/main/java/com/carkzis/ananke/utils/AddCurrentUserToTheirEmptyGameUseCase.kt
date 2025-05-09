@@ -21,7 +21,6 @@ class AddCurrentUserToTheirEmptyGameUseCase @Inject constructor(
                 userId = currentGame.creatorId.toLong(),
                 gameId = currentGame.id.toLong(),
             )
-            // TODO: Catch exception here.
             youRepository.addNewCharacter(newCharacter)
         }
     }

@@ -303,7 +303,7 @@ class YouViewModelTest {
     @Test
     fun `view model initially displays character bio when editing`() = runTest {
         val expectedCharacterBio = "A bio for the character."
-        
+
         youRepository.addNewCharacter(
             NewCharacter(
                 userId = userForTesting.id,

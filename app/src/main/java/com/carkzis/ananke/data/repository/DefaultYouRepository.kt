@@ -55,7 +55,6 @@ class DefaultYouRepository @Inject constructor(
         val currentUserId = anankeDataStore?.currentUserId()?.first()
 
         if (currentUserId == null) {
-            // TODO: This won't be unique enough, but it's just a placeholder for now.
             val userId = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
             val userName = "User-10000"
 
@@ -67,7 +66,6 @@ class DefaultYouRepository @Inject constructor(
 
             emit(newUser.toDomain())
         } else {
-            // TODO: This should throw an error if it fail.
             val user = youDao.getUserForUserId(currentUserId.toLong()).first()
             user?.let { emit(it.toDomain()) }
         }
