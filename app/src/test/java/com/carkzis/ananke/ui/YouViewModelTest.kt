@@ -83,7 +83,6 @@ class YouViewModelTest {
     fun `view model adds current user when initialised`() = runTest {
         val expectedUserId = userForTesting.id
         val currentGame = CurrentGame("1", "A Game", "A Description")
-        youRepository.currentUserId = expectedUserId
 
         gameRepository.emitCurrentGame(currentGame)
 
@@ -102,7 +101,6 @@ class YouViewModelTest {
     @Test
     fun `view model displays an initial character name`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
-        youRepository.currentUserId = userForTesting.id
 
         gameRepository.emitCurrentGame(currentGame)
 
@@ -121,7 +119,6 @@ class YouViewModelTest {
     @Test
     fun `view model displays an empty initial biography`() = runTest {
         val currentGame = CurrentGame("1", "A Game", "A Description")
-        youRepository.currentUserId = userForTesting.id
 
         gameRepository.emitCurrentGame(currentGame)
 
@@ -441,7 +438,6 @@ class YouViewModelTest {
     private fun TestScope.collectInitialCharacterInformation(expectedCharacterBio: String = "") {
         val currentGame = CurrentGame("1", "A Game", "A Description")
 
-        youRepository.currentUserId = userForTesting.id
         gameRepository.emitCurrentGame(currentGame)
 
         val collection = launch(UnconfinedTestDispatcher()) {

@@ -3,6 +3,7 @@ package com.carkzis.ananke.ui
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.GameCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
@@ -298,15 +299,25 @@ class TeamViewModelTest {
         )
 
         val users = mutableListOf<User>()
-        val collection = launch(UnconfinedTestDispatcher()) {
+
+        val collection1 = launch(UnconfinedTestDispatcher()) {
             teamRepository.getTeamMembers(gameId).collect { users.add(it.last()) }
         }
 
         assertTrue(users.contains(currentUser.toDomain()))
 
-        collection.cancel()
+        collection1.cancel()
 
-        // TODO: Implement adding character to game.
+        val characters = mutableListOf<GameCharacter>()
+        val collection2 = launch(UnconfinedTestDispatcher()) {
+            youRepository.getCharacterForUser(currentUser.toDomain(), gameId).collect {
+                characters.add(it)
+            }
+        }
+
+        assertTrue(characters.map { it.id }.contains(currentUser.userId.toString()))
+
+        collection2.cancel()
     }
 
     @Test

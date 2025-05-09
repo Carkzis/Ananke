@@ -1,6 +1,7 @@
 package com.carkzis.ananke.utils
 
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.repository.YouRepository
 import kotlinx.coroutines.flow.first
@@ -16,7 +17,11 @@ class AddCurrentUserToTheirEmptyGameUseCase @Inject constructor(
 
         if (teamMembers.isEmpty() && currentGame.creatorId.toLong() == currentUser.id) {
             teamRepository.addTeamMember(currentUser, currentGame.id.toLong())
-            // TODO: Need to also add a character.
+            val newCharacter = NewCharacter(
+                userId = currentGame.creatorId.toLong(),
+                gameId = currentGame.id.toLong(),
+            )
+            youRepository.addNewCharacter(newCharacter)
         }
     }
 }

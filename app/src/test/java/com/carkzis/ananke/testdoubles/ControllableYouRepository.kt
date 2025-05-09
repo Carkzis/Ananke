@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class ControllableYouRepository : YouRepository {
-    var currentUserId = 1L
     var currentUser: User? = null
 
     private val _characters = MutableSharedFlow<List<GameCharacter>>(replay = 1)
@@ -34,7 +33,7 @@ class ControllableYouRepository : YouRepository {
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
         characters.let {
             val newGameCharacter = GameCharacter(
-                id = currentUserId.toString(),
+                id = newCharacter.userId.toString(),
                 userName = "Dave",
                 character = RandomCharacterNameGenerator.generateCharacterName(),
                 bio = ""
