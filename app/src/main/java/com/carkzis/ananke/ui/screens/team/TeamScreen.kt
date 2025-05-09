@@ -1,8 +1,11 @@
 package com.carkzis.ananke.ui.screens.team
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -17,16 +20,21 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.theme.AnankeTheme
@@ -42,12 +50,22 @@ fun TeamScreen(
     event: TeamEvent = TeamEvent.TeamMemberDialogueHidden,
     onAddUser: (User) -> Unit = {},
     onViewTeamMember: (User) -> Unit = {},
+    onDismissDialogue: () -> Unit = {},
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {}
         is GamingState.InGame -> {
-            InGameTeamScreen(modifier, currentGame, teamMembers, users, onAddUser, onViewTeamMember, event)
+            InGameTeamScreen(
+                modifier,
+                currentGame,
+                teamMembers,
+                users,
+                onAddUser,
+                onViewTeamMember,
+                onDismissDialogue,
+                event
+            )
         }
     }
 }
@@ -60,17 +78,57 @@ private fun InGameTeamScreen(
     users: List<User>,
     onAddUser: (User) -> Unit,
     onViewTeamMember: (User) -> Unit,
+    onDismissDialogue: () -> Unit,
     event: TeamEvent = TeamEvent.TeamMemberDialogueHidden
 ) {
+    if (event is TeamEvent.TeamMemberDialogueShow) {
+        // TODO: Make this look good.
+        Timber.e("TeamMemberDialogueShow: ${event.teamMember.name} - ${event.character.character}")
+        Dialog(
+            onDismissRequest = onDismissDialogue,
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Card(
+                modifier = modifier
+                    .padding(16.dp)
+                    .fillMaxSize()
+                    .testTag("${AnankeDestination.TEAM}-team-member-dialogue"),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text("Name: ${event.teamMember.name}")
+                    Text("Character: ${event.character.character}")
+                    Text("Bio: ${event.character.bio}")
+                    AnankeButton(onClick = onDismissDialogue) {
+                        AnankeText(
+                            text = "Close",
+                            modifier = modifier
+                                .padding(8.dp)
+                                .testTag("${AnankeDestination.TEAM}-team-member-dialogue-close-button"),
+                            textStyle = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     val lazyListState = rememberLazyListState()
     LazyColumn(
         modifier = modifier.testTag("${AnankeDestination.TEAM}-team-column"),
         lazyListState
     ) {
-        if (event is TeamEvent.TeamMemberDialogueShow) {
-            Timber.e("TeamMemberDialogueShow: ${event.teamMember.name} - ${event.character.character}")
-        }
-
         teamScreenTitle(modifier)
         currentGameTitle(currentGame, modifier)
         teamMembers(modifier, teamMembers, onViewTeamMember)

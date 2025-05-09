@@ -37,6 +37,9 @@ fun TeamRoute(
         },
         onViewTeamMember = { teamMember ->
             viewModel.viewCharacterForTeamMember(teamMember)
-        }
+        },
+        onDismissDialogue = {
+            viewModel.closeTeamMemberDialogue()
+        },
     )
 }
