@@ -31,6 +31,7 @@ import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.team.TeamScreen
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
+import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -251,6 +252,7 @@ class TeamScreenTest {
         val viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )

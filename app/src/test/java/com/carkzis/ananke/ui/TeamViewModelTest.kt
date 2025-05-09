@@ -14,6 +14,7 @@ import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
+import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
@@ -47,6 +48,7 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -88,13 +90,13 @@ class TeamViewModelTest {
     }
 
     @Test
-    fun `view model adds new team mate to game`() = runTest {
-        val expectedTeamMember = User(1, "Zidun")
+    fun `view model adds new team mate to game along with their associated character`() = runTest {
+        val expectedTeamMember = User(42, "Zidun")
         val expectedGame = Game("1", "A Game", "A Description", "1")
         gameRepository.emitGames(listOf(expectedGame))
 
         val users = mutableListOf<User>()
-        val collection = launch(UnconfinedTestDispatcher()) {
+        val collection1 = launch(UnconfinedTestDispatcher()) {
             teamRepository.getUsers().collect { users.add(it.last()) }
         }
 
@@ -102,7 +104,18 @@ class TeamViewModelTest {
 
         assertTrue(users.contains(expectedTeamMember))
 
-        collection.cancel()
+        collection1.cancel()
+
+        val characters = mutableListOf<GameCharacter>()
+        val collection2 = launch(UnconfinedTestDispatcher()) {
+            youRepository.getCharacterForUser(expectedTeamMember, expectedGame.id.toLong()).collect {
+                characters.add(it)
+            }
+        }
+
+        assertTrue(characters.map { it.id }.contains(expectedTeamMember.id.toString()))
+
+        collection2.cancel()
     }
 
     @Test
@@ -294,6 +307,7 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -331,6 +345,7 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -363,6 +378,7 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )

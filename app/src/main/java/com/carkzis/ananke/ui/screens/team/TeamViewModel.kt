@@ -8,6 +8,7 @@ import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
+import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class TeamViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
     addCurrentUserToTheirEmptyGameUseCase: AddCurrentUserToTheirEmptyGameUseCase,
+    private val addTeamMemberUseCase: AddTeamMemberUseCase,
     private val checkGameExistsUseCase: CheckGameExistsUseCase,
     private val teamRepository: TeamRepository
 ) : ViewModel() {
@@ -79,7 +81,7 @@ class TeamViewModel @Inject constructor(
             try {
                 checkGameExistsUseCase.invoke(game).collect {
                     when (it) {
-                        is ValidatorResponse.Pass -> teamRepository.addTeamMember(teamMember, game.id.toLong())
+                        is ValidatorResponse.Pass -> addTeamMemberUseCase(teamMember, game.id.toLong())
                         is ValidatorResponse.Fail -> _message.emit(it.failureMessage)
                     }
                 }
