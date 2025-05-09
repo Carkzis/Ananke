@@ -1,5 +1,6 @@
 package com.carkzis.ananke.ui.screens.team
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import com.carkzis.ananke.navigation.AnankeDestination
 import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.theme.AnankeTheme
+import timber.log.Timber
 
 @Composable
 fun TeamScreen(
@@ -37,13 +39,15 @@ fun TeamScreen(
     modifier: Modifier = Modifier,
     users: List<User> = listOf(),
     teamMembers: List<User> = listOf(),
-    onAddUser: (User) -> Unit = {}
+    event: TeamEvent = TeamEvent.TeamMemberDialogueHidden,
+    onAddUser: (User) -> Unit = {},
+    onViewTeamMember: (User) -> Unit = {},
 ) {
     when (gamingState) {
         is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {}
         is GamingState.InGame -> {
-            InGameTeamScreen(modifier, currentGame, teamMembers, users, onAddUser)
+            InGameTeamScreen(modifier, currentGame, teamMembers, users, onAddUser, onViewTeamMember, event)
         }
     }
 }
@@ -54,16 +58,22 @@ private fun InGameTeamScreen(
     currentGame: CurrentGame,
     teamMembers: List<User>,
     users: List<User>,
-    onAddUser: (User) -> Unit
+    onAddUser: (User) -> Unit,
+    onViewTeamMember: (User) -> Unit,
+    event: TeamEvent = TeamEvent.TeamMemberDialogueHidden
 ) {
     val lazyListState = rememberLazyListState()
     LazyColumn(
         modifier = modifier.testTag("${AnankeDestination.TEAM}-team-column"),
         lazyListState
     ) {
+        if (event is TeamEvent.TeamMemberDialogueShow) {
+            Timber.e("TeamMemberDialogueShow: ${event.teamMember.name} - ${event.character.character}")
+        }
+
         teamScreenTitle(modifier)
         currentGameTitle(currentGame, modifier)
-        teamMembers(modifier, teamMembers)
+        teamMembers(modifier, teamMembers, onViewTeamMember)
         availableUsers(modifier, users, onAddUser)
     }
 }
@@ -97,7 +107,8 @@ private fun LazyListScope.currentGameTitle(
 
 private fun LazyListScope.teamMembers(
     modifier: Modifier,
-    teamMembers: List<User>
+    teamMembers: List<User>,
+    onViewTeamMember: (User) -> Unit
 ) {
     item {
         AnankeText(
@@ -126,7 +137,8 @@ private fun LazyListScope.teamMembers(
             item(key = "${teamMember.id}-tm") {
                 TeamMemberCard(
                     modifier = modifier,
-                    user = teamMember
+                    user = teamMember,
+                    onViewTeamMember = onViewTeamMember
                 )
             }
         }
@@ -163,7 +175,8 @@ private fun LazyListScope.availableUsers(
 @Composable
 private fun TeamMemberCard(
     modifier: Modifier,
-    user: User
+    user: User,
+    onViewTeamMember: (User) -> Unit
 ) {
     Card(
         modifier = modifier
@@ -176,7 +189,8 @@ private fun TeamMemberCard(
     ) {
         TeamMemberCardBox(
             modifier = modifier,
-            user = user
+            user = user,
+            onViewTeamMember = onViewTeamMember
         )
     }
 }
@@ -184,11 +198,15 @@ private fun TeamMemberCard(
 @Composable
 private fun TeamMemberCardBox(
     modifier: Modifier,
-    user: User
+    user: User,
+    onViewTeamMember: (User) -> Unit,
 ) {
     Box(
         modifier = modifier
             .padding(16.dp)
+            .clickable {
+                onViewTeamMember(user)
+            }
     ) {
         Row {
             Icon(

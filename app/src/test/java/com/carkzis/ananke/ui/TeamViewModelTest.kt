@@ -4,7 +4,6 @@ import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.GameCharacter
-import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
@@ -22,7 +21,6 @@ import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.UserCharacterUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest

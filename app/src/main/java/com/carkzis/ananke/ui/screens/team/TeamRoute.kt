@@ -19,6 +19,7 @@ fun TeamRoute(
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
     val availableUsers by viewModel.potentialTeamMemberList.collectAsStateWithLifecycle()
     val teamMembers by viewModel.currentTeamMembers.collectAsStateWithLifecycle()
+    val events by viewModel.event.collectAsStateWithLifecycle()
 
     if (gameState == GamingState.OutOfGame) {
         onOutOfGame()
@@ -30,8 +31,12 @@ fun TeamRoute(
         gamingState = gameState,
         users = availableUsers,
         teamMembers = teamMembers,
+        event = events,
         onAddUser = { user ->
             viewModel.addTeamMember(user, currentGame.toGame())
+        },
+        onViewTeamMember = { teamMember ->
+            viewModel.viewCharacterForTeamMember(teamMember)
         }
     )
 }
