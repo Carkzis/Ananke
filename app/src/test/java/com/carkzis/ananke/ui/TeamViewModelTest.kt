@@ -406,6 +406,20 @@ class TeamViewModelTest {
     }
 
     @Test
+    fun `view models initial dialogue state is hidden`() = runTest {
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        assertTrue(events.first() is TeamEvent.TeamMemberDialogueHidden)
+
+        collection.cancel()
+    }
+
+    @Test
     fun `view model sends event for current users character when viewing requested`() = runTest {
         val currentUser = dummyUserEntities.first()
         val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
@@ -421,7 +435,7 @@ class TeamViewModelTest {
 
         val events = mutableListOf<TeamEvent>()
         val collection = launch(UnconfinedTestDispatcher()) {
-            viewModel.event.take(2).collect {
+            viewModel.event.collect {
                 events.add(it)
             }
         }
@@ -430,6 +444,38 @@ class TeamViewModelTest {
 
         val lastEvent = events.last() as TeamEvent.TeamMemberDialogueShow
         assertTrue(lastEvent.teamMember == currentUser.toDomain())
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends event for closing dialogue`() = runTest {
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
+        val character = GameCharacter(
+            id = currentUser.userId.toString(),
+            userName = currentUser.username,
+            character = "Zidun",
+            bio = "A character bio"
+        )
+
+        gameRepository.emitCurrentGame(currentGame)
+        youRepository.emitCharacters(listOf(character))
+
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        viewModel.viewCharacterForTeamMember(currentUser.toDomain())
+        viewModel.closeTeamMemberDialogue()
+
+        assertEquals(3, events.size)
+        assertTrue(events.first() is TeamEvent.TeamMemberDialogueHidden)
+        assertTrue(events[1] is TeamEvent.TeamMemberDialogueShow)
+        assertTrue(events.last() is TeamEvent.TeamMemberDialogueHidden)
 
         collection.cancel()
     }
