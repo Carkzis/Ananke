@@ -4,11 +4,13 @@ import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.GameCharacter
+import com.carkzis.ananke.data.model.NewCharacter
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.testdoubles.dummyUserEntities
+import com.carkzis.ananke.ui.screens.team.TeamEvent
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
@@ -18,7 +20,9 @@ import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.UserCharacterUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -49,6 +53,7 @@ class TeamViewModelTest {
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
             AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -308,6 +313,7 @@ class TeamViewModelTest {
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
             AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -346,6 +352,7 @@ class TeamViewModelTest {
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
             AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -379,6 +386,7 @@ class TeamViewModelTest {
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
             AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -393,6 +401,35 @@ class TeamViewModelTest {
         }
 
         assertFalse(users.contains(currentUser.toDomain()))
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends event for current users character when viewing requested`() = runTest {
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
+        val character = GameCharacter(
+            id = currentUser.userId.toString(),
+            userName = currentUser.username,
+            character = "Zidun",
+            bio = "A character bio"
+        )
+
+        gameRepository.emitCurrentGame(currentGame)
+        youRepository.emitCharacters(listOf(character))
+
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.take(2).collect {
+                events.add(it)
+            }
+        }
+
+        viewModel.viewCharacterForTeamMember(currentUser.toDomain())
+
+        val lastEvent = events.last() as TeamEvent.TeamMemberDialogueShow
+        assertTrue(lastEvent.teamMember == currentUser.toDomain())
 
         collection.cancel()
     }
