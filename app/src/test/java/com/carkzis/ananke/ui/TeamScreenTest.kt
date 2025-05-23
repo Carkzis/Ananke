@@ -11,6 +11,7 @@ import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasAnyChild
@@ -103,7 +104,7 @@ class TeamScreenTest {
             var redirected = false
             val viewModel = teamViewModel()
 
-            initialiseGameScreenViaTeamRoute(
+            initialiseTeamScreenViaTeamRoute(
                 viewModel,
                 onOutOfGame = { redirected = true }
             )
@@ -119,7 +120,7 @@ class TeamScreenTest {
             val viewModel = teamViewModel()
 
             var redirected = false
-            initialiseGameScreenViaTeamRoute(
+            initialiseTeamScreenViaTeamRoute(
                 viewModel,
                 onOutOfGame = { redirected = true }
             )
@@ -180,7 +181,7 @@ class TeamScreenTest {
             gameRepository.emitCurrentGame(game)
             teamRepository.emitUsers(dummyUsers())
 
-            initialiseGameScreenViaTeamRoute(viewModel)
+            initialiseTeamScreenViaTeamRoute(viewModel)
 
             onNodeWithTag("${AnankeDestination.TEAM}-team-column")
                 .assertExists()
@@ -248,6 +249,33 @@ class TeamScreenTest {
         }
     }
 
+    @Test
+    fun `view and dismiss dialogue of a user`() = runTest {
+        composeTestRule.apply {
+            val viewModel = teamViewModel()
+
+            val game = CurrentGame("123")
+            gameRepository.emitCurrentGame(game)
+            teamRepository.emitUsers(dummyUsers())
+
+            initialiseTeamScreenViaTeamRoute(viewModel)
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-user-name")
+                .onFirst()
+                .assertHasClickAction()
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-user-dialogue")
+                .assertIsDisplayed()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-user-dialogue-close-button", useUnmergedTree = true)
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-user-dialogue")
+                .assertIsNotDisplayed()
+        }
+    }
+
     private fun SemanticsNodeInteractionCollection.assertUsersInListHaveExpectedData(expectedUsers: List<User>) {
         fetchSemanticsNodes().forEachIndexed { index, _ ->
             val currentCard = get(index)
@@ -295,7 +323,7 @@ class TeamScreenTest {
         }
     }
 
-    private fun initialiseGameScreenViaTeamRoute(
+    private fun initialiseTeamScreenViaTeamRoute(
         viewModel: TeamViewModel,
         onOutOfGame: () -> Unit = {},
         onShowSnackbar: suspend (String) -> Boolean = { false }
