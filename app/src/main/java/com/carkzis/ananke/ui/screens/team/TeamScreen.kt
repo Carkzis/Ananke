@@ -442,9 +442,6 @@ private fun UserCardBox(
     Box(
         modifier = modifier
             .padding(16.dp)
-            .clickable {
-                onViewUser(user)
-            }
     ) {
         Row {
             Icon(
@@ -458,7 +455,10 @@ private fun UserCardBox(
                 modifier = modifier
                     .align(CenterVertically)
                     .weight(1f)
-                    .testTag("${AnankeDestination.TEAM}-user-name"),
+                    .testTag("${AnankeDestination.TEAM}-user-name")
+                    .clickable {
+                        onViewUser(user)
+                    },
                 textStyle = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
