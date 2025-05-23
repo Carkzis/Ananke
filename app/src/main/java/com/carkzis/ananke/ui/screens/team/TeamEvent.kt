@@ -5,5 +5,6 @@ import com.carkzis.ananke.data.model.User
 
 sealed class TeamEvent {
     data class TeamMemberDialogueShow(val teamMember: User, val character: GameCharacter) : TeamEvent()
-    data object TeamMemberDialogueHidden : TeamEvent()
+    data object CloseDialogue : TeamEvent()
+    data class UserDialogueShow(val user: User) : TeamEvent()
 }

@@ -45,9 +45,10 @@ fun TeamScreen(
     modifier: Modifier = Modifier,
     users: List<User> = listOf(),
     teamMembers: List<User> = listOf(),
-    event: TeamEvent = TeamEvent.TeamMemberDialogueHidden,
+    event: TeamEvent = TeamEvent.CloseDialogue,
     onAddUser: (User) -> Unit = {},
     onViewTeamMember: (User) -> Unit = {},
+    onViewUser: (User) -> Unit = {},
     onDismissDialogue: () -> Unit = {},
 ) {
     when (gamingState) {
@@ -61,6 +62,7 @@ fun TeamScreen(
                 users,
                 onAddUser,
                 onViewTeamMember,
+                onViewUser,
                 onDismissDialogue,
                 event
             )
@@ -76,11 +78,16 @@ private fun InGameTeamScreen(
     users: List<User>,
     onAddUser: (User) -> Unit,
     onViewTeamMember: (User) -> Unit,
+    onViewUser: (User) -> Unit,
     onDismissDialogue: () -> Unit,
-    event: TeamEvent = TeamEvent.TeamMemberDialogueHidden
+    event: TeamEvent = TeamEvent.CloseDialogue
 ) {
     if (event is TeamEvent.TeamMemberDialogueShow) {
         TeamMemberDialogue(onDismissDialogue, modifier, event)
+    }
+
+    if (event is TeamEvent.UserDialogueShow) {
+        UserDialogue(onDismissDialogue, modifier, event)
     }
 
     val lazyListState = rememberLazyListState()
@@ -91,7 +98,7 @@ private fun InGameTeamScreen(
         teamScreenTitle(modifier)
         currentGameTitle(currentGame, modifier)
         teamMembers(modifier, teamMembers, onViewTeamMember)
-        availableUsers(modifier, users, onAddUser)
+        availableUsers(modifier, users, onAddUser, onViewUser)
     }
 }
 
@@ -181,6 +188,67 @@ private fun TeamMemberDialogue(
     }
 }
 
+@Composable
+private fun UserDialogue(
+    onDismissDialogue: () -> Unit,
+    modifier: Modifier,
+    event: TeamEvent.UserDialogueShow
+) {
+    Dialog(
+        onDismissRequest = onDismissDialogue,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Card(
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize()
+                .testTag("${AnankeDestination.TEAM}-user-dialogue"),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+        ) {
+            AnankeText(
+                text = "User",
+                modifier = modifier
+                    .padding(top = 32.dp)
+                    .testTag("${AnankeDestination.TEAM}-user-dialogue-title"),
+                textStyle = MaterialTheme.typography.headlineLarge
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AnankeText(
+                    text = "Name",
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.titleLarge
+                )
+                AnankeText(
+                    text = event.user.name,
+                    modifier = modifier
+                        .padding(8.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge
+                )
+                AnankeButton(onClick = onDismissDialogue) {
+                    AnankeText(
+                        text = "Close",
+                        modifier = modifier
+                            .padding(8.dp)
+                            .testTag("${AnankeDestination.TEAM}-user-dialogue-close-button"),
+                        textStyle = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
+    }
+}
+
 private fun LazyListScope.teamScreenTitle(modifier: Modifier) {
     item {
         AnankeText(
@@ -251,7 +319,8 @@ private fun LazyListScope.teamMembers(
 private fun LazyListScope.availableUsers(
     modifier: Modifier,
     users: List<User>,
-    onAddUser: (User) -> Unit
+    onAddUser: (User) -> Unit,
+    onViewUser: (User) -> Unit,
 ) {
     item {
         AnankeText(
@@ -269,6 +338,7 @@ private fun LazyListScope.availableUsers(
             UserCard(
                 modifier = modifier,
                 onAddUser = onAddUser,
+                onViewUser = onViewUser,
                 user = user
             )
         }
@@ -335,7 +405,8 @@ private fun TeamMemberCardBox(
 private fun UserCard(
     modifier: Modifier,
     onAddUser: (User) -> Unit,
-    user: User
+    onViewUser: (User) -> Unit,
+    user: User,
 ) {
     Card(
         modifier = modifier
@@ -349,6 +420,7 @@ private fun UserCard(
         UserCardBox(
             modifier = modifier,
             onAddUser = onAddUser,
+            onViewUser = onViewUser,
             user = user
         )
     }
@@ -358,11 +430,15 @@ private fun UserCard(
 private fun UserCardBox(
     modifier: Modifier,
     onAddUser: (User) -> Unit,
+    onViewUser: (User) -> Unit,
     user: User
 ) {
     Box(
         modifier = modifier
             .padding(16.dp)
+            .clickable {
+                onViewUser(user)
+            }
     ) {
         Row {
             Icon(
@@ -456,6 +532,20 @@ private fun TeamMemberDialoguePreview() {
                     character = "Zidun",
                     bio = "This is a test character.",
                 )
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun UserDialoguePreview() {
+    AnankeTheme {
+        UserDialogue(
+            onDismissDialogue = {},
+            modifier = Modifier,
+            event = TeamEvent.UserDialogueShow(
+                user = User(id = 1, name = "Zidun"),
             )
         )
     }

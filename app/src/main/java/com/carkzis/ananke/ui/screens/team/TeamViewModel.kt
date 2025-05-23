@@ -71,7 +71,7 @@ class TeamViewModel @Inject constructor(
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
 
-    private val _event = MutableStateFlow<TeamEvent>(TeamEvent.TeamMemberDialogueHidden)
+    private val _event = MutableStateFlow<TeamEvent>(TeamEvent.CloseDialogue)
     val event = _event.asStateFlow()
 
     init {
@@ -109,9 +109,15 @@ class TeamViewModel @Inject constructor(
         }
     }
 
-    fun closeTeamMemberDialogue() {
+    fun closeDialogue() {
         viewModelScope.launch {
-            _event.emit(TeamEvent.TeamMemberDialogueHidden)
+            _event.emit(TeamEvent.CloseDialogue)
+        }
+    }
+
+    fun viewUser(user: User) {
+        viewModelScope.launch {
+            _event.emit(TeamEvent.UserDialogueShow(user))
         }
     }
 

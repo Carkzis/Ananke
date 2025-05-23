@@ -412,7 +412,7 @@ class TeamViewModelTest {
             }
         }
 
-        assertTrue(events.first() is TeamEvent.TeamMemberDialogueHidden)
+        assertTrue(events.first() is TeamEvent.CloseDialogue)
 
         collection.cancel()
     }
@@ -468,12 +468,34 @@ class TeamViewModelTest {
         }
 
         viewModel.viewCharacterForTeamMember(currentUser.toDomain())
-        viewModel.closeTeamMemberDialogue()
+        viewModel.closeDialogue()
 
         assertEquals(3, events.size)
-        assertTrue(events.first() is TeamEvent.TeamMemberDialogueHidden)
+        assertTrue(events.first() is TeamEvent.CloseDialogue)
         assertTrue(events[1] is TeamEvent.TeamMemberDialogueShow)
-        assertTrue(events.last() is TeamEvent.TeamMemberDialogueHidden)
+        assertTrue(events.last() is TeamEvent.CloseDialogue)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends event for current user when viewing requested`() = runTest {
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
+
+        gameRepository.emitCurrentGame(currentGame)
+
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        viewModel.viewUser(currentUser.toDomain())
+
+        val lastEvent = events.last() as TeamEvent.UserDialogueShow
+        assertTrue(lastEvent.user == currentUser.toDomain())
 
         collection.cancel()
     }
