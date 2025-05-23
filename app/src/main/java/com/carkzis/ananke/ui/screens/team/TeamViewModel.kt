@@ -8,15 +8,20 @@ import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
+import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
+import com.carkzis.ananke.utils.UserCharacterUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -27,6 +32,8 @@ import javax.inject.Inject
 class TeamViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
     addCurrentUserToTheirEmptyGameUseCase: AddCurrentUserToTheirEmptyGameUseCase,
+    private val addTeamMemberUseCase: AddTeamMemberUseCase,
+    private val userCharacterUseCase: UserCharacterUseCase,
     private val checkGameExistsUseCase: CheckGameExistsUseCase,
     private val teamRepository: TeamRepository
 ) : ViewModel() {
@@ -64,6 +71,9 @@ class TeamViewModel @Inject constructor(
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
 
+    private val _event = MutableStateFlow<TeamEvent>(TeamEvent.CloseDialogue)
+    val event = _event.asStateFlow()
+
     init {
         viewModelScope.launch {
             currentGame.collect {
@@ -79,7 +89,7 @@ class TeamViewModel @Inject constructor(
             try {
                 checkGameExistsUseCase.invoke(game).collect {
                     when (it) {
-                        is ValidatorResponse.Pass -> teamRepository.addTeamMember(teamMember, game.id.toLong())
+                        is ValidatorResponse.Pass -> addTeamMemberUseCase(teamMember, game.id.toLong())
                         is ValidatorResponse.Fail -> _message.emit(it.failureMessage)
                     }
                 }
@@ -88,6 +98,26 @@ class TeamViewModel @Inject constructor(
                     _message.emit(it)
                 }
             }
+        }
+    }
+
+    fun viewCharacterForTeamMember(teamMember: User) {
+        viewModelScope.launch {
+            val currentGameId = currentGame.first().id
+            val gameCharacter = userCharacterUseCase(teamMember, currentGameId.toLong())
+            _event.emit(TeamEvent.TeamMemberDialogueShow(teamMember, gameCharacter))
+        }
+    }
+
+    fun viewUser(user: User) {
+        viewModelScope.launch {
+            _event.emit(TeamEvent.UserDialogueShow(user))
+        }
+    }
+
+    fun closeDialogue() {
+        viewModelScope.launch {
+            _event.emit(TeamEvent.CloseDialogue)
         }
     }
 

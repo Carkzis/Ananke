@@ -14,11 +14,13 @@ fun TeamRoute(
     modifier: Modifier = Modifier,
     viewModel: TeamViewModel = hiltViewModel(),
     onOutOfGame: () -> Unit,
+    onShowSnackbar: suspend (String) -> Boolean,
 ) {
     val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
     val availableUsers by viewModel.potentialTeamMemberList.collectAsStateWithLifecycle()
     val teamMembers by viewModel.currentTeamMembers.collectAsStateWithLifecycle()
+    val events by viewModel.event.collectAsStateWithLifecycle()
 
     if (gameState == GamingState.OutOfGame) {
         onOutOfGame()
@@ -30,8 +32,23 @@ fun TeamRoute(
         gamingState = gameState,
         users = availableUsers,
         teamMembers = teamMembers,
+        event = events,
         onAddUser = { user ->
             viewModel.addTeamMember(user, currentGame.toGame())
+        },
+        onViewTeamMember = { teamMember ->
+            viewModel.viewCharacterForTeamMember(teamMember)
+        },
+        onViewUser = { user ->
+            viewModel.viewUser(user)
+        },
+        onDismissDialogue = {
+            viewModel.closeDialogue()
+        },
+        onShowSnackbar = {
+            viewModel.message.collect {
+                onShowSnackbar(it)
+            }
         }
     )
 }

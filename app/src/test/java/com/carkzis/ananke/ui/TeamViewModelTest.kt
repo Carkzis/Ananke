@@ -9,14 +9,17 @@ import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.testdoubles.dummyUserEntities
+import com.carkzis.ananke.ui.screens.team.TeamEvent
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAddedToNonExistentGameException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
+import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.UserCharacterUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -47,6 +50,8 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -88,13 +93,13 @@ class TeamViewModelTest {
     }
 
     @Test
-    fun `view model adds new team mate to game`() = runTest {
-        val expectedTeamMember = User(1, "Zidun")
+    fun `view model adds new team mate to game along with their associated character`() = runTest {
+        val expectedTeamMember = User(42, "Zidun")
         val expectedGame = Game("1", "A Game", "A Description", "1")
         gameRepository.emitGames(listOf(expectedGame))
 
         val users = mutableListOf<User>()
-        val collection = launch(UnconfinedTestDispatcher()) {
+        val collection1 = launch(UnconfinedTestDispatcher()) {
             teamRepository.getUsers().collect { users.add(it.last()) }
         }
 
@@ -102,7 +107,18 @@ class TeamViewModelTest {
 
         assertTrue(users.contains(expectedTeamMember))
 
-        collection.cancel()
+        collection1.cancel()
+
+        val characters = mutableListOf<GameCharacter>()
+        val collection2 = launch(UnconfinedTestDispatcher()) {
+            youRepository.getCharacterForUser(expectedTeamMember, expectedGame.id.toLong()).collect {
+                characters.add(it)
+            }
+        }
+
+        assertTrue(characters.map { it.id }.contains(expectedTeamMember.id.toString()))
+
+        collection2.cancel()
     }
 
     @Test
@@ -294,6 +310,8 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -331,6 +349,8 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -363,6 +383,8 @@ class TeamViewModelTest {
         viewModel = TeamViewModel(
             GameStateUseCase(gameRepository),
             AddCurrentUserToTheirEmptyGameUseCase(teamRepository, youRepository),
+            AddTeamMemberUseCase(teamRepository, youRepository),
+            UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
             teamRepository
         )
@@ -377,6 +399,103 @@ class TeamViewModelTest {
         }
 
         assertFalse(users.contains(currentUser.toDomain()))
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view models initial dialogue state is hidden`() = runTest {
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        assertTrue(events.first() is TeamEvent.CloseDialogue)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends event for current users character when viewing requested`() = runTest {
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
+        val character = GameCharacter(
+            id = currentUser.userId.toString(),
+            userName = currentUser.username,
+            character = "Zidun",
+            bio = "A character bio"
+        )
+
+        gameRepository.emitCurrentGame(currentGame)
+        youRepository.emitCharacters(listOf(character))
+
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        viewModel.viewCharacterForTeamMember(currentUser.toDomain())
+
+        val lastEvent = events.last() as TeamEvent.TeamMemberDialogueShow
+        assertTrue(lastEvent.teamMember == currentUser.toDomain())
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends event for closing dialogue`() = runTest {
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
+        val character = GameCharacter(
+            id = currentUser.userId.toString(),
+            userName = currentUser.username,
+            character = "Zidun",
+            bio = "A character bio"
+        )
+
+        gameRepository.emitCurrentGame(currentGame)
+        youRepository.emitCharacters(listOf(character))
+
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        viewModel.viewCharacterForTeamMember(currentUser.toDomain())
+        viewModel.closeDialogue()
+
+        assertEquals(3, events.size)
+        assertTrue(events.first() is TeamEvent.CloseDialogue)
+        assertTrue(events[1] is TeamEvent.TeamMemberDialogueShow)
+        assertTrue(events.last() is TeamEvent.CloseDialogue)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model sends event for current user when viewing requested`() = runTest {
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
+
+        gameRepository.emitCurrentGame(currentGame)
+
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        viewModel.viewUser(currentUser.toDomain())
+
+        val lastEvent = events.last() as TeamEvent.UserDialogueShow
+        assertTrue(lastEvent.user == currentUser.toDomain())
 
         collection.cancel()
     }

@@ -10,7 +10,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.model.NewGame
 import java.util.UUID
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NewGameRoute(
     modifier: Modifier = Modifier,
