@@ -53,7 +53,8 @@ fun AnankeNavHost(
             TeamRoute(
                 onOutOfGame = {
                     navController.navigateUp()
-                }
+                },
+                onShowSnackbar = onShowSnackbar
             )
         }
         composable(route = AnankeDestination.YOU.toString()) {

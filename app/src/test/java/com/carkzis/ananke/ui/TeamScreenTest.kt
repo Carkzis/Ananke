@@ -244,6 +244,7 @@ class TeamScreenTest {
             TeamRoute(
                 viewModel = viewModel,
                 onOutOfGame = onOutOfGame,
+                onShowSnackbar = { false }
             )
         }
     }

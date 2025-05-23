@@ -14,6 +14,7 @@ fun TeamRoute(
     modifier: Modifier = Modifier,
     viewModel: TeamViewModel = hiltViewModel(),
     onOutOfGame: () -> Unit,
+    onShowSnackbar: suspend (String) -> Boolean,
 ) {
     val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
@@ -44,5 +45,10 @@ fun TeamRoute(
         onDismissDialogue = {
             viewModel.closeDialogue()
         },
+        onShowSnackbar = {
+            viewModel.message.collect {
+                onShowSnackbar(it)
+            }
+        }
     )
 }
