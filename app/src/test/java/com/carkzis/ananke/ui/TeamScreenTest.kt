@@ -1,7 +1,12 @@
 package com.carkzis.ananke.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
@@ -30,6 +35,7 @@ import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.team.TeamScreen
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
+import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
@@ -40,7 +46,10 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -94,7 +103,10 @@ class TeamScreenTest {
             var redirected = false
             val viewModel = teamViewModel()
 
-            initialiseGameScreenViaGameRoute(viewModel) { redirected = true }
+            initialiseGameScreenViaTeamRoute(
+                viewModel,
+                onOutOfGame = { redirected = true }
+            )
 
             assertTrue(redirected)
         }
@@ -107,7 +119,10 @@ class TeamScreenTest {
             val viewModel = teamViewModel()
 
             var redirected = false
-            initialiseGameScreenViaGameRoute(viewModel) { redirected = true }
+            initialiseGameScreenViaTeamRoute(
+                viewModel,
+                onOutOfGame = { redirected = true }
+            )
 
             assertFalse(redirected)
 
@@ -165,7 +180,7 @@ class TeamScreenTest {
             gameRepository.emitCurrentGame(game)
             teamRepository.emitUsers(dummyUsers())
 
-            initialiseGameScreenViaGameRoute(viewModel)
+            initialiseGameScreenViaTeamRoute(viewModel)
 
             onNodeWithTag("${AnankeDestination.TEAM}-team-column")
                 .assertExists()
@@ -188,6 +203,47 @@ class TeamScreenTest {
 
             onAllNodesWithTag("${AnankeDestination.TEAM}-user-card").apply {
                 assertUsersInListHaveExpectedData(expectedUsers = dummyUsers().drop(1))
+            }
+        }
+    }
+
+    @Test
+    fun `when unable to add more team members a snackbar appears`() = runTest {
+        var snackbarHostState: SnackbarHostState? = null
+        val viewModel = teamViewModel()
+        val game = CurrentGame("123")
+        val teamLimit = 0
+
+        composeTestRule.setContent {
+            snackbarHostState = remember { SnackbarHostState() }
+
+            gameRepository.emitCurrentGame(game)
+            teamRepository.emitUsers(dummyUsers())
+            teamRepository.limit = teamLimit
+
+            TeamRoute(
+                viewModel = viewModel,
+                onOutOfGame = {},
+                onShowSnackbar = { message ->
+                    snackbarHostState?.showSnackbar(
+                        message = message, duration = SnackbarDuration.Short
+                    ) == SnackbarResult.Dismissed
+                }
+            )
+        }
+
+        composeTestRule.apply {
+            addHighestUserInListToTeam(
+                onCompletion = {
+                    gameRepository.emitGames(listOf(game.toGame()))
+                }
+            )
+
+            runBlocking {
+                val actualSnackbarText = snapshotFlow { snackbarHostState?.currentSnackbarData }
+                    .first()?.visuals?.message
+                val expectedSnackbarText = TooManyUsersInTeamException(teamLimit).message
+                assertEquals(expectedSnackbarText, actualSnackbarText)
             }
         }
     }
@@ -239,12 +295,16 @@ class TeamScreenTest {
         }
     }
 
-    private fun initialiseGameScreenViaGameRoute(viewModel: TeamViewModel, onOutOfGame: () -> Unit = {}) {
+    private fun initialiseGameScreenViaTeamRoute(
+        viewModel: TeamViewModel,
+        onOutOfGame: () -> Unit = {},
+        onShowSnackbar: suspend (String) -> Boolean = { false }
+    ) {
         composeTestRule.setContent {
             TeamRoute(
                 viewModel = viewModel,
                 onOutOfGame = onOutOfGame,
-                onShowSnackbar = { false }
+                onShowSnackbar = onShowSnackbar
             )
         }
     }

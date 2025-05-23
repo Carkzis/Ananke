@@ -109,15 +109,15 @@ class TeamViewModel @Inject constructor(
         }
     }
 
-    fun closeDialogue() {
-        viewModelScope.launch {
-            _event.emit(TeamEvent.CloseDialogue)
-        }
-    }
-
     fun viewUser(user: User) {
         viewModelScope.launch {
             _event.emit(TeamEvent.UserDialogueShow(user))
+        }
+    }
+
+    fun closeDialogue() {
+        viewModelScope.launch {
+            _event.emit(TeamEvent.CloseDialogue)
         }
     }
 
