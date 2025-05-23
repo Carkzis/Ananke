@@ -276,6 +276,39 @@ class TeamScreenTest {
         }
     }
 
+    @Test
+    fun `view and dismiss dialogue of a team member`() = runTest {
+        composeTestRule.apply {
+            val viewModel = teamViewModel()
+
+            val game = CurrentGame("123")
+            gameRepository.emitCurrentGame(game)
+            teamRepository.emitUsers(dummyUsers())
+
+            initialiseTeamScreenViaTeamRoute(viewModel)
+
+            addHighestUserInListToTeam(
+                onCompletion = {
+                    gameRepository.emitGames(listOf(game.toGame()))
+                }
+            )
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-tm-card-box")
+                .onFirst()
+                .assertHasClickAction()
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-team-member-dialogue")
+                .assertIsDisplayed()
+
+            // Closing the dialogue manually as Roboletric is not seeing the close button.
+            viewModel.closeDialogue()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-team-member-dialogue")
+                .assertIsNotDisplayed()
+        }
+    }
+
     private fun SemanticsNodeInteractionCollection.assertUsersInListHaveExpectedData(expectedUsers: List<User>) {
         fetchSemanticsNodes().forEachIndexed { index, _ ->
             val currentCard = get(index)

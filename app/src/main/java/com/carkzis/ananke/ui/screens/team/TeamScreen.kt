@@ -383,6 +383,7 @@ private fun TeamMemberCardBox(
     Box(
         modifier = modifier
             .padding(16.dp)
+            .testTag("${AnankeDestination.TEAM}-tm-card-box")
             .clickable {
                 onViewTeamMember(user)
             }
