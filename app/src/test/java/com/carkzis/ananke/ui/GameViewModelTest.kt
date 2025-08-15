@@ -3,10 +3,10 @@ package com.carkzis.ananke.ui
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.toCurrentGame
-import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.testdoubles.dummyUserEntities
+import com.carkzis.ananke.ui.screens.game.CreatorIdDoesNotMatchException
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
@@ -18,7 +18,6 @@ import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.OnboardUserUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -117,6 +116,25 @@ class GameViewModelTest {
     }
 
     @Test
+    fun `view model deletes game successfully`() = runTest {
+        val gameToDelete = dummyGames().first()
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        val actualGameList = viewModel.gameList.value
+        assertEquals(dummyGames().size - 1, actualGameList.size)
+        assertEquals(false, actualGameList.contains(gameToDelete))
+
+        collection.cancel()
+    }
+
+    @Test
     fun `view model sends toast message about when failing to enter game`() = runTest {
         val currentGame = dummyGames().first().toCurrentGame()
         val messages = mutableListOf<String>()
@@ -185,6 +203,64 @@ class GameViewModelTest {
         assertEquals(1, messages.size)
 
         collection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message when failing to delete game with creator ID mismatch`() = runTest {
+        val gameToDelete = dummyGames().first()
+        val messages = mutableListOf<String>()
+
+        val gameCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        val messageCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.CREATOR_ID_MISMATCH = true
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        val actualGameList = viewModel.gameList.value
+        assertEquals(dummyGames().size, actualGameList.size)
+        assertEquals(true, actualGameList.contains(gameToDelete))
+
+        assertEquals(CreatorIdDoesNotMatchException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        gameCollection.cancel()
+        messageCollection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message when failing to delete game as game does not exist`() = runTest {
+        val gameToDelete = dummyGames().first()
+        val messages = mutableListOf<String>()
+
+        val gameCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        val messageCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.DELETE_GAME_EXISTS = false
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        val actualGameList = viewModel.gameList.value
+        assertEquals(dummyGames().size, actualGameList.size)
+        assertEquals(true, actualGameList.contains(gameToDelete))
+
+        assertEquals(GameDoesNotExistException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        gameCollection.cancel()
+        messageCollection.cancel()
     }
 
     @Test

@@ -70,6 +70,22 @@ class GameViewModel @Inject constructor(
             }
         }
     }
+
+    fun deleteGame(game: Game) {
+        viewModelScope.launch {
+            try {
+                gameRepository.deleteGame(game)
+            } catch (exception: Throwable) {
+                when (exception) {
+                    is CreatorIdDoesNotMatchException,
+                    is GameDoesNotExistException -> {
+                        exception.message?.let { _message.emit(it) }
+                    }
+                    else -> throw Exception(exception.message)
+                }
+            }
+        }
+    }
 }
 
 sealed interface GamingState {
