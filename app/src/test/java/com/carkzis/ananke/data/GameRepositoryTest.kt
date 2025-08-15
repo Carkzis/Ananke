@@ -7,12 +7,14 @@ import com.carkzis.ananke.data.database.GameDao
 import com.carkzis.ananke.data.database.GameEntity
 import com.carkzis.ananke.data.database.toDomainListing
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.NewGame
 import com.carkzis.ananke.data.repository.DefaultGameRepository
 import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.testdoubles.ControllableGameDao
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.testdoubles.dummyUserEntities
+import com.carkzis.ananke.ui.screens.game.CreatorIdDoesNotMatchException
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
@@ -158,14 +160,41 @@ class GameRepositoryTest {
         gameRepository.removeCurrentGame()
     }
 
+    //endregion
+    //region delete game
+
     @Test
-    fun `repository deletes game`() = runTest {
+    fun `repository deletes game if same creator id`() = runTest {
         val storedGames = gameRepository.getGames().first()
         val gameToDelete = storedGames.first()
+        anankeDataStore.setCurrentUserId(gameToDelete.creatorId)
 
         gameRepository.deleteGame(gameToDelete)
         val updatedGames = gameRepository.getGames().first()
         assertTrue(updatedGames.none { it.id == gameToDelete.id })
+    }
+
+    @Test(expected = CreatorIdDoesNotMatchException::class)
+    fun `repository does not delete game if different creator id`() = runTest {
+        val storedGames = gameRepository.getGames().first()
+        val gameToDelete = storedGames.first()
+        anankeDataStore.setCurrentUserId("9999")
+
+        gameRepository.deleteGame(gameToDelete)
+    }
+
+    @Test(expected = GameDoesNotExistException::class)
+    fun `repository throws exception if deleting game that does not exist`() = runTest {
+        val creatorId = dummyUserEntities.first().userId.toString()
+        val nonExistentGame = Game(
+            "9999",
+            "NonExistentGame",
+            "This game does not exist",
+            creatorId
+        )
+        anankeDataStore.setCurrentUserId(creatorId)
+
+        gameRepository.deleteGame(nonExistentGame)
     }
 
     //endregion

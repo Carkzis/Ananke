@@ -10,10 +10,12 @@ import com.carkzis.ananke.data.model.NewGame
 import com.carkzis.ananke.data.database.toDomainCurrent
 import com.carkzis.ananke.data.database.toDomainListing
 import com.carkzis.ananke.data.model.toEntity
+import com.carkzis.ananke.ui.screens.game.CreatorIdDoesNotMatchException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.game.InvalidGameException
 import com.carkzis.ananke.ui.screens.nugame.GameAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -56,6 +58,9 @@ class DefaultGameRepository @Inject constructor(
     }
 
     override suspend fun deleteGame(game: Game) {
+        if (anankeDataStore?.currentUserId()?.first() != game.creatorId) {
+            throw CreatorIdDoesNotMatchException()
+        }
         gameDao.getGame(game.id).first() ?: throw GameDoesNotExistException()
         gameDao.deleteGame(game.id)
     }
