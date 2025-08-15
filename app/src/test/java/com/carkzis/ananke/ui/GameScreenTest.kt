@@ -36,6 +36,7 @@ import com.carkzis.ananke.ui.screens.game.GameRoute
 import com.carkzis.ananke.ui.screens.game.GameScreen
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -64,6 +65,7 @@ class GameScreenTest {
 
     private var snackbarHostState: SnackbarHostState? = null
     private val onboardUseCase = OnboardUserUseCase(ControllableYouRepository())
+    private val deletableGameUseCase = DeletableGameUseCase(ControllableYouRepository())
 
     @After
     fun tearDown() {
@@ -101,7 +103,12 @@ class GameScreenTest {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
 
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                gameRepository
+            )
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -126,7 +133,12 @@ class GameScreenTest {
     fun `exit a game so that a list of games displays again`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame())
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                gameRepository
+            )
             var actualCurrentGame = dummyGames().first().toCurrentGame()
 
             initialiseGameScreen(
@@ -153,7 +165,12 @@ class GameScreenTest {
     fun `dismiss an enter game dialog to remove it`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                gameRepository
+            )
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -178,7 +195,12 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository(initialGames = dummyGames()).apply {
                 ENTRY_GENERIC_FAIL = true
             }
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                gameRepository
+            )
 
             initialiseGameScreenViaGameRoute(viewModel)
 
@@ -197,7 +219,12 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame()).apply {
                 FAIL_EXIT = true
             }
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                gameRepository
+            )
 
             initialiseGameScreenViaGameRoute(viewModel)
 

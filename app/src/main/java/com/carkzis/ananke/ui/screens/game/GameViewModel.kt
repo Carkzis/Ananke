@@ -2,16 +2,18 @@ package com.carkzis.ananke.ui.screens.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.utils.DeletableGameUseCase
+import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,10 +22,21 @@ import javax.inject.Inject
 class GameViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
     onboardUserUseCase: OnboardUserUseCase,
+    deletableGameUseCase: DeletableGameUseCase,
     private val gameRepository: GameRepository
 ) : ViewModel() {
 
     val gameList: StateFlow<List<Game>> = gameRepository.getGames().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000L),
+        listOf()
+    )
+
+    val deletableGames = gameList.map {
+        it.filter { game ->
+            deletableGameUseCase(game)
+        }
+    }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000L),
         listOf()

@@ -2,6 +2,7 @@ package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
@@ -13,6 +14,7 @@ import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.screens.game.InvalidGameException
+import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.OnboardUserUseCase
@@ -43,6 +45,7 @@ class GameViewModelTest {
         viewModel = GameViewModel(
             gameStateUseCase = GameStateUseCase(gameRepository),
             onboardUserUseCase = OnboardUserUseCase(youRepository),
+            deletableGameUseCase = DeletableGameUseCase(youRepository),
             gameRepository = gameRepository
         )
     }
@@ -130,6 +133,25 @@ class GameViewModelTest {
         val actualGameList = viewModel.gameList.value
         assertEquals(dummyGames().size - 1, actualGameList.size)
         assertEquals(false, actualGameList.contains(gameToDelete))
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model provides list of deletable games`() = runTest {
+        val currentUser = User(dummyGames().first().creatorId.toLong(), "User 1")
+        youRepository.currentUser = currentUser
+        val deletableGames = mutableListOf<Game>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.deletableGames.collect {
+                deletableGames.addAll(it)
+            }
+        }
+
+        gameRepository.emitGames(dummyGames())
+
+        val expectedSizeOfGames = dummyGames().filter { it.creatorId == currentUser.id.toString() }.size
+        assertEquals(expectedSizeOfGames, deletableGames.size)
 
         collection.cancel()
     }
@@ -271,6 +293,7 @@ class GameViewModelTest {
     fun dummyGames() = listOf(
         Game("abc", "My First Game", "It is the first one.", "1"),
         Game("def", "My Second Game", "It is the second one.", "1"),
-        Game("ghi", "My Third Game", "It is the third one.", "1")
+        Game("ghi", "My Third Game", "It is the third one.", "1"),
+        Game("jkl", "Someone else's game", "It belongs to someone else", "2")
     )
 }

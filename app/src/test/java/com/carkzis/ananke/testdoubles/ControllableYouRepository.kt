@@ -26,8 +26,9 @@ class ControllableYouRepository : YouRepository {
     }
 
     override fun getCurrentUser(): Flow<User> = flow {
-        currentUser = dummyUserEntities.first().toDomain()
-        emit(dummyUserEntities.first().toDomain())
+        if (currentUser == null) currentUser = dummyUserEntities.first().toDomain()
+        val emitableCurrentUser = currentUser
+        emit(emitableCurrentUser!!)
     }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
