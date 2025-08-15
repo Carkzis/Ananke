@@ -67,6 +67,13 @@ class ControllableGameRepository(
         _currentGame.tryEmit(CurrentGame.EMPTY)
     }
 
+    override suspend fun deleteGame(game: Game) {
+        games.let {
+            val newList = it.filterNot { existingGame -> existingGame.id == game.id }
+            _games.tryEmit(newList)
+        }
+    }
+
     fun emitGames(newGames: List<Game>) {
         _games.tryEmit(newGames)
     }

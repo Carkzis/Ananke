@@ -1,6 +1,8 @@
 package com.carkzis.ananke.data.database
 
+import androidx.core.location.LocationRequestCompat.Quality
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -21,4 +23,7 @@ interface GameDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertGame(game: GameEntity)
+
+    @Query(value = "DELETE FROM games WHERE gameId = :gameId")
+    suspend fun deleteGame(gameId: String)
 }

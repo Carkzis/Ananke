@@ -55,6 +55,11 @@ class DefaultGameRepository @Inject constructor(
         anankeDataStore?.removeCurrentGameId()
     }
 
+    override suspend fun deleteGame(game: Game) {
+        gameDao.getGame(game.id).first() ?: throw GameDoesNotExistException()
+        gameDao.deleteGame(game.id)
+    }
+
     private fun validateCurrentGame(currentGame: CurrentGame) {
         if (currentGame.id == CurrentGame.EMPTY.id) {
             throw InvalidGameException()

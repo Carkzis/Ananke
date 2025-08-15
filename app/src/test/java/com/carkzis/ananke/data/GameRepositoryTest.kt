@@ -158,6 +158,16 @@ class GameRepositoryTest {
         gameRepository.removeCurrentGame()
     }
 
+    @Test
+    fun `repository deletes game`() = runTest {
+        val storedGames = gameRepository.getGames().first()
+        val gameToDelete = storedGames.first()
+
+        gameRepository.deleteGame(gameToDelete)
+        val updatedGames = gameRepository.getGames().first()
+        assertTrue(updatedGames.none { it.id == gameToDelete.id })
+    }
+
     //endregion
 
     private suspend fun getGamesEntitiesAsDomainObjects() =
