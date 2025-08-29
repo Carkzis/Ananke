@@ -22,7 +22,7 @@ class DefaultAnankeDataStore @Inject constructor(
 ) : AnankeDataStore {
     private val data = preferences.data
 
-    override suspend fun currentGameId() = data.map { preferences ->
+    override fun currentGameId() = data.map { preferences ->
         preferences[GAME_ID]
     }
 
@@ -46,7 +46,7 @@ class DefaultAnankeDataStore @Inject constructor(
         }
     }
 
-    override suspend fun currentUserId(): Flow<String?> = data.map { preferences ->
+    override fun currentUserId(): Flow<String?> = data.map { preferences ->
         preferences[USER_ID]
     }
 
