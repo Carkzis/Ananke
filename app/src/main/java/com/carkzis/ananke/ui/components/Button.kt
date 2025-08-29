@@ -11,7 +11,11 @@ import androidx.compose.ui.unit.dp
 import com.carkzis.ananke.navigation.GameDestination
 
 @Composable
-fun AnankeButton(onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
+fun AnankeButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
     Button(
         onClick = onClick,
         modifier = modifier.padding(8.dp),

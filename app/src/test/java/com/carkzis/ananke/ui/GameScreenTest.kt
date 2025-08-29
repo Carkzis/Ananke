@@ -273,6 +273,7 @@ class GameScreenTest {
         composeTestRule.setContent {
             GameScreen(
                 games = dummyGames(),
+                deletableGames = listOf(),
                 gamingState = gamingState
             )
         }
@@ -286,6 +287,7 @@ class GameScreenTest {
         composeTestRule.setContent {
             GameScreen(
                 games = dummyGames(),
+                deletableGames = listOf(),
                 gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
                 onEnterGame = {
                     onEnterGame(it)
