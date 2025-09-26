@@ -30,4 +30,13 @@ interface TeamDao {
         """,
     )
     fun getTeamMembersForGame(gameId: Long): Flow<List<UserEntityWithGames>>
+
+    @Transaction
+    @Query(
+        value = """
+            DELETE FROM UserGameCrossRef 
+            WHERE gameId = :gameId
+        """,
+    )
+    suspend fun deleteTeamMembersForGame(gameId: Long)
 }

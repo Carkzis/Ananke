@@ -69,6 +69,26 @@ class TeamDaoTest {
         teamDao.insertTeamMember(dummyUserEntities.first())
     }
 
+    @Test
+    fun `teamDao deletes all cross references for a game`() = runTest {
+        val teamMember1 = teamDao.getTeamMembers().first().first()
+        val teamMember2 = teamDao.getTeamMembers().first().last()
+
+        val gameForCrossRef = dummyGameEntities.first()
+        val crossRef1 = UserGameCrossRef(gameForCrossRef.gameId, teamMember1.userId)
+        val crossRef2 = UserGameCrossRef(gameForCrossRef.gameId, teamMember2.userId)
+        teamDao.insertOrIgnoreUserGameCrossRefEntities(listOf(crossRef1))
+        teamDao.insertOrIgnoreUserGameCrossRefEntities(listOf(crossRef2))
+
+        val usersForGameAtStart = teamDao.getTeamMembersForGame(gameForCrossRef.gameId).first()
+        assertEquals(2, usersForGameAtStart.size)
+
+        teamDao.deleteTeamMembersForGame(gameForCrossRef.gameId)
+
+        val expactedUsersForGame = teamDao.getTeamMembersForGame(gameForCrossRef.gameId).first()
+        assertEquals(0, expactedUsersForGame.size)
+    }
+
     private suspend fun insertDummyUserEntities() {
         dummyUserEntities.forEach {
             teamDao.insertTeamMember(it)
