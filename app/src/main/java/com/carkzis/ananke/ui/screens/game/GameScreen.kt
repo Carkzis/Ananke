@@ -388,6 +388,7 @@ private fun DeleteGameDialogButton(
     }
 
     AnankeButton(
+        enabled = deletableGames.isNotEmpty(),
         onClick = {
             deleteGameDialog.value = true
         },
@@ -441,9 +442,9 @@ fun DeleteGameDialog(
                                 onDismissRequest = {
                                     deleteGameDoubleCheckDialog.value = false
                                 },
-                                onConfirmRequest = {
+                                onConfirmRequest = { game ->
                                     deleteGameDoubleCheckDialog.value = false
-                                    // TODO: Actually delete the game.
+                                    onConfirmRequest(game)
                                 }
                             )
                         }
