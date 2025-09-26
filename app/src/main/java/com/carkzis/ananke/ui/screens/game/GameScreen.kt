@@ -1,6 +1,7 @@
 package com.carkzis.ananke.ui.screens.game
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TransitEnterexit
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -38,6 +40,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
@@ -103,7 +106,7 @@ private fun OutOfGameScreen(
     LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
         gameScreenTitle(modifier)
         listOfAvailableGames(games, modifier, onEnterGame)
-        bottomButtonRow(modifier, deletableGames, onNewGameClick, {})
+        bottomButtonRow(modifier, deletableGames, onNewGameClick, onDeleteGameClick)
     }
 }
 
@@ -368,9 +371,7 @@ private fun DeleteGameDialogButton(
     onDeleteGameClick: (Game) -> Unit,
     modifier: Modifier
 ) {
-
     val deleteGameDialog = remember { mutableStateOf(false) }
-    val onDeleteGameClick = { deleteGameDialog.value = true }
 
     if (deleteGameDialog.value) {
         DeleteGameDialog(
@@ -386,7 +387,12 @@ private fun DeleteGameDialogButton(
         )
     }
 
-    AnankeButton(onClick = {}, modifier = modifier) {
+    AnankeButton(
+        onClick = {
+            deleteGameDialog.value = true
+        },
+        modifier = modifier
+    ) {
         AnankeText(
             text = "Delete a Game",
             modifier = modifier
@@ -403,7 +409,106 @@ fun DeleteGameDialog(
     onDismissRequest: () -> Unit,
     onConfirmRequest: (Game) -> Unit
 ) {
+    val deleteGameDoubleCheckDialog = remember { mutableStateOf(false) }
 
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = modifier,
+        ) {
+            LazyColumn(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                item {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Delete a game",
+                        style = MaterialTheme.typography.headlineMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                deletableGames.forEach {
+                    item {
+                        if (deleteGameDoubleCheckDialog.value) {
+                            DeleteGameDoubleCheckDialog(
+                                modifier = Modifier,
+                                game = it,
+                                onDismissRequest = {
+                                    deleteGameDoubleCheckDialog.value = false
+                                },
+                                onConfirmRequest = {
+                                    deleteGameDoubleCheckDialog.value = false
+                                    // TODO: Actually delete the game.
+                                }
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                modifier = Modifier,
+                                text = it.name
+                            )
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .clickable {
+                                        deleteGameDoubleCheckDialog.value = true
+                                    }
+                                    .testTag("${GameDestination.HOME}-delete-alert-delete-button")
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteGameDoubleCheckDialog(
+    modifier: Modifier,
+    game: Game,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: (Game) -> Unit,
+) {
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+        title = { Text("Delete ${game.name}?") },
+        text = { Text("Are you sure you want to delete this game? This action cannot be undone.") },
+        confirmButton = {
+            Icon(
+                imageVector = Icons.Rounded.Done,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable { onConfirmRequest(game) }
+                    .testTag("${GameDestination.HOME}-delete-alert-confirm")
+            )
+        },
+        dismissButton = {
+            Icon(
+                imageVector = Icons.Rounded.Close,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable { onDismissRequest() }
+                    .testTag("${GameDestination.HOME}-delete-alert-reject")
+            )
+        },
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    )
 }
 
 @Composable
