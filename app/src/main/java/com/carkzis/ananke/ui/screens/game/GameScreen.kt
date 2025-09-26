@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -414,7 +415,6 @@ fun DeleteGameDialog(
 
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Card(
             modifier = modifier,
@@ -423,22 +423,17 @@ fun DeleteGameDialog(
                 modifier = Modifier.padding(16.dp)
             ) {
                 item {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Delete a game",
-                        style = MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center,
-                    )
+                    DeleteGameDialogTitleText()
                 }
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                deletableGames.forEach {
+                deletableGames.forEach { deletableGame ->
                     item {
                         if (deleteGameDoubleCheckDialog.value) {
                             DeleteGameDoubleCheckDialog(
                                 modifier = Modifier,
-                                game = it,
+                                game = deletableGame,
                                 onDismissRequest = {
                                     deleteGameDoubleCheckDialog.value = false
                                 },
@@ -454,19 +449,12 @@ fun DeleteGameDialog(
                             verticalAlignment = CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                modifier = Modifier,
-                                text = it.name
+                            AnankeText(
+                                modifier = Modifier.weight(0.9f),
+                                text = deletableGame.name
                             )
-                            Icon(
-                                imageVector = Icons.Rounded.Delete,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .clickable {
-                                        deleteGameDoubleCheckDialog.value = true
-                                    }
-                                    .testTag("${GameDestination.HOME}-delete-alert-delete-button")
+                            DeleteGameIcon(
+                                deleteGameDoubleCheckDialog
                             )
                         }
                     }
@@ -474,6 +462,30 @@ fun DeleteGameDialog(
             }
         }
     }
+}
+
+@Composable
+private fun DeleteGameDialogTitleText() {
+    AnankeText(
+        modifier = Modifier.fillMaxWidth(),
+        text = "Delete a game",
+        textStyle = MaterialTheme.typography.headlineMedium,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+private fun DeleteGameIcon(deleteGameDoubleCheckDialog: MutableState<Boolean>) {
+    Icon(
+        imageVector = Icons.Rounded.Delete,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable {
+                deleteGameDoubleCheckDialog.value = true
+            }
+            .testTag("${GameDestination.HOME}-delete-alert-delete-button")
+    )
 }
 
 @Composable
@@ -489,26 +501,38 @@ fun DeleteGameDoubleCheckDialog(
         title = { Text("Delete ${game.name}?") },
         text = { Text("Are you sure you want to delete this game? This action cannot be undone.") },
         confirmButton = {
-            Icon(
-                imageVector = Icons.Rounded.Done,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .clickable { onConfirmRequest(game) }
-                    .testTag("${GameDestination.HOME}-delete-alert-confirm")
-            )
+            DeleteGameConfirmIcon(onConfirmRequest, game)
         },
         dismissButton = {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .clickable { onDismissRequest() }
-                    .testTag("${GameDestination.HOME}-delete-alert-reject")
-            )
+            DeleteGameDismissIcon(onDismissRequest)
         },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+    )
+}
+
+@Composable
+private fun DeleteGameConfirmIcon(
+    onConfirmRequest: (Game) -> Unit,
+    game: Game
+) {
+    Icon(
+        imageVector = Icons.Rounded.Done,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable { onConfirmRequest(game) }
+            .testTag("${GameDestination.HOME}-delete-alert-confirm")
+    )
+}
+
+@Composable
+private fun DeleteGameDismissIcon(onDismissRequest: () -> Unit) {
+    Icon(
+        imageVector = Icons.Rounded.Close,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable { onDismissRequest() }
+            .testTag("${GameDestination.HOME}-delete-alert-reject")
     )
 }
 
@@ -578,6 +602,50 @@ private fun GameEnterDialogPreview() {
                 description = "This is a game.",
                 creatorId = "",
             )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DeleteGameDialogPreview() {
+    AnankeTheme {
+        DeleteGameDialog(
+            modifier = Modifier,
+            deletableGames = listOf(
+                Game(
+                    id = "1",
+                    name = "Game 1",
+                    description = "This is a game.",
+                    creatorId = "",
+                ),
+                Game(
+                    id = "2",
+                    name = "Game 2",
+                    description = "This is another game.",
+                    creatorId = "",
+                )
+            ),
+            onDismissRequest = {},
+            onConfirmRequest = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DeleteGameDoubleCheckDialogPreview() {
+    AnankeTheme {
+        DeleteGameDoubleCheckDialog(
+            modifier = Modifier,
+            game = Game(
+                id = "1",
+                name = "Game 1",
+                description = "This is a game.",
+                creatorId = "",
+            ),
+            onDismissRequest = {},
+            onConfirmRequest = {}
         )
     }
 }
