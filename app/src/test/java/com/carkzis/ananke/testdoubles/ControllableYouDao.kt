@@ -87,5 +87,9 @@ class ControllableYouDao: YouDao {
         )
     }
 
+    override suspend fun deleteCharactersForGameId(gameId: Long) {
+        TODO("Not yet implemented")
+    }
+
     private fun idDescending() = compareBy(CharacterEntity::characterId).reversed()
 }
