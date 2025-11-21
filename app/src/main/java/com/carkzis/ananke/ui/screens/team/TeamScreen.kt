@@ -111,7 +111,14 @@ private fun InGameTeamScreen(
     }
 
     if (event is TeamEvent.DeleteTeamMemberConfirmationDialogueShow) {
-        onRemoveTeamMember(event.teamMember)
+        DeleteTeamMemberConfirmationDialogue(
+            onDismissDialogue = onDismissDialogue,
+            modifier = modifier,
+            event = event,
+            onRemoveTeamMember = {
+                onRemoveTeamMember(event.teamMember)
+            }
+        )
     }
 
     val lazyListState = rememberLazyListState()
@@ -274,6 +281,81 @@ private fun UserDialogue(
                             .testTag("${AnankeDestination.TEAM}-user-dialogue-close-button"),
                         textStyle = MaterialTheme.typography.bodyLarge
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteTeamMemberConfirmationDialogue(
+    onDismissDialogue: () -> Unit,
+    modifier: Modifier,
+    event: TeamEvent.DeleteTeamMemberConfirmationDialogueShow,
+    onRemoveTeamMember: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismissDialogue,
+    ) {
+        Card(
+            modifier = modifier
+                .padding(16.dp)
+                .testTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue"),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+        ) {
+            Column(
+                modifier = modifier
+                    .padding(16.dp)
+                    .testTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue-column"),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    modifier = modifier
+                        .padding(8.dp)
+                        .testTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue-icon"),
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = null,
+                )
+                AnankeText(
+                    text = "Are you sure you want to remove ${event.teamMember.name} from the team?",
+                    modifier = modifier
+                        .padding(8.dp)
+                        .testTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue-text"),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    AnankeButton(
+                        onClick = {
+                            onRemoveTeamMember()
+                            onDismissDialogue()
+                        },
+                        modifier = modifier.testTag("${AnankeDestination.TEAM}-confirm-remove-team-member-button")
+                    ) {
+                        AnankeText(
+                            text = "Yes",
+                            modifier = modifier.padding(8.dp)
+                                .width(40.dp),
+                            textStyle = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    AnankeButton(
+                        onClick = onDismissDialogue,
+                        modifier = modifier.testTag("${AnankeDestination.TEAM}-cancel-remove-team-member-button")
+                    ) {
+                        AnankeText(
+                            text = "No",
+                            modifier = modifier.padding(8.dp)
+                                .width(40.dp),
+                            textStyle = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
         }
@@ -612,6 +694,22 @@ private fun UserDialoguePreview() {
             event = TeamEvent.UserDialogueShow(
                 user = User(id = 1, name = "Zidun"),
             )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DeleteTeamMemberConfirmationDialoguePreview(
+) {
+    AnankeTheme {
+        DeleteTeamMemberConfirmationDialogue(
+            onDismissDialogue = {},
+            modifier = Modifier,
+            event = TeamEvent.DeleteTeamMemberConfirmationDialogueShow(
+                teamMember = User(id = 1, name = "Zidun"),
+            ),
+            onRemoveTeamMember = {}
         )
     }
 }
