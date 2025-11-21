@@ -48,8 +48,9 @@ class ControllableTeamRepository(
         }
     }
 
+    var teamMembersDeletedCalled = false
     override suspend fun deleteTeamMembersForGame(gameId: Long) {
-        TODO("Not yet implemented")
+        teamMembersDeletedCalled = true
     }
 
     fun emitUsers(users: List<User>) {

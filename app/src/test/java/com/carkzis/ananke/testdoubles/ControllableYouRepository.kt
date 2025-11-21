@@ -71,8 +71,9 @@ class ControllableYouRepository : YouRepository {
         )
     }
 
+    var charactersDeletedCalled = false
     override suspend fun deleteCharactersForGame(gameId: Long) {
-        TODO("Not yet implemented")
+        charactersDeletedCalled = true
     }
 
     fun emitCharacters(characters: List<GameCharacter>) {

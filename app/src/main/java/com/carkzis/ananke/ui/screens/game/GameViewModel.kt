@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
 import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
@@ -23,6 +24,7 @@ class GameViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
     onboardUserUseCase: OnboardUserUseCase,
     deletableGameUseCase: DeletableGameUseCase,
+    private val cleanUpCharactersAndTeamMembersUseCase: CleanUpCharactersAndTeamMembersUseCase,
     private val gameRepository: GameRepository
 ) : ViewModel() {
 
@@ -88,6 +90,7 @@ class GameViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 gameRepository.deleteGame(game)
+                cleanUpCharactersAndTeamMembersUseCase(game.id.toLong())
             } catch (exception: Throwable) {
                 when (exception) {
                     is CreatorIdDoesNotMatchException,

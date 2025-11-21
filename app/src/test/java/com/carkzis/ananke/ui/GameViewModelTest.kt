@@ -5,6 +5,7 @@ import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.testdoubles.dummyUserEntities
 import com.carkzis.ananke.ui.screens.game.CreatorIdDoesNotMatchException
@@ -14,6 +15,7 @@ import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.screens.game.InvalidGameException
+import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
 import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
@@ -38,14 +40,22 @@ class GameViewModelTest {
     private lateinit var gameRepository: ControllableGameRepository
     private lateinit var youRepository: ControllableYouRepository
 
+    private lateinit var teamRepository: ControllableTeamRepository
+
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
         youRepository = ControllableYouRepository()
+        teamRepository = ControllableTeamRepository()
+
         viewModel = GameViewModel(
             gameStateUseCase = GameStateUseCase(gameRepository),
             onboardUserUseCase = OnboardUserUseCase(youRepository),
             deletableGameUseCase = DeletableGameUseCase(youRepository),
+            cleanUpCharactersAndTeamMembersUseCase = CleanUpCharactersAndTeamMembersUseCase(
+                teamRepository = teamRepository,
+                youRepository = youRepository
+            ),
             gameRepository = gameRepository
         )
     }
@@ -290,10 +300,28 @@ class GameViewModelTest {
         assertEquals(youRepository.currentUser, dummyUserEntities.first().toDomain())
     }
 
+    @Test
+    fun `view model cleans up team members and characters when deleting a game`() = runTest {
+        val gameToDelete = dummyGames().first()
+
+        val gameCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        assertEquals(true, teamRepository.teamMembersDeletedCalled)
+        assertEquals(true, youRepository.charactersDeletedCalled)
+
+        gameCollection.cancel()
+    }
+
     fun dummyGames() = listOf(
-        Game("abc", "My First Game", "It is the first one.", "1"),
-        Game("def", "My Second Game", "It is the second one.", "1"),
-        Game("ghi", "My Third Game", "It is the third one.", "1"),
-        Game("jkl", "Someone else's game", "It belongs to someone else", "2")
+        Game("1", "My First Game", "It is the first one.", "1"),
+        Game("2", "My Second Game", "It is the second one.", "1"),
+        Game("3", "My Third Game", "It is the third one.", "1"),
+        Game("4", "Someone else's game", "It belongs to someone else", "2")
     )
 }

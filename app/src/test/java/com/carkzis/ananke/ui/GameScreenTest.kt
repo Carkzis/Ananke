@@ -29,6 +29,7 @@ import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
@@ -36,6 +37,7 @@ import com.carkzis.ananke.ui.screens.game.GameRoute
 import com.carkzis.ananke.ui.screens.game.GameScreen
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
 import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
@@ -66,6 +68,11 @@ class GameScreenTest {
     private var snackbarHostState: SnackbarHostState? = null
     private val onboardUseCase = OnboardUserUseCase(ControllableYouRepository())
     private val deletableGameUseCase = DeletableGameUseCase(ControllableYouRepository())
+
+    private val cleanUpCharactersAndTeamMembersUseCase = CleanUpCharactersAndTeamMembersUseCase(
+        ControllableYouRepository(),
+        ControllableTeamRepository()
+    )
 
     @After
     fun tearDown() {
@@ -107,7 +114,8 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
-                gameRepository
+                cleanUpCharactersAndTeamMembersUseCase,
+                gameRepository,
             )
             var actualCurrentGame = CurrentGame.EMPTY
 
@@ -137,6 +145,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
             var actualCurrentGame = dummyGames().first().toCurrentGame()
@@ -169,6 +178,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
             var actualCurrentGame = CurrentGame.EMPTY
@@ -199,6 +209,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
 
@@ -223,6 +234,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
 
@@ -368,9 +380,9 @@ class GameScreenTest {
     }
 
     private fun dummyGames() = listOf(
-        Game("abc", "My First Game", "It is the first one.", "1"),
-        Game("def", "My Second Game", "It is the second one.", "2"),
-        Game("ghi", "My Third Game", "It is the third one.", "3")
+        Game("1", "My First Game", "It is the first one.", "1"),
+        Game("2", "My Second Game", "It is the second one.", "2"),
+        Game("3", "My Third Game", "It is the third one.", "3")
     )
 
 }
