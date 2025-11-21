@@ -11,6 +11,7 @@ import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
+import com.carkzis.ananke.utils.RemoveTeamMemberUseCase
 import com.carkzis.ananke.utils.UserCharacterUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,7 @@ class TeamViewModel @Inject constructor(
     private val addTeamMemberUseCase: AddTeamMemberUseCase,
     private val userCharacterUseCase: UserCharacterUseCase,
     private val checkGameExistsUseCase: CheckGameExistsUseCase,
+    private val removeTeamMemberUseCase: RemoveTeamMemberUseCase,
     private val teamRepository: TeamRepository
 ) : ViewModel() {
     val gamingState = gameStateUseCase().stateIn(
@@ -139,7 +141,9 @@ class TeamViewModel @Inject constructor(
 
     fun deleteTeamMember(teamMember: User) {
         viewModelScope.launch {
-            teamRepository.deleteTeamMember(teamMember)
+            val currentGameId = currentGame.first().id
+            val gameCharacter = userCharacterUseCase(teamMember, currentGameId.toLong())
+            removeTeamMemberUseCase(teamMember, gameCharacter)
         }
     }
 

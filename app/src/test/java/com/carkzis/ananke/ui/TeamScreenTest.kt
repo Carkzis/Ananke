@@ -41,6 +41,7 @@ import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
+import com.carkzis.ananke.utils.RemoveTeamMemberUseCase
 import com.carkzis.ananke.utils.UserCharacterUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -377,6 +378,7 @@ class TeamScreenTest {
             AddTeamMemberUseCase(teamRepository, youRepository),
             UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
+            RemoveTeamMemberUseCase(teamRepository, youRepository),
             teamRepository
         )
         return viewModel

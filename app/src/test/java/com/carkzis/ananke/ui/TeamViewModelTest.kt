@@ -19,6 +19,7 @@ import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
+import com.carkzis.ananke.utils.RemoveTeamMemberUseCase
 import com.carkzis.ananke.utils.UserCharacterUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -53,6 +54,7 @@ class TeamViewModelTest {
             AddTeamMemberUseCase(teamRepository, youRepository),
             UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
+            RemoveTeamMemberUseCase(teamRepository, youRepository),
             teamRepository
         )
     }
@@ -313,6 +315,7 @@ class TeamViewModelTest {
             AddTeamMemberUseCase(teamRepository, youRepository),
             UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
+            RemoveTeamMemberUseCase(teamRepository, youRepository),
             teamRepository
         )
 
@@ -352,6 +355,7 @@ class TeamViewModelTest {
             AddTeamMemberUseCase(teamRepository, youRepository),
             UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
+            RemoveTeamMemberUseCase(teamRepository, youRepository),
             teamRepository
         )
 
@@ -386,6 +390,7 @@ class TeamViewModelTest {
             AddTeamMemberUseCase(teamRepository, youRepository),
             UserCharacterUseCase(youRepository),
             CheckGameExistsUseCase(gameRepository),
+            RemoveTeamMemberUseCase(teamRepository, youRepository),
             teamRepository
         )
 
@@ -502,11 +507,19 @@ class TeamViewModelTest {
 
     @Test
     fun `view model deletes team member`() = runTest {
+        val currentUser = dummyUserEntities.first()
+        val currentGame = CurrentGame("1", "A Title", "A Description", currentUser.userId.toString())
+
+        gameRepository.emitCurrentGame(currentGame)
+
         val expectedTeamMember = User(42, "Zidun")
+
+        teamRepository.emitUsers(listOf(expectedTeamMember))
 
         viewModel.deleteTeamMember(expectedTeamMember)
 
         assertEquals(expectedTeamMember, teamRepository.deletedTeamMember)
+        assertTrue(youRepository.deletedCharacter != null)
     }
 
     @Test
