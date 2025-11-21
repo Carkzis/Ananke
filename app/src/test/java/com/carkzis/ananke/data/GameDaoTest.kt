@@ -84,4 +84,12 @@ class GameDaoTest {
         gameDao.insertGame(newGameSameName)
     }
 
+    @Test
+    fun `gameDao deletes game entity`() = runTest {
+        val gameToDelete = dummyGameEntities.first()
+        gameDao.upsertGames(dummyGameEntities.shuffled())
+        gameDao.deleteGame(gameToDelete.gameId.toString())
+        assertTrue(gameDao.getGames().first().none { it.gameId == gameToDelete.gameId })
+    }
+
 }

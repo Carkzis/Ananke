@@ -50,4 +50,13 @@ interface YouDao {
         """
     )
     fun getCharactersForGameId(gameId: Long): Flow<GameEntityWithCharacters?>
+
+    @Transaction
+    @Query(
+        value = """
+            DELETE FROM characters 
+            WHERE gameOwnerId = :gameId
+        """,
+    )
+    suspend fun deleteCharactersForGameId(gameId: Long)
 }

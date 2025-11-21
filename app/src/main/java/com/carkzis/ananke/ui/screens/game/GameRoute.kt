@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import timber.log.Timber
 
 @Composable
 fun GameRoute(
@@ -15,11 +16,13 @@ fun GameRoute(
 ) {
     val games by viewModel.gameList.collectAsStateWithLifecycle()
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
+    val deletableGames by viewModel.deletableGames.collectAsStateWithLifecycle()
 
     GameScreen(
         modifier = modifier,
         onNewGameClick = onNewGameClick,
         games = games,
+        deletableGames = deletableGames,
         gamingState = gameState,
         onEnterGame = { currentGame ->
             viewModel.enterGame(currentGame)
@@ -31,6 +34,9 @@ fun GameRoute(
             viewModel.message.collect {
                 onShowSnackbar(it)
             }
+        },
+        onDeleteGameClick = {
+            viewModel.deleteGame(it)
         }
     )
 }

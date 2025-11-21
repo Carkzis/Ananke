@@ -117,4 +117,8 @@ class DefaultYouRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun deleteCharactersForGame(gameId: Long) {
+        youDao.deleteCharactersForGameId(gameId)
+    }
 }

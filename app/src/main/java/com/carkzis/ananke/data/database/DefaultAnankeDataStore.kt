@@ -8,6 +8,8 @@ import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
@@ -20,7 +22,7 @@ class DefaultAnankeDataStore @Inject constructor(
 ) : AnankeDataStore {
     private val data = preferences.data
 
-    override suspend fun currentGameId() = data.map { preferences ->
+    override fun currentGameId() = data.map { preferences ->
         preferences[GAME_ID]
     }
 
@@ -44,7 +46,7 @@ class DefaultAnankeDataStore @Inject constructor(
         }
     }
 
-    override suspend fun currentUserId(): Flow<String?> = data.map { preferences ->
+    override fun currentUserId(): Flow<String?> = data.map { preferences ->
         preferences[USER_ID]
     }
 

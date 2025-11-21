@@ -2,23 +2,26 @@ package com.carkzis.ananke.ui
 
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.model.toCurrentGame
-import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.testdoubles.dummyUserEntities
+import com.carkzis.ananke.ui.screens.game.CreatorIdDoesNotMatchException
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.screens.game.InvalidGameException
+import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
+import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.OnboardUserUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -37,13 +40,22 @@ class GameViewModelTest {
     private lateinit var gameRepository: ControllableGameRepository
     private lateinit var youRepository: ControllableYouRepository
 
+    private lateinit var teamRepository: ControllableTeamRepository
+
     @Before
     fun setUp() {
         gameRepository = ControllableGameRepository()
         youRepository = ControllableYouRepository()
+        teamRepository = ControllableTeamRepository()
+
         viewModel = GameViewModel(
             gameStateUseCase = GameStateUseCase(gameRepository),
             onboardUserUseCase = OnboardUserUseCase(youRepository),
+            deletableGameUseCase = DeletableGameUseCase(youRepository),
+            cleanUpCharactersAndTeamMembersUseCase = CleanUpCharactersAndTeamMembersUseCase(
+                teamRepository = teamRepository,
+                youRepository = youRepository
+            ),
             gameRepository = gameRepository
         )
     }
@@ -112,6 +124,44 @@ class GameViewModelTest {
 
         val actualCurrentGamingState = viewModel.gamingState.value
         assertEquals(expectedCurrentGamingState, actualCurrentGamingState)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model deletes game successfully`() = runTest {
+        val gameToDelete = dummyGames().first()
+
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        val actualGameList = viewModel.gameList.value
+        assertEquals(dummyGames().size - 1, actualGameList.size)
+        assertEquals(false, actualGameList.contains(gameToDelete))
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `view model provides list of deletable games`() = runTest {
+        val currentUser = User(dummyGames().first().creatorId.toLong(), "User 1")
+        youRepository.currentUser = currentUser
+        val deletableGames = mutableListOf<Game>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.deletableGames.collect {
+                deletableGames.addAll(it)
+            }
+        }
+
+        gameRepository.emitGames(dummyGames())
+
+        val expectedSizeOfGames = dummyGames().filter { it.creatorId == currentUser.id.toString() }.size
+        assertEquals(expectedSizeOfGames, deletableGames.size)
 
         collection.cancel()
     }
@@ -188,13 +238,90 @@ class GameViewModelTest {
     }
 
     @Test
+    fun `view model sends toast message when failing to delete game with creator ID mismatch`() = runTest {
+        val gameToDelete = dummyGames().first()
+        val messages = mutableListOf<String>()
+
+        val gameCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        val messageCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.CREATOR_ID_MISMATCH = true
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        val actualGameList = viewModel.gameList.value
+        assertEquals(dummyGames().size, actualGameList.size)
+        assertEquals(true, actualGameList.contains(gameToDelete))
+
+        assertEquals(CreatorIdDoesNotMatchException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        gameCollection.cancel()
+        messageCollection.cancel()
+    }
+
+    @Test
+    fun `view model sends toast message when failing to delete game as game does not exist`() = runTest {
+        val gameToDelete = dummyGames().first()
+        val messages = mutableListOf<String>()
+
+        val gameCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        val messageCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.message.collect { messages.add(it) }
+        }
+
+        gameRepository.DELETE_GAME_EXISTS = false
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        val actualGameList = viewModel.gameList.value
+        assertEquals(dummyGames().size, actualGameList.size)
+        assertEquals(true, actualGameList.contains(gameToDelete))
+
+        assertEquals(GameDoesNotExistException().message, messages.firstOrNull())
+        assertEquals(1, messages.size)
+
+        gameCollection.cancel()
+        messageCollection.cancel()
+    }
+
+    @Test
     fun `view model creates a new user for the device if unavailable`() = runTest {
         assertEquals(youRepository.currentUser, dummyUserEntities.first().toDomain())
     }
 
+    @Test
+    fun `view model cleans up team members and characters when deleting a game`() = runTest {
+        val gameToDelete = dummyGames().first()
+
+        val gameCollection = launch(UnconfinedTestDispatcher()) {
+            viewModel.gameList.collect {}
+        }
+
+        gameRepository.emitGames(dummyGames())
+
+        viewModel.deleteGame(gameToDelete)
+
+        assertEquals(true, teamRepository.teamMembersDeletedCalled)
+        assertEquals(true, youRepository.charactersDeletedCalled)
+
+        gameCollection.cancel()
+    }
+
     fun dummyGames() = listOf(
-        Game("abc", "My First Game", "It is the first one.", "1"),
-        Game("def", "My Second Game", "It is the second one.", "1"),
-        Game("ghi", "My Third Game", "It is the third one.", "1")
+        Game("1", "My First Game", "It is the first one.", "1"),
+        Game("2", "My Second Game", "It is the second one.", "1"),
+        Game("3", "My Third Game", "It is the third one.", "1"),
+        Game("4", "Someone else's game", "It belongs to someone else", "2")
     )
 }

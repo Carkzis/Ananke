@@ -41,5 +41,12 @@ class ControllableGameDao : GameDao {
         }
     }
 
+    override suspend fun deleteGame(gameId: String) {
+        games.update { previousValues ->
+            previousValues.filterNot { it.gameId.toString() == gameId }
+                .sortedWith(idDescending())
+        }
+    }
+
     private fun idDescending() = compareBy(GameEntity::gameId).reversed()
 }

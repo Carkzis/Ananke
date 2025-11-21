@@ -98,4 +98,19 @@ class YouDaoTest {
 
         assertEquals(dummyUser, actualUser)
     }
+
+    @Test
+    fun `youDao deletes characters for a game id`() = runTest {
+        val charactersAtStart = youDao.getCharactersForGameId(dummyGame.gameId)
+            .first()
+            ?.characterEntities
+        assertEquals(dummyCharacters, charactersAtStart)
+
+        youDao.deleteCharactersForGameId(dummyGame.gameId)
+
+        val charactersAtEnd = youDao.getCharactersForGameId(dummyGame.gameId)
+            .first()
+            ?.characterEntities
+        assertEquals(null, charactersAtEnd)
+    }
 }

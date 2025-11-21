@@ -9,6 +9,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasAnyChild
@@ -21,6 +23,7 @@ import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -29,6 +32,7 @@ import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
+import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
@@ -36,6 +40,8 @@ import com.carkzis.ananke.ui.screens.game.GameRoute
 import com.carkzis.ananke.ui.screens.game.GameScreen
 import com.carkzis.ananke.ui.screens.game.GameViewModel
 import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
+import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -64,6 +70,12 @@ class GameScreenTest {
 
     private var snackbarHostState: SnackbarHostState? = null
     private val onboardUseCase = OnboardUserUseCase(ControllableYouRepository())
+    private val deletableGameUseCase = DeletableGameUseCase(ControllableYouRepository())
+
+    private val cleanUpCharactersAndTeamMembersUseCase = CleanUpCharactersAndTeamMembersUseCase(
+        ControllableYouRepository(),
+        ControllableTeamRepository()
+    )
 
     @After
     fun tearDown() {
@@ -101,7 +113,13 @@ class GameScreenTest {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
 
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
+                gameRepository,
+            )
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -126,7 +144,13 @@ class GameScreenTest {
     fun `exit a game so that a list of games displays again`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame())
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
+                gameRepository
+            )
             var actualCurrentGame = dummyGames().first().toCurrentGame()
 
             initialiseGameScreen(
@@ -153,7 +177,13 @@ class GameScreenTest {
     fun `dismiss an enter game dialog to remove it`() {
         composeTestRule.apply {
             val gameRepository = ControllableGameRepository()
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
+                gameRepository
+            )
             var actualCurrentGame = CurrentGame.EMPTY
 
             initialiseGameScreen(
@@ -178,7 +208,13 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository(initialGames = dummyGames()).apply {
                 ENTRY_GENERIC_FAIL = true
             }
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
+                gameRepository
+            )
 
             initialiseGameScreenViaGameRoute(viewModel)
 
@@ -197,7 +233,13 @@ class GameScreenTest {
             val gameRepository = ControllableGameRepository(initialCurrentGame = dummyGames().first().toCurrentGame()).apply {
                 FAIL_EXIT = true
             }
-            val viewModel = GameViewModel(GameStateUseCase(gameRepository), onboardUseCase, gameRepository)
+            val viewModel = GameViewModel(
+                GameStateUseCase(gameRepository),
+                onboardUseCase,
+                deletableGameUseCase,
+                cleanUpCharactersAndTeamMembersUseCase,
+                gameRepository
+            )
 
             initialiseGameScreenViaGameRoute(viewModel)
 
@@ -212,6 +254,113 @@ class GameScreenTest {
             assertCurrentStateIsWithinGame()
 
             assertSnapshotHasExpectedMessage(expectedSnackbarText = ExitGameFailedException().message)
+        }
+    }
+
+    @Test
+    fun `delete game button inactive when no deletable games`() {
+        composeTestRule.apply {
+            initialiseEmptyGameScreen(gamingState = GamingState.OutOfGame)
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .assertExists()
+                .assertIsNotEnabled()
+        }
+    }
+
+    @Test
+    fun `clicking delete a game button opens a dialogue with deletable games`() {
+        val deletableGames = dummyGames().take(1)
+        composeTestRule.apply {
+            initialiseGameScreenForDeletions(gamingState = GamingState.OutOfGame, games = deletableGames)
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .assertExists()
+                .assertIsEnabled()
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-dialog")
+                .assertExists()
+
+            onNodeWithTag("${GameDestination.HOME}-deletable-game-text")
+                .assertExists()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .assertExists()
+        }
+    }
+
+    @Test
+    fun `clicking delete on a specific game in the delete a game dialogue opens new dialogue`() {
+        val deletableGames = dummyGames().take(1)
+        composeTestRule.apply {
+            initialiseGameScreenForDeletions(gamingState = GamingState.OutOfGame, games = deletableGames)
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-double-check-dialogue")
+                .assertExists()
+        }
+    }
+
+    @Test
+    fun `can exit delete a game dialogue returning to initial dialogue`() {
+        val deletableGames = dummyGames().take(1)
+        composeTestRule.apply {
+            initialiseGameScreenForDeletions(gamingState = GamingState.OutOfGame, games = deletableGames)
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-reject")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-dialog")
+                .assertExists()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-double-check-dialogue")
+                .assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `deleting a game exits all delete game dialogues and calls delete games`() {
+        val deletableGames = dummyGames().take(1)
+        val gamesDeleted = mutableListOf<Game>()
+
+        composeTestRule.apply {
+            initialiseGameScreenForDeletions(
+                gamingState = GamingState.OutOfGame,
+                games = deletableGames,
+                onDeleteGameClick = {
+                    gamesDeleted += it
+                }
+            )
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-confirm")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-dialog")
+                .assertDoesNotExist()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-double-check-dialogue")
+                .assertDoesNotExist()
+
+            assertEquals(1, gamesDeleted.size)
+            assertEquals(deletableGames.first(), gamesDeleted.first())
         }
     }
 
@@ -246,6 +395,32 @@ class GameScreenTest {
         composeTestRule.setContent {
             GameScreen(
                 games = dummyGames(),
+                deletableGames = listOf(),
+                gamingState = gamingState
+            )
+        }
+    }
+
+    private fun initialiseGameScreenForDeletions(
+        gamingState: GamingState,
+        onDeleteGameClick: (Game) -> Unit = {},
+        games: List<Game>
+    ) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = games,
+                deletableGames = games,
+                onDeleteGameClick = onDeleteGameClick,
+                gamingState = gamingState
+            )
+        }
+    }
+
+    private fun initialiseEmptyGameScreen(gamingState: GamingState) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = listOf(),
+                deletableGames = listOf(),
                 gamingState = gamingState
             )
         }
@@ -259,6 +434,7 @@ class GameScreenTest {
         composeTestRule.setContent {
             GameScreen(
                 games = dummyGames(),
+                deletableGames = listOf(),
                 gamingState = viewModel.gamingState.collectAsStateWithLifecycle().value,
                 onEnterGame = {
                     onEnterGame(it)
@@ -339,9 +515,9 @@ class GameScreenTest {
     }
 
     private fun dummyGames() = listOf(
-        Game("abc", "My First Game", "It is the first one.", "1"),
-        Game("def", "My Second Game", "It is the second one.", "2"),
-        Game("ghi", "My Third Game", "It is the third one.", "3")
+        Game("1", "My First Game", "It is the first one.", "1"),
+        Game("2", "My Second Game", "It is the second one.", "2"),
+        Game("3", "My Third Game", "It is the third one.", "3")
     )
 
 }

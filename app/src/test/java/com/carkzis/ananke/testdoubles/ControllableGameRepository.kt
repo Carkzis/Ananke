@@ -5,6 +5,7 @@ import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.data.model.NewGame
+import com.carkzis.ananke.ui.screens.game.CreatorIdDoesNotMatchException
 import com.carkzis.ananke.ui.screens.game.EnterGameFailedException
 import com.carkzis.ananke.ui.screens.game.ExitGameFailedException
 import com.carkzis.ananke.ui.screens.game.GameDoesNotExistException
@@ -19,10 +20,11 @@ class ControllableGameRepository(
     initialGames: List<Game> = listOf()
 ) : GameRepository {
     var ADD_GAME_EXISTS = false
-
     var ENTRY_GAME_EXISTS = true
     var ENTRY_GAME_INVALID = false
     var ENTRY_GENERIC_FAIL = false
+    var CREATOR_ID_MISMATCH = false
+    var DELETE_GAME_EXISTS = true
 
     var FAIL_EXIT = false
 
@@ -65,6 +67,16 @@ class ControllableGameRepository(
         if (FAIL_EXIT) throw ExitGameFailedException()
 
         _currentGame.tryEmit(CurrentGame.EMPTY)
+    }
+
+    override suspend fun deleteGame(game: Game) {
+        if (CREATOR_ID_MISMATCH) throw CreatorIdDoesNotMatchException()
+        if (!DELETE_GAME_EXISTS) throw GameDoesNotExistException()
+
+        games.let {
+            val newList = it.filterNot { existingGame -> existingGame.id == game.id }
+            _games.tryEmit(newList)
+        }
     }
 
     fun emitGames(newGames: List<Game>) {

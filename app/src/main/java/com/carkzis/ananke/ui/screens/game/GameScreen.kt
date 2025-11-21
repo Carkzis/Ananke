@@ -1,12 +1,14 @@
 package com.carkzis.ananke.ui.screens.game
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.TransitEnterexit
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -28,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,6 +41,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
@@ -51,9 +56,11 @@ import com.carkzis.ananke.ui.theme.Typography
 fun GameScreen(
     modifier: Modifier = Modifier,
     onNewGameClick: () -> Unit = {},
+    onDeleteGameClick: (Game) -> Unit = {},
     onEnterGame: (CurrentGame) -> Unit = {},
     onExitGame: () -> Unit = {},
     games: List<Game>,
+    deletableGames: List<Game>,
     gamingState: GamingState,
     onShowSnackbar: suspend () -> Unit = {}
 ) {
@@ -62,7 +69,15 @@ fun GameScreen(
     when (gamingState) {
         is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {
-            OutOfGameScreen(modifier, lazyListState, games, onEnterGame, onNewGameClick)
+            OutOfGameScreen(
+                modifier,
+                lazyListState,
+                games,
+                deletableGames,
+                onEnterGame,
+                onNewGameClick,
+                onDeleteGameClick,
+            )
         }
         is GamingState.InGame -> {
             InGameScreen(modifier, gamingState, onExitGame)
@@ -84,13 +99,31 @@ private fun OutOfGameScreen(
     modifier: Modifier,
     lazyListState: LazyListState,
     games: List<Game>,
+    deletableGames: List<Game>,
     onEnterGame: (CurrentGame) -> Unit,
-    onNewGameClick: () -> Unit
+    onNewGameClick: () -> Unit,
+    onDeleteGameClick: (Game) -> Unit,
 ) {
     LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
         gameScreenTitle(modifier)
         listOfAvailableGames(games, modifier, onEnterGame)
-        newGameButton(onNewGameClick, modifier)
+        bottomButtonRow(modifier, deletableGames, onNewGameClick, onDeleteGameClick)
+    }
+}
+
+private fun LazyListScope.bottomButtonRow(
+    modifier: Modifier,
+    deletableGames: List<Game>,
+    onNewGameClick: () -> Unit,
+    onDeleteGameClick: (Game) -> Unit,
+) {
+    item {
+        Row(
+            modifier = modifier.fillMaxWidth()
+        ) {
+            GameScreenNewGameButton(onNewGameClick, Modifier.weight(0.5f))
+            DeleteGameDialogButton(deletableGames, onDeleteGameClick, Modifier.weight(0.5f))
+        }
     }
 }
 
@@ -170,13 +203,6 @@ private fun LazyListScope.exitGameButton(
     modifier: Modifier
 ) {
     item { GameScreenExitGameButton(onExitGame, modifier) }
-}
-
-private fun LazyListScope.newGameButton(
-    onNewGameClick: () -> Unit,
-    modifier: Modifier
-) {
-    item { GameScreenNewGameButton(onNewGameClick, modifier) }
 }
 
 @Composable
@@ -330,7 +356,7 @@ private fun ColumnScope.GameCardMetadata(modifier: Modifier) {
 
 @Composable
 private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifier) {
-    AnankeButton(onClick = onNewGameClick) {
+    AnankeButton(onClick = onNewGameClick, modifier = modifier) {
         AnankeText(
             text = "Add New Game",
             modifier = modifier
@@ -338,6 +364,179 @@ private fun GameScreenNewGameButton(onNewGameClick: () -> Unit, modifier: Modifi
                 .testTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button")
         )
     }
+}
+
+@Composable
+private fun DeleteGameDialogButton(
+    deletableGames: List<Game>,
+    onDeleteGameClick: (Game) -> Unit,
+    modifier: Modifier
+) {
+    val deleteGameDialog = remember { mutableStateOf(false) }
+
+    if (deleteGameDialog.value) {
+        DeleteGameDialog(
+            modifier,
+            deletableGames,
+            onDismissRequest = {
+                deleteGameDialog.value = false
+            },
+            onConfirmRequest = { game ->
+                deleteGameDialog.value = false
+                onDeleteGameClick(game)
+            },
+        )
+    }
+
+    AnankeButton(
+        enabled = deletableGames.isNotEmpty(),
+        onClick = {
+            deleteGameDialog.value = true
+        },
+        modifier = modifier
+            .testTag("${GameDestination.HOME}-delete-a-game-button")
+    ) {
+        AnankeText(
+            text = "Delete a Game",
+            modifier = modifier
+                .padding(8.dp)
+        )
+    }
+}
+
+@Composable
+fun DeleteGameDialog(
+    modifier: Modifier,
+    deletableGames: List<Game>,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: (Game) -> Unit
+) {
+    val deleteGameDoubleCheckDialog = remember { mutableStateOf(false) }
+
+    Dialog(
+        onDismissRequest = onDismissRequest,
+    ) {
+        Card(
+            modifier = modifier
+                .testTag("${GameDestination.HOME}-delete-a-game-dialog"),
+        ) {
+            LazyColumn(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                item {
+                    DeleteGameDialogTitleText()
+                }
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                deletableGames.forEach { deletableGame ->
+                    item {
+                        if (deleteGameDoubleCheckDialog.value) {
+                            DeleteGameDoubleCheckDialog(
+                                modifier = Modifier,
+                                game = deletableGame,
+                                onDismissRequest = {
+                                    deleteGameDoubleCheckDialog.value = false
+                                },
+                                onConfirmRequest = { game ->
+                                    deleteGameDoubleCheckDialog.value = false
+                                    onConfirmRequest(game)
+                                }
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            AnankeText(
+                                modifier = Modifier.weight(0.9f),
+                                text = deletableGame.name
+                            )
+                            DeleteGameIcon(
+                                deleteGameDoubleCheckDialog
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeleteGameDialogTitleText() {
+    AnankeText(
+        modifier = Modifier.fillMaxWidth()
+            .testTag("${GameDestination.HOME}-deletable-game-text"),
+        text = "Delete a game",
+        textStyle = MaterialTheme.typography.headlineMedium,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+private fun DeleteGameIcon(deleteGameDoubleCheckDialog: MutableState<Boolean>) {
+    Icon(
+        imageVector = Icons.Rounded.Delete,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable {
+                deleteGameDoubleCheckDialog.value = true
+            }
+            .testTag("${GameDestination.HOME}-delete-alert-delete-button")
+    )
+}
+
+@Composable
+fun DeleteGameDoubleCheckDialog(
+    modifier: Modifier,
+    game: Game,
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: (Game) -> Unit,
+) {
+    AlertDialog(
+        modifier = modifier
+            .testTag( "${GameDestination.HOME}-delete-double-check-dialogue"),
+        onDismissRequest = onDismissRequest,
+        title = { Text("Delete ${game.name}?") },
+        text = { Text("Are you sure you want to delete this game? This action cannot be undone.") },
+        confirmButton = {
+            DeleteGameConfirmIcon(onConfirmRequest, game)
+        },
+        dismissButton = {
+            DeleteGameDismissIcon(onDismissRequest)
+        },
+    )
+}
+
+@Composable
+private fun DeleteGameConfirmIcon(
+    onConfirmRequest: (Game) -> Unit,
+    game: Game
+) {
+    Icon(
+        imageVector = Icons.Rounded.Done,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable { onConfirmRequest(game) }
+            .testTag("${GameDestination.HOME}-delete-alert-confirm")
+    )
+}
+
+@Composable
+private fun DeleteGameDismissIcon(onDismissRequest: () -> Unit) {
+    Icon(
+        imageVector = Icons.Rounded.Close,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(16.dp)
+            .clickable { onDismissRequest() }
+            .testTag("${GameDestination.HOME}-delete-alert-reject")
+    )
 }
 
 @Composable
@@ -410,6 +609,50 @@ private fun GameEnterDialogPreview() {
     }
 }
 
+@Preview
+@Composable
+private fun DeleteGameDialogPreview() {
+    AnankeTheme {
+        DeleteGameDialog(
+            modifier = Modifier,
+            deletableGames = listOf(
+                Game(
+                    id = "1",
+                    name = "Game 1",
+                    description = "This is a game.",
+                    creatorId = "",
+                ),
+                Game(
+                    id = "2",
+                    name = "Game 2",
+                    description = "This is another game.",
+                    creatorId = "",
+                )
+            ),
+            onDismissRequest = {},
+            onConfirmRequest = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DeleteGameDoubleCheckDialogPreview() {
+    AnankeTheme {
+        DeleteGameDoubleCheckDialog(
+            modifier = Modifier,
+            game = Game(
+                id = "1",
+                name = "Game 1",
+                description = "This is a game.",
+                creatorId = "",
+            ),
+            onDismissRequest = {},
+            onConfirmRequest = {}
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun OutOfGameScreenPreview() {
@@ -429,6 +672,7 @@ private fun OutOfGameScreenPreview() {
                     creatorId = "",
                 )
             ),
+            deletableGames = listOf(),
             gamingState = GamingState.OutOfGame
         )
     }
@@ -440,6 +684,7 @@ private fun InGameScreenPreview() {
     AnankeTheme {
         GameScreen(
             games = listOf(),
+            deletableGames = listOf(),
             gamingState = GamingState.InGame(
                 CurrentGame(
                     id = "3",

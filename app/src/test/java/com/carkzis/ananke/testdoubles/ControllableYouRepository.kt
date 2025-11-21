@@ -26,8 +26,9 @@ class ControllableYouRepository : YouRepository {
     }
 
     override fun getCurrentUser(): Flow<User> = flow {
-        currentUser = dummyUserEntities.first().toDomain()
-        emit(dummyUserEntities.first().toDomain())
+        if (currentUser == null) currentUser = dummyUserEntities.first().toDomain()
+        val emitableCurrentUser = currentUser
+        emit(emitableCurrentUser!!)
     }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
@@ -68,6 +69,11 @@ class ControllableYouRepository : YouRepository {
                 }
             }
         )
+    }
+
+    var charactersDeletedCalled = false
+    override suspend fun deleteCharactersForGame(gameId: Long) {
+        charactersDeletedCalled = true
     }
 
     fun emitCharacters(characters: List<GameCharacter>) {
