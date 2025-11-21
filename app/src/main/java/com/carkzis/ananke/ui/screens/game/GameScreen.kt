@@ -394,12 +394,12 @@ private fun DeleteGameDialogButton(
             deleteGameDialog.value = true
         },
         modifier = modifier
+            .testTag("${GameDestination.HOME}-delete-a-game-button")
     ) {
         AnankeText(
             text = "Delete a Game",
             modifier = modifier
                 .padding(8.dp)
-                .testTag("${GameDestination.HOME}-delete-a-game-button")
         )
     }
 }
@@ -417,7 +417,8 @@ fun DeleteGameDialog(
         onDismissRequest = onDismissRequest,
     ) {
         Card(
-            modifier = modifier,
+            modifier = modifier
+                .testTag("${GameDestination.HOME}-delete-a-game-dialog"),
         ) {
             LazyColumn(
                 modifier = Modifier.padding(16.dp)
@@ -467,7 +468,8 @@ fun DeleteGameDialog(
 @Composable
 private fun DeleteGameDialogTitleText() {
     AnankeText(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .testTag("${GameDestination.HOME}-deletable-game-text"),
         text = "Delete a game",
         textStyle = MaterialTheme.typography.headlineMedium,
         textAlign = TextAlign.Center,
@@ -496,7 +498,8 @@ fun DeleteGameDoubleCheckDialog(
     onConfirmRequest: (Game) -> Unit,
 ) {
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier
+            .testTag( "${GameDestination.HOME}-delete-double-check-dialogue"),
         onDismissRequest = onDismissRequest,
         title = { Text("Delete ${game.name}?") },
         text = { Text("Are you sure you want to delete this game? This action cannot be undone.") },

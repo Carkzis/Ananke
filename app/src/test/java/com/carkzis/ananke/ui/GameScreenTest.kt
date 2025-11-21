@@ -9,6 +9,8 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasAnyChild
@@ -21,6 +23,7 @@ import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -256,32 +259,98 @@ class GameScreenTest {
 
     @Test
     fun `delete game button inactive when no deletable games`() {
+        composeTestRule.apply {
+            initialiseEmptyGameScreen(gamingState = GamingState.OutOfGame)
 
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .assertExists()
+                .assertIsNotEnabled()
+        }
     }
 
     @Test
     fun `clicking delete a game button opens a dialogue with deletable games`() {
+        val deletableGames = dummyGames().take(1)
+        composeTestRule.apply {
+            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
 
-    }
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .assertExists()
+                .assertIsEnabled()
+                .performClick()
 
-    @Test
-    fun `can exit initial deleting a game dialogue`() {
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-dialog")
+                .assertExists()
 
+            onNodeWithTag("${GameDestination.HOME}-deletable-game-text")
+                .assertExists()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .assertExists()
+        }
     }
 
     @Test
     fun `clicking delete on a specific game in the delete a game dialogue opens new dialogue`() {
+        val deletableGames = dummyGames().take(1)
+        composeTestRule.apply {
+            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
 
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-double-check-dialogue")
+                .assertExists()
+        }
     }
 
     @Test
     fun `can exit delete a game dialogue returning to initial dialogue`() {
+        val deletableGames = dummyGames().take(1)
+        composeTestRule.apply {
+            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
 
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-reject")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-dialog")
+                .assertExists()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-double-check-dialogue")
+                .assertDoesNotExist()
+        }
     }
 
     @Test
-    fun `deleting a game exits all delete game dialogues with game removed`() {
+    fun `deleting a game exits all delete game dialogues`() {
+        val deletableGames = dummyGames().take(1)
+        composeTestRule.apply {
+            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
 
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-delete-button")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-alert-confirm")
+                .performClick()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-a-game-dialog")
+                .assertDoesNotExist()
+
+            onNodeWithTag("${GameDestination.HOME}-delete-double-check-dialogue")
+                .assertDoesNotExist()
+        }
     }
 
     private fun initialiseGameScreenViaGameRoute(
@@ -315,6 +384,26 @@ class GameScreenTest {
         composeTestRule.setContent {
             GameScreen(
                 games = dummyGames(),
+                deletableGames = listOf(),
+                gamingState = gamingState
+            )
+        }
+    }
+
+    private fun initialiseGameScreen(gamingState: GamingState, games: List<Game>) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = games,
+                deletableGames = games,
+                gamingState = gamingState
+            )
+        }
+    }
+
+    private fun initialiseEmptyGameScreen(gamingState: GamingState) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = listOf(),
                 deletableGames = listOf(),
                 gamingState = gamingState
             )
