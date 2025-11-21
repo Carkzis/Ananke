@@ -49,4 +49,8 @@ class DefaultTeamRepository @Inject constructor(
             teamDao.insertOrIgnoreUserGameCrossRefEntities(listOf(UserGameCrossRef(gameId, teamMember.id)))
         }
     }
+
+    override suspend fun deleteTeamMembersForGame(gameId: Long) {
+        teamDao.deleteTeamMembersForGame(gameId)
+    }
 }

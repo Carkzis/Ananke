@@ -46,7 +46,9 @@ class ControllableTeamDao : TeamDao {
     }
 
     override suspend fun deleteTeamMembersForGame(gameId: Long) {
-        TODO("Not yet implemented")
+        crossReferences.removeIf {
+            it.first == gameId
+        }
     }
 
     private fun idDescending() = compareBy(UserEntity::userId).reversed()

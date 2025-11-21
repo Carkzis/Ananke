@@ -5,6 +5,7 @@ import com.carkzis.ananke.data.database.AnankeDataStore
 import com.carkzis.ananke.data.database.DefaultAnankeDataStore
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.NewCharacter
+import com.carkzis.ananke.data.network.toDomainUser
 import com.carkzis.ananke.data.repository.DefaultYouRepository
 import com.carkzis.ananke.data.repository.YouRepository
 import com.carkzis.ananke.testdoubles.ControllableYouDao
@@ -18,6 +19,7 @@ import com.carkzis.ananke.ui.screens.you.CharacterNamingException
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.assertNameHasExpectedFormat
 import com.carkzis.ananke.utils.assertUserHasExpectedFormat
+import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -235,5 +237,28 @@ class YouRepositoryTest {
 
         val actualUser = youRepository.getCurrentUser().first()
         assertEquals(expectedUser.toDomain(), actualUser)
+    }
+
+    @Test
+    fun `repository deletes all characters for a game`() = runTest {
+        val expectedGameId = dummyGameEntities.first().gameId
+        val nonDeletedGameId = dummyGameEntities.last().gameId
+
+        val firstTeamMember = dummyUserEntities.first()
+        val secondTeamMember = dummyUserEntities.last()
+
+        val newCharacterForCurrentGame = NewCharacter(firstTeamMember.userId, expectedGameId)
+        val newCharacterForNonDeletedGame = NewCharacter(secondTeamMember.userId, nonDeletedGameId)
+
+        youRepository.addNewCharacter(newCharacterForCurrentGame)
+        youRepository.addNewCharacter(newCharacterForNonDeletedGame)
+
+        youRepository.deleteCharactersForGame(expectedGameId)
+
+        val charactersForDeletedGame = youDao.characters.value.filter { it.gameOwnerId == expectedGameId }
+        assertTrue(charactersForDeletedGame.isEmpty())
+
+        val charactersForNonDeletedGame = youDao.characters.value.filter { it.gameOwnerId == nonDeletedGameId }
+        assertTrue(charactersForNonDeletedGame.isNotEmpty())
     }
 }
