@@ -49,6 +49,12 @@ fun TeamRoute(
             viewModel.message.collect {
                 onShowSnackbar(it)
             }
+        },
+        onRemoveTeamMember = { teamMember ->
+            viewModel.deleteTeamMember(teamMember)
+        },
+        onViewTeamMemberForRemoval = { teamMember ->
+            viewModel.deleteTeamMemberDialogue(teamMember)
         }
     )
 }

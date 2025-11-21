@@ -1,16 +1,21 @@
 package com.carkzis.ananke.ui.screens.team
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.TagFaces
@@ -46,10 +51,13 @@ fun TeamScreen(
     modifier: Modifier = Modifier,
     users: List<User> = listOf(),
     teamMembers: List<User> = listOf(),
+    deletableTeamMembers: List<User> = listOf(),
     event: TeamEvent = TeamEvent.CloseDialogue,
     onAddUser: (User) -> Unit = {},
     onViewTeamMember: (User) -> Unit = {},
     onViewUser: (User) -> Unit = {},
+    onRemoveTeamMember: (User) -> Unit = {},
+    onViewTeamMemberForRemoval: (User)  -> Unit = {},
     onDismissDialogue: () -> Unit = {},
     onShowSnackbar: suspend () -> Unit = {}
 ) {
@@ -62,15 +70,18 @@ fun TeamScreen(
         is GamingState.OutOfGame -> {}
         is GamingState.InGame -> {
             InGameTeamScreen(
-                modifier,
-                currentGame,
-                teamMembers,
-                users,
-                onAddUser,
-                onViewTeamMember,
-                onViewUser,
-                onDismissDialogue,
-                event
+                modifier = modifier,
+                currentGame = currentGame,
+                teamMembers = teamMembers,
+                users = users,
+                deletableTeamMembers = deletableTeamMembers,
+                onAddUser = onAddUser,
+                onViewTeamMember = onViewTeamMember,
+                onViewUser = onViewUser,
+                onRemoveTeamMember =onRemoveTeamMember,
+                onViewTeamMemberForRemoval = onViewTeamMemberForRemoval,
+                onDismissDialogue = onDismissDialogue,
+                event = event
             )
         }
     }
@@ -81,11 +92,14 @@ private fun InGameTeamScreen(
     modifier: Modifier,
     currentGame: CurrentGame,
     teamMembers: List<User>,
+    deletableTeamMembers: List<User>,
     users: List<User>,
     onAddUser: (User) -> Unit,
     onViewTeamMember: (User) -> Unit,
     onViewUser: (User) -> Unit,
     onDismissDialogue: () -> Unit,
+    onRemoveTeamMember: (User) -> Unit = {},
+    onViewTeamMemberForRemoval: (User)  -> Unit = {},
     event: TeamEvent = TeamEvent.CloseDialogue
 ) {
     if (event is TeamEvent.TeamMemberDialogueShow) {
@@ -96,6 +110,10 @@ private fun InGameTeamScreen(
         UserDialogue(onDismissDialogue, modifier, event)
     }
 
+    if (event is TeamEvent.DeleteTeamMemberConfirmationDialogueShow) {
+        onRemoveTeamMember(event.teamMember)
+    }
+
     val lazyListState = rememberLazyListState()
     LazyColumn(
         modifier = modifier.testTag("${AnankeDestination.TEAM}-team-column"),
@@ -103,7 +121,14 @@ private fun InGameTeamScreen(
     ) {
         teamScreenTitle(modifier)
         currentGameTitle(currentGame, modifier)
-        teamMembers(modifier, teamMembers, onViewTeamMember)
+        teamMembers(
+            modifier,
+            teamMembers,
+            deletableTeamMembers,
+            onViewTeamMember,
+            onViewTeamMemberForRemoval,
+
+        )
         availableUsers(modifier, users, onAddUser, onViewUser)
     }
 }
@@ -285,7 +310,9 @@ private fun LazyListScope.currentGameTitle(
 private fun LazyListScope.teamMembers(
     modifier: Modifier,
     teamMembers: List<User>,
-    onViewTeamMember: (User) -> Unit
+    deletableTeamMembers: List<User>,
+    onViewTeamMember: (User) -> Unit,
+    onViewTeamMemberForRemoval: (User)  -> Unit = {},
 ) {
     item {
         AnankeText(
@@ -301,7 +328,7 @@ private fun LazyListScope.teamMembers(
     if (teamMembers.isEmpty()) {
         item {
             AnankeText(
-                text = "There are currently no users in the game.",
+                text = "There are currently no users in the game. You will need to delete the game from the home menu.",
                 modifier = modifier
                     .padding(8.dp)
                     .testTag("${AnankeDestination.TEAM}-no-team-members-text"),
@@ -315,7 +342,9 @@ private fun LazyListScope.teamMembers(
                 TeamMemberCard(
                     modifier = modifier,
                     user = teamMember,
-                    onViewTeamMember = onViewTeamMember
+                    onViewTeamMember = onViewTeamMember,
+                    removable = deletableTeamMembers.contains(teamMember),
+                    onViewTeamMemberForRemoval = onViewTeamMemberForRemoval
                 )
             }
         }
@@ -355,7 +384,9 @@ private fun LazyListScope.availableUsers(
 private fun TeamMemberCard(
     modifier: Modifier,
     user: User,
-    onViewTeamMember: (User) -> Unit
+    removable: Boolean,
+    onViewTeamMember: (User) -> Unit,
+    onViewTeamMemberForRemoval: (User)  -> Unit = {},
 ) {
     Card(
         modifier = modifier
@@ -369,7 +400,9 @@ private fun TeamMemberCard(
         TeamMemberCardBox(
             modifier = modifier,
             user = user,
-            onViewTeamMember = onViewTeamMember
+            removable = removable,
+            onViewTeamMember = onViewTeamMember,
+            onViewTeamMemberForRemoval = onViewTeamMemberForRemoval
         )
     }
 }
@@ -378,7 +411,9 @@ private fun TeamMemberCard(
 private fun TeamMemberCardBox(
     modifier: Modifier,
     user: User,
+    removable: Boolean,
     onViewTeamMember: (User) -> Unit,
+    onViewTeamMemberForRemoval: (User)  -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -388,22 +423,42 @@ private fun TeamMemberCardBox(
                 onViewTeamMember(user)
             }
     ) {
-        Row {
-            Icon(
-                modifier = modifier
-                    .align(CenterVertically),
-                imageVector = Icons.Filled.Shield,
-                contentDescription = null,
-            )
-            AnankeText(
-                text = user.name,
-                modifier = modifier
-                    .align(CenterVertically)
-                    .padding(start = 16.dp)
-                    .testTag("${AnankeDestination.TEAM}-team-member-name"),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Left
-            )
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                Icon(
+                    modifier = modifier
+                        .align(CenterVertically),
+                    imageVector = Icons.Filled.Shield,
+                    contentDescription = null,
+                )
+                AnankeText(
+                    text = user.name,
+                    modifier = modifier
+                        .align(CenterVertically)
+                        .width(intrinsicSize = IntrinsicSize.Max)
+                        .padding(start = 16.dp)
+                        .testTag("${AnankeDestination.TEAM}-team-member-name"),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Left,
+                )
+            }
+
+            if (removable) {
+                Icon(
+                    modifier = modifier
+                        .align(CenterVertically)
+                        .padding(start = 16.dp)
+                        .testTag("${AnankeDestination.TEAM}-remove-team-member-icon")
+                        .clickable {
+                            onViewTeamMemberForRemoval(user)
+                        },
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = null,
+                )
+            }
         }
     }
 }
@@ -518,6 +573,9 @@ private fun TeamScreenWithTeamMembersPreview() {
             ),
             teamMembers = listOf(
                 User(id = 1, name = "Zidun"),
+                User(id = 2, name = "Vivu")
+            ),
+            deletableTeamMembers = listOf(
                 User(id = 2, name = "Vivu")
             ),
         )
