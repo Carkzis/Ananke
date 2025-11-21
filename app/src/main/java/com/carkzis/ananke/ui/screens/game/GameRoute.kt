@@ -17,12 +17,16 @@ fun GameRoute(
     val games by viewModel.gameList.collectAsStateWithLifecycle()
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
     val deletableGames by viewModel.deletableGames.collectAsStateWithLifecycle()
+    val playerCounts by viewModel.playerCountForGames.collectAsStateWithLifecycle()
+
+    viewModel.onViewDisplayed()
 
     GameScreen(
         modifier = modifier,
         onNewGameClick = onNewGameClick,
         games = games,
         deletableGames = deletableGames,
+        playerCounts = playerCounts,
         gamingState = gameState,
         onEnterGame = { currentGame ->
             viewModel.enterGame(currentGame)
