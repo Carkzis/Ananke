@@ -10,6 +10,7 @@ import com.carkzis.ananke.data.database.UserGameCrossRef
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.testdoubles.dummyUserEntities
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -87,6 +88,16 @@ class TeamDaoTest {
 
         val expactedUsersForGame = teamDao.getTeamMembersForGame(gameForCrossRef.gameId).first()
         assertEquals(0, expactedUsersForGame.size)
+    }
+
+    @Test
+    fun `teamDao deletes a team member`() = runTest {
+        val teamMemberToDelete = teamDao.getTeamMembers().first().first()
+        teamDao.deleteTeamMember(teamMemberToDelete)
+
+        val usersAfterDeletion = teamDao.getTeamMembers().first()
+        assertEquals(dummyUserEntities.size - 1, usersAfterDeletion.size)
+        assertTrue(!usersAfterDeletion.contains(teamMemberToDelete))
     }
 
     private suspend fun insertDummyUserEntities() {

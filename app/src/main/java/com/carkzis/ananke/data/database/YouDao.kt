@@ -1,6 +1,7 @@
 package com.carkzis.ananke.data.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -59,4 +60,13 @@ interface YouDao {
         """,
     )
     suspend fun deleteCharactersForGameId(gameId: Long)
+
+    @Transaction
+    @Query(
+        value = """
+            DELETE FROM characters 
+            WHERE characterId = :characterId
+        """
+    )
+    suspend fun deleteCharacter(characterId: Long)
 }

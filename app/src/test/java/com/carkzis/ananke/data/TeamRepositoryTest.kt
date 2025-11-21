@@ -144,6 +144,23 @@ class TeamRepositoryTest {
         assertEquals(listOf(secondTeamMember), teamMembersForNonDeletedGame)
     }
 
+    @Test
+    fun `repository deletes particular team member`() = runTest {
+        val expectedGameId = dummyGameEntities.first().gameId
+
+        val firstTeamMember = networkDataSource.getUsers()[0].toDomainUser()
+        val secondTeamMember = networkDataSource.getUsers()[1].toDomainUser()
+
+        teamRepository.addTeamMember(firstTeamMember, expectedGameId)
+        teamRepository.addTeamMember(secondTeamMember, expectedGameId)
+
+        teamRepository.deleteTeamMember(firstTeamMember)
+
+        val remainingTeamMembers = teamRepository.getTeamMembers(expectedGameId).first()
+
+        assertEquals(listOf(secondTeamMember), remainingTeamMembers)
+    }
+
     private suspend fun getUserEntitiesAsDomainObjects(id: Long) =
         teamDao.getTeamMembersForGame(id)
             .first()

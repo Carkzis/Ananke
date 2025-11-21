@@ -11,4 +11,5 @@ interface YouRepository {
     suspend fun addNewCharacter(newCharacter: NewCharacter)
     suspend fun updateCharacter(character: GameCharacter, currentGameId: Long, formerGameCharacter: GameCharacter)
     suspend fun deleteCharactersForGame(gameId: Long)
+    suspend fun deleteCharacter(character: GameCharacter)
 }

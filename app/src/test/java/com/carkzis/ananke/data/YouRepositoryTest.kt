@@ -261,4 +261,29 @@ class YouRepositoryTest {
         val charactersForNonDeletedGame = youDao.characters.value.filter { it.gameOwnerId == nonDeletedGameId }
         assertTrue(charactersForNonDeletedGame.isNotEmpty())
     }
+
+    @Test
+    fun `repository deletes particular character`() = runTest {
+        val expectedGameId = dummyGameEntities.first().gameId
+
+        val firstTeamMember = dummyUserEntities.first()
+        val secondTeamMember = dummyUserEntities.last()
+
+        val newCharacterForFirstMember = NewCharacter(firstTeamMember.userId, expectedGameId)
+        val newCharacterForSecondMember = NewCharacter(secondTeamMember.userId, expectedGameId)
+
+        youRepository.addNewCharacter(newCharacterForFirstMember)
+        youRepository.addNewCharacter(newCharacterForSecondMember)
+
+        val characterToDelete = youRepository.getCharacterForUser(
+            firstTeamMember.toDomain(), expectedGameId
+        ).first()
+
+        youRepository.deleteCharacter(characterToDelete)
+
+        val remainingCharacters = youDao.characters.value.filter { it.gameOwnerId == expectedGameId }
+
+        assertEquals(1, remainingCharacters.size)
+        assertEquals(secondTeamMember.userId, remainingCharacters.first().userOwnerId)
+    }
 }

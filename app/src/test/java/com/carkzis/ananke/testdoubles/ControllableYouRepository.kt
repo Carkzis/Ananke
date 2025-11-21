@@ -76,6 +76,10 @@ class ControllableYouRepository : YouRepository {
         charactersDeletedCalled = true
     }
 
+    override suspend fun deleteCharacter(character: GameCharacter) {
+        TODO("Not yet implemented")
+    }
+
     fun emitCharacters(characters: List<GameCharacter>) {
         _characters.tryEmit(characters)
     }

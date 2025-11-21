@@ -93,5 +93,13 @@ class ControllableYouDao: YouDao {
         }
     }
 
+    override suspend fun deleteCharacter(characterId: Long) {
+        characters.update {
+            it.filter { currentCharacter ->
+                currentCharacter.characterId != characterId
+            }.sortedWith(idDescending())
+        }
+    }
+
     private fun idDescending() = compareBy(CharacterEntity::characterId).reversed()
 }

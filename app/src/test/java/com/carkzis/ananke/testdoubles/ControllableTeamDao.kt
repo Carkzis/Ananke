@@ -51,5 +51,13 @@ class ControllableTeamDao : TeamDao {
         }
     }
 
+    override suspend fun deleteTeamMember(teamMember: UserEntity) {
+        teamMembers.update {
+            it.filter { currentMember ->
+                currentMember.userId != teamMember.userId
+            }.sortedWith(idDescending())
+        }
+    }
+
     private fun idDescending() = compareBy(UserEntity::userId).reversed()
 }

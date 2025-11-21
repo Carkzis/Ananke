@@ -53,6 +53,10 @@ class ControllableTeamRepository(
         teamMembersDeletedCalled = true
     }
 
+    override suspend fun deleteTeamMember(teamMember: User) {
+        TODO("Not yet implemented")
+    }
+
     fun emitUsers(users: List<User>) {
         _users.tryEmit(users)
     }
