@@ -68,6 +68,16 @@ class TeamViewModel @Inject constructor(
         listOf()
     )
 
+    val deletableTeamMembers = currentTeamMembers.map { teamMembers ->
+        teamMembers.filter { teamMember ->
+            teamMember.id != currentGame.first().creatorId.toLong()
+        }
+    }.stateIn(
+        viewModelScope,
+        WhileSubscribed(5000L),
+        listOf()
+    )
+
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
 
@@ -115,9 +125,21 @@ class TeamViewModel @Inject constructor(
         }
     }
 
+    fun deleteTeamMemberDialogue(teamMember: User) {
+        viewModelScope.launch {
+            _event.emit(TeamEvent.DeleteTeamMemberConfirmationDialogueShow(teamMember))
+        }
+    }
+
     fun closeDialogue() {
         viewModelScope.launch {
             _event.emit(TeamEvent.CloseDialogue)
+        }
+    }
+
+    fun deleteTeamMember(teamMember: User) {
+        viewModelScope.launch {
+            teamRepository.deleteTeamMember(teamMember)
         }
     }
 

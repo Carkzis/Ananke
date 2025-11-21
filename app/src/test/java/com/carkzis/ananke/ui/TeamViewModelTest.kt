@@ -500,6 +500,57 @@ class TeamViewModelTest {
         collection.cancel()
     }
 
+    @Test
+    fun `view model deletes team member`() = runTest {
+        val expectedTeamMember = User(42, "Zidun")
+
+        viewModel.deleteTeamMember(expectedTeamMember)
+
+        assertEquals(expectedTeamMember, teamRepository.deletedTeamMember)
+    }
+
+    @Test
+    fun `view model sends event to show delete team member confirmation dialogue`() = runTest {
+        val expectedTeamMember = User(42, "Zidun")
+
+        val events = mutableListOf<TeamEvent>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.event.collect {
+                events.add(it)
+            }
+        }
+
+        viewModel.deleteTeamMemberDialogue(expectedTeamMember)
+
+        val lastEvent = events.last() as TeamEvent.DeleteTeamMemberConfirmationDialogueShow
+        assertTrue(lastEvent.teamMember == expectedTeamMember)
+
+        collection.cancel()
+    }
+
+    @Test
+    fun `deletable team members does not contain creator user`() = runTest {
+        val creatorUser = dummyUserEntities.first()
+        val nonCreatorUser = dummyUserEntities.last()
+        val currentGame = CurrentGame("1", "A Title", "A Description", creatorUser.userId.toString())
+
+        gameRepository.emitCurrentGame(currentGame)
+        teamRepository.addTeamMember(creatorUser.toDomain(), currentGame.id.toLong())
+        teamRepository.addTeamMember(nonCreatorUser.toDomain(), currentGame.id.toLong())
+
+        val deletableTeamMembers = mutableListOf<List<User>>()
+        val collection = launch(UnconfinedTestDispatcher()) {
+            viewModel.deletableTeamMembers.collect {
+                deletableTeamMembers.add(it)
+            }
+        }
+
+        assertTrue(deletableTeamMembers.last().contains(nonCreatorUser.toDomain()))
+        assertFalse(deletableTeamMembers.last().contains(creatorUser.toDomain()))
+
+        collection.cancel()
+    }
+
     private fun CurrentGame.toGame() = Game(this.id, this.name, this.description, this.creatorId)
 
 }
