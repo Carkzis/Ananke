@@ -272,7 +272,7 @@ class GameScreenTest {
     fun `clicking delete a game button opens a dialogue with deletable games`() {
         val deletableGames = dummyGames().take(1)
         composeTestRule.apply {
-            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
+            initialiseGameScreenForDeletions(gamingState = GamingState.OutOfGame, games = deletableGames)
 
             onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
                 .assertExists()
@@ -294,7 +294,7 @@ class GameScreenTest {
     fun `clicking delete on a specific game in the delete a game dialogue opens new dialogue`() {
         val deletableGames = dummyGames().take(1)
         composeTestRule.apply {
-            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
+            initialiseGameScreenForDeletions(gamingState = GamingState.OutOfGame, games = deletableGames)
 
             onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
                 .performClick()
@@ -311,7 +311,7 @@ class GameScreenTest {
     fun `can exit delete a game dialogue returning to initial dialogue`() {
         val deletableGames = dummyGames().take(1)
         composeTestRule.apply {
-            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
+            initialiseGameScreenForDeletions(gamingState = GamingState.OutOfGame, games = deletableGames)
 
             onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
                 .performClick()
@@ -331,10 +331,18 @@ class GameScreenTest {
     }
 
     @Test
-    fun `deleting a game exits all delete game dialogues`() {
+    fun `deleting a game exits all delete game dialogues and calls delete games`() {
         val deletableGames = dummyGames().take(1)
+        val gamesDeleted = mutableListOf<Game>()
+
         composeTestRule.apply {
-            initialiseGameScreen(gamingState = GamingState.OutOfGame, games = deletableGames)
+            initialiseGameScreenForDeletions(
+                gamingState = GamingState.OutOfGame,
+                games = deletableGames,
+                onDeleteGameClick = {
+                    gamesDeleted += it
+                }
+            )
 
             onNodeWithTag("${GameDestination.HOME}-delete-a-game-button")
                 .performClick()
@@ -350,6 +358,9 @@ class GameScreenTest {
 
             onNodeWithTag("${GameDestination.HOME}-delete-double-check-dialogue")
                 .assertDoesNotExist()
+
+            assertEquals(1, gamesDeleted.size)
+            assertEquals(deletableGames.first(), gamesDeleted.first())
         }
     }
 
@@ -390,11 +401,16 @@ class GameScreenTest {
         }
     }
 
-    private fun initialiseGameScreen(gamingState: GamingState, games: List<Game>) {
+    private fun initialiseGameScreenForDeletions(
+        gamingState: GamingState,
+        onDeleteGameClick: (Game) -> Unit = {},
+        games: List<Game>
+    ) {
         composeTestRule.setContent {
             GameScreen(
                 games = games,
                 deletableGames = games,
+                onDeleteGameClick = onDeleteGameClick,
                 gamingState = gamingState
             )
         }
