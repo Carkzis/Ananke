@@ -254,6 +254,36 @@ class GameScreenTest {
         }
     }
 
+    @Test
+    fun `delete game button inactive when no deletable games`() {
+
+    }
+
+    @Test
+    fun `clicking delete a game button opens a dialogue with deletable games`() {
+
+    }
+
+    @Test
+    fun `can exit initial deleting a game dialogue`() {
+
+    }
+
+    @Test
+    fun `clicking delete on a specific game in the delete a game dialogue opens new dialogue`() {
+
+    }
+
+    @Test
+    fun `can exit delete a game dialogue returning to initial dialogue`() {
+
+    }
+
+    @Test
+    fun `deleting a game exits all delete game dialogues with game removed`() {
+
+    }
+
     private fun initialiseGameScreenViaGameRoute(
         viewModel: GameViewModel
     ) {
