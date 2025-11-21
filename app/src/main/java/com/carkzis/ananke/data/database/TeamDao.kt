@@ -41,6 +41,12 @@ interface TeamDao {
     )
     suspend fun deleteTeamMembersForGame(gameId: Long)
 
-    @Delete
-    suspend fun deleteTeamMember(teamMember: UserEntity)
+    @Transaction
+    @Query(
+        value = """
+            DELETE FROM UserGameCrossRef
+            WHERE userId = :userId AND gameId = :gameId
+        """,
+    )
+    suspend fun deleteTeamMember(userId: Long, gameId: Long)
 }

@@ -9,5 +9,5 @@ interface TeamRepository {
     suspend fun addTeamMember(teamMember: User, gameId: Long)
     suspend fun deleteTeamMembersForGame(gameId: Long)
 
-    suspend fun deleteTeamMember(teamMember: User)
+    suspend fun deleteTeamMember(teamMember: User, gameId: Long)
 }

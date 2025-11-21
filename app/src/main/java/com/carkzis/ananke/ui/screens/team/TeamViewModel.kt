@@ -143,7 +143,7 @@ class TeamViewModel @Inject constructor(
         viewModelScope.launch {
             val currentGameId = currentGame.first().id
             val gameCharacter = userCharacterUseCase(teamMember, currentGameId.toLong())
-            removeTeamMemberUseCase(teamMember, gameCharacter)
+            removeTeamMemberUseCase(teamMember, gameCharacter, currentGameId.toLong())
         }
     }
 

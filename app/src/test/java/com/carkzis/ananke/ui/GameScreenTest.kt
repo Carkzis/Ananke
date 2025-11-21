@@ -116,6 +116,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository,
             )

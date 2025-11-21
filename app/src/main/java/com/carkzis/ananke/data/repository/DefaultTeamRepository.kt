@@ -54,7 +54,7 @@ class DefaultTeamRepository @Inject constructor(
         teamDao.deleteTeamMembersForGame(gameId)
     }
 
-    override suspend fun deleteTeamMember(teamMember: User) {
-        teamDao.deleteTeamMember(teamMember.toEntity())
+    override suspend fun deleteTeamMember(teamMember: User, gameId: Long) {
+        teamDao.deleteTeamMember(teamMember.id, gameId)
     }
 }
