@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.GameWithPlayerCount
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -43,6 +44,7 @@ import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
 import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
+import com.carkzis.ananke.utils.PlayerCountUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -70,6 +72,8 @@ class GameScreenTest {
     private var snackbarHostState: SnackbarHostState? = null
     private val onboardUseCase = OnboardUserUseCase(ControllableYouRepository())
     private val deletableGameUseCase = DeletableGameUseCase(ControllableYouRepository())
+
+    private val playerCountUseCase = PlayerCountUseCase(ControllableTeamRepository())
 
     private val cleanUpCharactersAndTeamMembersUseCase = CleanUpCharactersAndTeamMembersUseCase(
         ControllableYouRepository(),
@@ -116,7 +120,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
-
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository,
             )
@@ -148,6 +152,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -181,6 +186,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -212,6 +218,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -237,6 +244,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -396,7 +404,13 @@ class GameScreenTest {
             GameScreen(
                 games = dummyGames(),
                 deletableGames = listOf(),
-                gamingState = gamingState
+                gamingState = gamingState,
+                playerCounts = dummyGames().map {
+                    GameWithPlayerCount(
+                        game = it,
+                        playerCount = 0
+                    )
+                }
             )
         }
     }
@@ -411,7 +425,13 @@ class GameScreenTest {
                 games = games,
                 deletableGames = games,
                 onDeleteGameClick = onDeleteGameClick,
-                gamingState = gamingState
+                gamingState = gamingState,
+                playerCounts = dummyGames().map {
+                    GameWithPlayerCount(
+                        game = it,
+                        playerCount = 0
+                    )
+                }
             )
         }
     }
@@ -421,7 +441,8 @@ class GameScreenTest {
             GameScreen(
                 games = listOf(),
                 deletableGames = listOf(),
-                gamingState = gamingState
+                gamingState = gamingState,
+                playerCounts = listOf()
             )
         }
     }
@@ -443,7 +464,8 @@ class GameScreenTest {
                 onExitGame = {
                     viewModel.exitGame()
                     onExitGame(CurrentGame.EMPTY)
-                }
+                },
+                playerCounts = viewModel.playerCountForGames.collectAsStateWithLifecycle().value
             )
         }
     }

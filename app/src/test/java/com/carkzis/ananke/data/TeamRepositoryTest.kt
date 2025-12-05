@@ -154,7 +154,7 @@ class TeamRepositoryTest {
         teamRepository.addTeamMember(firstTeamMember, expectedGameId)
         teamRepository.addTeamMember(secondTeamMember, expectedGameId)
 
-        teamRepository.deleteTeamMember(firstTeamMember)
+        teamRepository.deleteTeamMember(firstTeamMember, expectedGameId)
 
         val remainingTeamMembers = teamRepository.getTeamMembers(expectedGameId).first()
 

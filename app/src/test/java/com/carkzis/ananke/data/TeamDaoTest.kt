@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.carkzis.ananke.data.database.AnankeDatabase
 import com.carkzis.ananke.data.database.TeamDao
+import com.carkzis.ananke.data.database.UserEntityWithGames
 import com.carkzis.ananke.data.database.UserGameCrossRef
 import com.carkzis.ananke.testdoubles.dummyGameEntities
 import com.carkzis.ananke.testdoubles.dummyUserEntities
@@ -93,11 +94,30 @@ class TeamDaoTest {
     @Test
     fun `teamDao deletes a team member`() = runTest {
         val teamMemberToDelete = teamDao.getTeamMembers().first().first()
-        teamDao.deleteTeamMember(teamMemberToDelete)
 
-        val usersAfterDeletion = teamDao.getTeamMembers().first()
+        dummyUserEntities.forEach {
+            teamDao.insertOrIgnoreUserGameCrossRefEntities(
+                listOf(
+                    UserGameCrossRef(
+                        dummyGameEntities.first().gameId,
+                        it.userId
+                    )
+                )
+            )
+        }
+
+        teamDao.deleteTeamMember(teamMemberToDelete.userId, dummyGameEntities.first().gameId)
+
+        val usersAfterDeletion = teamDao.getTeamMembersForGame(dummyGameEntities.first().gameId).first()
         assertEquals(dummyUserEntities.size - 1, usersAfterDeletion.size)
-        assertTrue(!usersAfterDeletion.contains(teamMemberToDelete))
+        assertTrue(
+            !usersAfterDeletion.contains(
+                UserEntityWithGames(
+                    teamMemberToDelete,
+                    games = listOf(dummyGameEntities.first())
+                )
+            )
+        )
     }
 
     private suspend fun insertDummyUserEntities() {

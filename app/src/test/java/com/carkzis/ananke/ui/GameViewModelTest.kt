@@ -20,6 +20,7 @@ import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.OnboardUserUseCase
+import com.carkzis.ananke.utils.PlayerCountUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -56,7 +57,8 @@ class GameViewModelTest {
                 teamRepository = teamRepository,
                 youRepository = youRepository
             ),
-            gameRepository = gameRepository
+            gameRepository = gameRepository,
+            playerCountUseCase = PlayerCountUseCase(teamRepository)
         )
     }
 
