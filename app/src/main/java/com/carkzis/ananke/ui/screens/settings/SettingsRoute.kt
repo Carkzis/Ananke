@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.carkzis.ananke.data.model.User
 
 @Composable
 fun SettingsRoute(
@@ -13,6 +12,6 @@ fun SettingsRoute(
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
 
     SettingsScreen(
-        currentUser = currentUser ?: User.EMPTY
+        currentUser = currentUser
     )
 }
