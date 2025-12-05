@@ -30,9 +30,11 @@ import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.data.model.toGame
 import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableTeamRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
+import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.team.TeamScreen
 import com.carkzis.ananke.ui.screens.team.TeamViewModel
@@ -376,6 +378,32 @@ class TeamScreenTest {
         }
     }
 
+    @Test
+    fun `team screen shows filtered list of potential team members`() {
+        composeTestRule.apply {
+            val game = CurrentGame("123")
+            gameRepository.emitCurrentGame(game)
+            teamRepository.emitUsers(dummyUsers())
+
+            val filterText = dummyUsers().first().name
+            initialiseTeamScreenWithSearchText(
+                viewModel = teamViewModel(),
+                searchText = filterText
+            )
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-user-card").apply {
+                fetchSemanticsNodes().forEachIndexed { index, _ ->
+                    val currentCard = get(index)
+                    currentCard.apply {
+                        hasAnyChild(hasText(dummyUsers()[0].name))
+                        hasAnyChild(hasText(filterText))
+                    }
+                }
+                assertCountEquals(1)
+            }
+        }
+    }
+
     private fun SemanticsNodeInteractionCollection.assertUsersInListHaveExpectedData(expectedUsers: List<User>) {
         fetchSemanticsNodes().forEachIndexed { index, _ ->
             val currentCard = get(index)
@@ -419,6 +447,22 @@ class TeamScreenTest {
                 currentGame = actualCurrentGame,
                 gamingState = gamingState,
                 users = dummyUsers()
+            )
+        }
+    }
+
+    private fun initialiseTeamScreenWithSearchText(viewModel: TeamViewModel, searchText: String) {
+        composeTestRule.setContent {
+            val gamingState by viewModel.gamingState.collectAsStateWithLifecycle()
+            val actualCurrentGame = viewModel
+                .currentGame
+                .collectAsStateWithLifecycle(initialValue = CurrentGame.EMPTY)
+                .value
+            TeamScreen(
+                currentGame = actualCurrentGame,
+                gamingState = gamingState,
+                users = dummyUsers(),
+                searchText = searchText
             )
         }
     }

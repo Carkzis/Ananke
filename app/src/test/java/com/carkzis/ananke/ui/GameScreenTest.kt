@@ -394,6 +394,29 @@ class GameScreenTest {
         }
     }
 
+    @Test
+    fun `game shows filtered list of games`() {
+        composeTestRule.apply {
+            val filterText = "First"
+            initialiseGameScreenWithSearchText(
+                gamingState = GamingState.OutOfGame,
+                searchText = filterText
+            )
+
+            onAllNodesWithTag("${GameDestination.HOME}-gamecard").apply {
+                fetchSemanticsNodes().forEachIndexed { index, _ ->
+                    val currentCard = get(index)
+                    currentCard.apply {
+                        hasAnyChild(hasText(dummyGames()[0].name))
+                        hasAnyChild(hasText(dummyGames()[0].description))
+                        hasAnyChild(hasTestTag("${GameDestination.HOME}-game-enter-button"))
+                    }
+                }
+                assertCountEquals(1)
+            }
+        }
+    }
+
     private fun initialiseGameScreenViaGameRoute(
         viewModel: GameViewModel
     ) {
@@ -473,6 +496,26 @@ class GameScreenTest {
                         playerCount = 0
                     )
                 }
+            )
+        }
+    }
+
+    private fun initialiseGameScreenWithSearchText(
+        gamingState: GamingState,
+        searchText: String,
+    ) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = dummyGames(),
+                deletableGames = listOf(),
+                gamingState = gamingState,
+                playerCounts = dummyGames().map {
+                    GameWithPlayerCount(
+                        game = it,
+                        playerCount = 0
+                    )
+                },
+                searchText = searchText
             )
         }
     }
