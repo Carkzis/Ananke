@@ -10,10 +10,12 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -28,6 +30,13 @@ class AnankeAppState(
             .currentBackStackEntryAsState().value?.destination
 
     val destinations = AnankeDestination.values().toList()
+
+    val launchSearchBar = MutableStateFlow(
+        SearchDialogueState(
+            isOpen = false,
+            currentDestination = "${AnankeDestination.GAME}/${GameDestination.HOME}"
+        )
+    )
 
     val availabilityMap: Flow<Map<AnankeDestination, Boolean>> =
         gameStateUseCase().stateIn(
@@ -48,6 +57,20 @@ class AnankeAppState(
         navController.navigate(destination.toString(), navigationOptions())
     }
 
+    fun openSearchBar(destination: String) {
+        launchSearchBar.value = SearchDialogueState(
+            isOpen = true,
+            currentDestination = destination
+        )
+    }
+
+    fun closeSearchBar(destination: String) {
+        launchSearchBar.value = SearchDialogueState(
+            isOpen = false,
+            currentDestination = destination
+        )
+    }
+
     private fun navigationOptions(): NavOptionsBuilder.() -> Unit = {
         popUpTo(navController.graph.findStartDestination().id) {
             saveState = true
@@ -56,6 +79,11 @@ class AnankeAppState(
     }
 
 }
+
+data class SearchDialogueState(
+    val isOpen: Boolean,
+    val currentDestination: String
+)
 
 @Composable
 fun rememberAnankeAppState(

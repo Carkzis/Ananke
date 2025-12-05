@@ -60,6 +60,7 @@ fun GameScreen(
     onDeleteGameClick: (Game) -> Unit = {},
     onEnterGame: (CurrentGame) -> Unit = {},
     onExitGame: () -> Unit = {},
+    onInGame: (Boolean) -> Unit = {},
     games: List<Game>,
     deletableGames: List<Game>,
     playerCounts: List<GameWithPlayerCount>,
@@ -69,8 +70,11 @@ fun GameScreen(
     GameScreenLaunchedEffects(onShowSnackbar)
     val lazyListState = rememberLazyListState()
     when (gamingState) {
-        is GamingState.Loading -> {}
+        is GamingState.Loading -> {
+            onInGame(false)
+        }
         is GamingState.OutOfGame -> {
+            onInGame(false)
             OutOfGameScreen(
                 modifier,
                 lazyListState,
@@ -83,6 +87,7 @@ fun GameScreen(
             )
         }
         is GamingState.InGame -> {
+            onInGame(true)
             InGameScreen(modifier, gamingState, onExitGame)
         }
     }
@@ -521,7 +526,7 @@ fun DeleteGameDoubleCheckDialog(
 }
 
 @Composable
-private fun DeleteGameConfirmIcon(
+fun DeleteGameConfirmIcon(
     onConfirmRequest: (Game) -> Unit,
     game: Game
 ) {
@@ -536,7 +541,7 @@ private fun DeleteGameConfirmIcon(
 }
 
 @Composable
-private fun DeleteGameDismissIcon(onDismissRequest: () -> Unit) {
+fun DeleteGameDismissIcon(onDismissRequest: () -> Unit) {
     Icon(
         imageVector = Icons.Rounded.Close,
         contentDescription = null,
