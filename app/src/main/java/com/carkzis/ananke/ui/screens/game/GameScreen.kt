@@ -45,6 +45,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.GameWithPlayerCount
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
@@ -61,6 +62,7 @@ fun GameScreen(
     onExitGame: () -> Unit = {},
     games: List<Game>,
     deletableGames: List<Game>,
+    playerCounts: List<GameWithPlayerCount>,
     gamingState: GamingState,
     onShowSnackbar: suspend () -> Unit = {}
 ) {
@@ -74,6 +76,7 @@ fun GameScreen(
                 lazyListState,
                 games,
                 deletableGames,
+                playerCounts,
                 onEnterGame,
                 onNewGameClick,
                 onDeleteGameClick,
@@ -100,13 +103,14 @@ private fun OutOfGameScreen(
     lazyListState: LazyListState,
     games: List<Game>,
     deletableGames: List<Game>,
+    playerCounts: List<GameWithPlayerCount>,
     onEnterGame: (CurrentGame) -> Unit,
     onNewGameClick: () -> Unit,
     onDeleteGameClick: (Game) -> Unit,
 ) {
     LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
         gameScreenTitle(modifier)
-        listOfAvailableGames(games, modifier, onEnterGame)
+        listOfAvailableGames(games, modifier, onEnterGame, playerCounts)
         bottomButtonRow(modifier, deletableGames, onNewGameClick, onDeleteGameClick)
     }
 }
@@ -155,14 +159,16 @@ private fun LazyListScope.gameScreenTitle(modifier: Modifier) {
 private fun LazyListScope.listOfAvailableGames(
     games: List<Game>,
     modifier: Modifier,
-    onEnterGame: (CurrentGame) -> Unit
+    onEnterGame: (CurrentGame) -> Unit,
+    playerCounts: List<GameWithPlayerCount>
 ) {
     games.forEach { game ->
         item(key = game.id) {
             GameCard(
                 modifier = modifier,
                 onEnterGame = onEnterGame,
-                game = game
+                game = game,
+                playerCount = playerCounts.find { it.game.id == game.id }?.playerCount ?: 0
             )
         }
     }
@@ -209,7 +215,8 @@ private fun LazyListScope.exitGameButton(
 private fun GameCard(
     modifier: Modifier,
     onEnterGame: (CurrentGame) -> Unit,
-    game: Game
+    game: Game,
+    playerCount: Int
 ) {
     val enterGameDialog = remember { mutableStateOf(false) }
     val onEnterGameClick = { enterGameDialog.value = true }
@@ -237,7 +244,7 @@ private fun GameCard(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        GameCardBox(modifier, game, onEnterGameClick)
+        GameCardBox(modifier, game, onEnterGameClick, playerCount)
     }
 }
 
@@ -263,7 +270,8 @@ private fun GameEnterDialog(
 private fun GameCardBox(
     modifier: Modifier,
     game: Game,
-    onEnterGameClick: () -> Unit
+    onEnterGameClick: () -> Unit,
+    playerCount: Int
 ) {
     Box(
         modifier = modifier
@@ -277,7 +285,7 @@ private fun GameCardBox(
                 GameCardEnterButton(modifier, onEnterGameClick)
             }
 
-            GameCardMetadata(modifier)
+            GameCardMetadata(modifier, playerCount)
         }
     }
 }
@@ -344,10 +352,10 @@ private fun GameEnterDismissIcon(onDismissRequest: () -> Unit) {
 }
 
 @Composable
-private fun ColumnScope.GameCardMetadata(modifier: Modifier) {
+private fun ColumnScope.GameCardMetadata(modifier: Modifier, playerCount: Int) {
     GameCardDivider(modifier)
     AnankeText(
-        text = "Players: 0",
+        text = "Players: $playerCount",
         textAlign = TextAlign.Start,
         modifier = modifier.align(Alignment.Start),
         textStyle = Typography.bodySmall
@@ -560,6 +568,7 @@ private fun GameCardPreview() {
         GameCard(
             modifier = Modifier,
             onEnterGame = {},
+            playerCount = 0,
             game = Game(
                 id = "",
                 name = "The Game",
@@ -673,6 +682,7 @@ private fun OutOfGameScreenPreview() {
                 )
             ),
             deletableGames = listOf(),
+            playerCounts = listOf(),
             gamingState = GamingState.OutOfGame
         )
     }
@@ -685,6 +695,7 @@ private fun InGameScreenPreview() {
         GameScreen(
             games = listOf(),
             deletableGames = listOf(),
+            playerCounts = listOf(),
             gamingState = GamingState.InGame(
                 CurrentGame(
                     id = "3",

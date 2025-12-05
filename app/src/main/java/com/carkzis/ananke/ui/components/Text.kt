@@ -21,7 +21,7 @@ fun AnankeText(
     text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Center,
-    textStyle: TextStyle = Typography.bodyMedium
+    textStyle: TextStyle = Typography.bodyMedium,
 ) {
     Text(
         text = text,

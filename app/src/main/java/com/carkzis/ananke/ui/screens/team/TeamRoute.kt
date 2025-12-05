@@ -20,6 +20,7 @@ fun TeamRoute(
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
     val availableUsers by viewModel.potentialTeamMemberList.collectAsStateWithLifecycle()
     val teamMembers by viewModel.currentTeamMembers.collectAsStateWithLifecycle()
+    val deletableTeamMembers by viewModel.deletableTeamMembers.collectAsStateWithLifecycle()
     val events by viewModel.event.collectAsStateWithLifecycle()
 
     if (gameState == GamingState.OutOfGame) {
@@ -32,6 +33,7 @@ fun TeamRoute(
         gamingState = gameState,
         users = availableUsers,
         teamMembers = teamMembers,
+        deletableTeamMembers = deletableTeamMembers,
         event = events,
         onAddUser = { user ->
             viewModel.addTeamMember(user, currentGame.toGame())
@@ -49,6 +51,12 @@ fun TeamRoute(
             viewModel.message.collect {
                 onShowSnackbar(it)
             }
+        },
+        onRemoveTeamMember = { teamMember ->
+            viewModel.deleteTeamMember(teamMember)
+        },
+        onViewTeamMemberForRemoval = { teamMember ->
+            viewModel.deleteTeamMemberDialogue(teamMember)
         }
     )
 }

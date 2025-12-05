@@ -53,6 +53,15 @@ class ControllableTeamRepository(
         teamMembersDeletedCalled = true
     }
 
+    var deletedTeamMember: User? = null
+    override suspend fun deleteTeamMember(
+        teamMember: User,
+        gameId: Long
+    ) {
+        deletedTeamMember = teamMember
+    }
+
+
     fun emitUsers(users: List<User>) {
         _users.tryEmit(users)
     }

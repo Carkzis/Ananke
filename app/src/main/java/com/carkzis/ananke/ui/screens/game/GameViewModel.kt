@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.GameWithPlayerCount
 import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
 import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
+import com.carkzis.ananke.utils.PlayerCountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,6 +27,7 @@ class GameViewModel @Inject constructor(
     gameStateUseCase: GameStateUseCase,
     onboardUserUseCase: OnboardUserUseCase,
     deletableGameUseCase: DeletableGameUseCase,
+    private val playerCountUseCase: PlayerCountUseCase,
     private val cleanUpCharactersAndTeamMembersUseCase: CleanUpCharactersAndTeamMembersUseCase,
     private val gameRepository: GameRepository
 ) : ViewModel() {
@@ -33,6 +37,9 @@ class GameViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5000L),
         listOf()
     )
+
+    private val _playerCountForGames = MutableStateFlow<List<GameWithPlayerCount>>(listOf())
+    val playerCountForGames: StateFlow<List<GameWithPlayerCount>> = _playerCountForGames
 
     val deletableGames = gameList.map {
         it.filter { game ->
@@ -73,6 +80,20 @@ class GameViewModel @Inject constructor(
                     else -> throw Exception(exception.message)
                 }
             }
+        }
+    }
+
+    fun onViewDisplayed() {
+        viewModelScope.launch {
+            val games = gameList.value
+            val gamesWithPlayerCounts = games.map { game ->
+                val playerCount = playerCountUseCase(game.id.toLong())
+                GameWithPlayerCount(
+                    game = game,
+                    playerCount = playerCount
+                )
+            }
+            _playerCountForGames.emit(gamesWithPlayerCounts)
         }
     }
 

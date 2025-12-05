@@ -23,12 +23,12 @@ import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
+import com.carkzis.ananke.data.model.GameWithPlayerCount
 import com.carkzis.ananke.data.model.toCurrentGame
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
@@ -44,6 +44,7 @@ import com.carkzis.ananke.utils.CleanUpCharactersAndTeamMembersUseCase
 import com.carkzis.ananke.utils.DeletableGameUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
 import com.carkzis.ananke.utils.OnboardUserUseCase
+import com.carkzis.ananke.utils.PlayerCountUseCase
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
@@ -71,6 +72,8 @@ class GameScreenTest {
     private var snackbarHostState: SnackbarHostState? = null
     private val onboardUseCase = OnboardUserUseCase(ControllableYouRepository())
     private val deletableGameUseCase = DeletableGameUseCase(ControllableYouRepository())
+
+    private val playerCountUseCase = PlayerCountUseCase(ControllableTeamRepository())
 
     private val cleanUpCharactersAndTeamMembersUseCase = CleanUpCharactersAndTeamMembersUseCase(
         ControllableYouRepository(),
@@ -117,6 +120,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository,
             )
@@ -148,6 +152,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -181,6 +186,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -212,6 +218,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -237,6 +244,7 @@ class GameScreenTest {
                 GameStateUseCase(gameRepository),
                 onboardUseCase,
                 deletableGameUseCase,
+                playerCountUseCase,
                 cleanUpCharactersAndTeamMembersUseCase,
                 gameRepository
             )
@@ -364,6 +372,28 @@ class GameScreenTest {
         }
     }
 
+    @Test
+    fun `game shows correct number of players`() {
+        composeTestRule.apply {
+            val playerCount = 4
+            initialiseGameScreenWithPlayerCounts(gamingState = GamingState.OutOfGame, playerCount = playerCount)
+
+            onAllNodesWithTag("${GameDestination.HOME}-gamecard").apply {
+                fetchSemanticsNodes().forEachIndexed { index, _ ->
+                    val currentCard = get(index)
+                    currentCard.apply {
+                        hasAnyChild(
+                            hasText(
+                                "${dummyGames()[index].name} - $playerCount players",
+                                substring = true
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun initialiseGameScreenViaGameRoute(
         viewModel: GameViewModel
     ) {
@@ -396,7 +426,32 @@ class GameScreenTest {
             GameScreen(
                 games = dummyGames(),
                 deletableGames = listOf(),
-                gamingState = gamingState
+                gamingState = gamingState,
+                playerCounts = dummyGames().map {
+                    GameWithPlayerCount(
+                        game = it,
+                        playerCount = 0
+                    )
+                }
+            )
+        }
+    }
+
+    private fun initialiseGameScreenWithPlayerCounts(
+        gamingState: GamingState,
+        playerCount: Int
+    ) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = dummyGames(),
+                deletableGames = listOf(),
+                gamingState = gamingState,
+                playerCounts = dummyGames().map {
+                    GameWithPlayerCount(
+                        game = it,
+                        playerCount = playerCount
+                    )
+                }
             )
         }
     }
@@ -411,7 +466,13 @@ class GameScreenTest {
                 games = games,
                 deletableGames = games,
                 onDeleteGameClick = onDeleteGameClick,
-                gamingState = gamingState
+                gamingState = gamingState,
+                playerCounts = dummyGames().map {
+                    GameWithPlayerCount(
+                        game = it,
+                        playerCount = 0
+                    )
+                }
             )
         }
     }
@@ -421,7 +482,8 @@ class GameScreenTest {
             GameScreen(
                 games = listOf(),
                 deletableGames = listOf(),
-                gamingState = gamingState
+                gamingState = gamingState,
+                playerCounts = listOf()
             )
         }
     }
@@ -443,7 +505,8 @@ class GameScreenTest {
                 onExitGame = {
                     viewModel.exitGame()
                     onExitGame(CurrentGame.EMPTY)
-                }
+                },
+                playerCounts = viewModel.playerCountForGames.collectAsStateWithLifecycle().value
             )
         }
     }

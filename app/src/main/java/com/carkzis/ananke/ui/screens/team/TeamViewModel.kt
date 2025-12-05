@@ -11,6 +11,7 @@ import com.carkzis.ananke.utils.AddCurrentUserToTheirEmptyGameUseCase
 import com.carkzis.ananke.utils.AddTeamMemberUseCase
 import com.carkzis.ananke.utils.CheckGameExistsUseCase
 import com.carkzis.ananke.utils.GameStateUseCase
+import com.carkzis.ananke.utils.RemoveTeamMemberUseCase
 import com.carkzis.ananke.utils.UserCharacterUseCase
 import com.carkzis.ananke.utils.ValidatorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,6 +36,7 @@ class TeamViewModel @Inject constructor(
     private val addTeamMemberUseCase: AddTeamMemberUseCase,
     private val userCharacterUseCase: UserCharacterUseCase,
     private val checkGameExistsUseCase: CheckGameExistsUseCase,
+    private val removeTeamMemberUseCase: RemoveTeamMemberUseCase,
     private val teamRepository: TeamRepository
 ) : ViewModel() {
     val gamingState = gameStateUseCase().stateIn(
@@ -62,6 +64,16 @@ class TeamViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentTeamMembers = currentGame.flatMapLatest { game ->
         teamRepository.getTeamMembers(game.id.toLong())
+    }.stateIn(
+        viewModelScope,
+        WhileSubscribed(5000L),
+        listOf()
+    )
+
+    val deletableTeamMembers = currentTeamMembers.map { teamMembers ->
+        teamMembers.filter { teamMember ->
+            teamMember.id != currentGame.first().creatorId.toLong()
+        }
     }.stateIn(
         viewModelScope,
         WhileSubscribed(5000L),
@@ -115,9 +127,23 @@ class TeamViewModel @Inject constructor(
         }
     }
 
+    fun deleteTeamMemberDialogue(teamMember: User) {
+        viewModelScope.launch {
+            _event.emit(TeamEvent.DeleteTeamMemberConfirmationDialogueShow(teamMember))
+        }
+    }
+
     fun closeDialogue() {
         viewModelScope.launch {
             _event.emit(TeamEvent.CloseDialogue)
+        }
+    }
+
+    fun deleteTeamMember(teamMember: User) {
+        viewModelScope.launch {
+            val currentGameId = currentGame.first().id
+            val gameCharacter = userCharacterUseCase(teamMember, currentGameId.toLong())
+            removeTeamMemberUseCase(teamMember, gameCharacter, currentGameId.toLong())
         }
     }
 

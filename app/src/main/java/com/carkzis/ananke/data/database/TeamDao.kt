@@ -1,6 +1,7 @@
 package com.carkzis.ananke.data.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -39,4 +40,13 @@ interface TeamDao {
         """,
     )
     suspend fun deleteTeamMembersForGame(gameId: Long)
+
+    @Transaction
+    @Query(
+        value = """
+            DELETE FROM UserGameCrossRef
+            WHERE userId = :userId AND gameId = :gameId
+        """,
+    )
+    suspend fun deleteTeamMember(userId: Long, gameId: Long)
 }

@@ -8,4 +8,6 @@ interface TeamRepository {
     fun getTeamMembers(gameId: Long): Flow<List<User>>
     suspend fun addTeamMember(teamMember: User, gameId: Long)
     suspend fun deleteTeamMembersForGame(gameId: Long)
+
+    suspend fun deleteTeamMember(teamMember: User, gameId: Long)
 }
