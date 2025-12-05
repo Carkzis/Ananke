@@ -31,6 +31,13 @@ class ControllableYouRepository : YouRepository {
         emit(emitableCurrentUser!!)
     }
 
+    override suspend fun updateUsername(
+        user: User,
+        newName: String
+    ) {
+        currentUser = user.copy(name = newName)
+    }
+
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
         characters.let {
             val newGameCharacter = GameCharacter(

@@ -71,6 +71,14 @@ class DefaultYouRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateUsername(user: User, newName: String) {
+        val updatedUser = UserEntity(
+            userId = user.id,
+            username = newName
+        )
+        youDao.insertUser(updatedUser)
+    }
+
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {
         val charactersForGameId = youDao.getCharactersForGameId(newCharacter.gameId)
                 .first()

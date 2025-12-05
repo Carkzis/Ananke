@@ -44,6 +44,9 @@ class ControllableYouDao: YouDao {
     }
 
     override suspend fun insertUser(user: UserEntity) {
+        listOfUsers.removeIf {
+            it.userId == user.userId
+        }
         listOfUsers.add(user)
     }
 
