@@ -5,13 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import timber.log.Timber
 
 @Composable
 fun GameRoute(
     modifier: Modifier = Modifier,
     onNewGameClick: () -> Unit = {},
     onShowSnackbar: suspend (String) -> Boolean,
+    searchText: String = "",
     viewModel: GameViewModel = hiltViewModel(),
 ) {
     val games by viewModel.gameList.collectAsStateWithLifecycle()
@@ -41,6 +41,7 @@ fun GameRoute(
         },
         onDeleteGameClick = {
             viewModel.deleteGame(it)
-        }
+        },
+        searchText = searchText
     )
 }

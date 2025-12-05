@@ -15,6 +15,7 @@ fun TeamRoute(
     viewModel: TeamViewModel = hiltViewModel(),
     onOutOfGame: () -> Unit,
     onShowSnackbar: suspend (String) -> Boolean,
+    searchText: String = ""
 ) {
     val currentGame by viewModel.currentGame.collectAsStateWithLifecycle(CurrentGame.EMPTY)
     val gameState by viewModel.gamingState.collectAsStateWithLifecycle()
@@ -57,6 +58,7 @@ fun TeamRoute(
         },
         onViewTeamMemberForRemoval = { teamMember ->
             viewModel.deleteTeamMemberDialogue(teamMember)
-        }
+        },
+        searchText = searchText
     )
 }

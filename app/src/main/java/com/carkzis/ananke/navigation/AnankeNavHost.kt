@@ -16,6 +16,7 @@ fun AnankeNavHost(
     modifier: Modifier = Modifier,
     appState: AnankeAppState,
     onShowSnackbar: suspend (String) -> Boolean,
+    searchText: String,
     startDestination: String = AnankeDestination.GAME.toString()
 ) {
     val navController = appState.navController
@@ -31,11 +32,13 @@ fun AnankeNavHost(
             composable(route = "${AnankeDestination.GAME}/${GameDestination.HOME}") {
                 GameRoute(
                     onNewGameClick = {
+                        appState.updateSearchText("")
                         navController.navigate("${AnankeDestination.GAME}/${GameDestination.NEW}") {
                             launchSingleTop = true
                         }
                     },
-                    onShowSnackbar = onShowSnackbar
+                    onShowSnackbar = onShowSnackbar,
+                    searchText = searchText,
                 )
             }
             composable(
@@ -54,7 +57,8 @@ fun AnankeNavHost(
                 onOutOfGame = {
                     navController.navigateUp()
                 },
-                onShowSnackbar = onShowSnackbar
+                onShowSnackbar = onShowSnackbar,
+                searchText = searchText,
             )
         }
         composable(route = AnankeDestination.YOU.toString()) {

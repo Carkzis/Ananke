@@ -64,6 +64,7 @@ fun GameScreen(
     deletableGames: List<Game>,
     playerCounts: List<GameWithPlayerCount>,
     gamingState: GamingState,
+    searchText: String = "",
     onShowSnackbar: suspend () -> Unit = {}
 ) {
     GameScreenLaunchedEffects(onShowSnackbar)
@@ -80,6 +81,7 @@ fun GameScreen(
                 onEnterGame,
                 onNewGameClick,
                 onDeleteGameClick,
+                searchText,
             )
         }
         is GamingState.InGame -> {
@@ -107,10 +109,11 @@ private fun OutOfGameScreen(
     onEnterGame: (CurrentGame) -> Unit,
     onNewGameClick: () -> Unit,
     onDeleteGameClick: (Game) -> Unit,
+    searchText: String = ""
 ) {
     LazyColumn(modifier = modifier.testTag("${GameDestination.HOME}-gameslist"), lazyListState) {
         gameScreenTitle(modifier)
-        listOfAvailableGames(games, modifier, onEnterGame, playerCounts)
+        listOfAvailableGames(games, modifier, onEnterGame, playerCounts, searchText)
         bottomButtonRow(modifier, deletableGames, onNewGameClick, onDeleteGameClick)
     }
 }
@@ -160,10 +163,17 @@ private fun LazyListScope.listOfAvailableGames(
     games: List<Game>,
     modifier: Modifier,
     onEnterGame: (CurrentGame) -> Unit,
-    playerCounts: List<GameWithPlayerCount>
+    playerCounts: List<GameWithPlayerCount>,
+    searchText: String = ""
 ) {
     games.forEach { game ->
         item(key = game.id) {
+            if (searchText.isNotEmpty() &&
+                !game.name.contains(searchText, ignoreCase = true) &&
+                !game.description.contains(searchText, ignoreCase = true)
+            ) {
+                return@item
+            }
             GameCard(
                 modifier = modifier,
                 onEnterGame = onEnterGame,
@@ -521,7 +531,7 @@ fun DeleteGameDoubleCheckDialog(
 }
 
 @Composable
-private fun DeleteGameConfirmIcon(
+fun DeleteGameConfirmIcon(
     onConfirmRequest: (Game) -> Unit,
     game: Game
 ) {
@@ -536,7 +546,7 @@ private fun DeleteGameConfirmIcon(
 }
 
 @Composable
-private fun DeleteGameDismissIcon(onDismissRequest: () -> Unit) {
+fun DeleteGameDismissIcon(onDismissRequest: () -> Unit) {
     Icon(
         imageVector = Icons.Rounded.Close,
         contentDescription = null,

@@ -59,7 +59,8 @@ fun TeamScreen(
     onRemoveTeamMember: (User) -> Unit = {},
     onViewTeamMemberForRemoval: (User)  -> Unit = {},
     onDismissDialogue: () -> Unit = {},
-    onShowSnackbar: suspend () -> Unit = {}
+    onShowSnackbar: suspend () -> Unit = {},
+    searchText: String = "",
 ) {
     LaunchedEffect(Unit) {
         onShowSnackbar()
@@ -81,7 +82,8 @@ fun TeamScreen(
                 onRemoveTeamMember =onRemoveTeamMember,
                 onViewTeamMemberForRemoval = onViewTeamMemberForRemoval,
                 onDismissDialogue = onDismissDialogue,
-                event = event
+                event = event,
+                searchText = searchText,
             )
         }
     }
@@ -100,7 +102,8 @@ private fun InGameTeamScreen(
     onDismissDialogue: () -> Unit,
     onRemoveTeamMember: (User) -> Unit = {},
     onViewTeamMemberForRemoval: (User)  -> Unit = {},
-    event: TeamEvent = TeamEvent.CloseDialogue
+    event: TeamEvent = TeamEvent.CloseDialogue,
+    searchText: String = "",
 ) {
     if (event is TeamEvent.TeamMemberDialogueShow) {
         TeamMemberDialogue(onDismissDialogue, modifier, event)
@@ -136,7 +139,7 @@ private fun InGameTeamScreen(
             onViewTeamMemberForRemoval,
 
         )
-        availableUsers(modifier, users, onAddUser, onViewUser)
+        availableUsers(modifier, users, onAddUser, onViewUser, searchText)
     }
 }
 
@@ -438,6 +441,7 @@ private fun LazyListScope.availableUsers(
     users: List<User>,
     onAddUser: (User) -> Unit,
     onViewUser: (User) -> Unit,
+    searchText: String = ""
 ) {
     item {
         AnankeText(
@@ -452,6 +456,10 @@ private fun LazyListScope.availableUsers(
 
     users.forEach { user ->
         item(key = "${user.id}-pt") {
+            if (searchText.isNotEmpty() && !user.name.contains(searchText, ignoreCase = true)) {
+                return@item
+            }
+
             UserCard(
                 modifier = modifier,
                 onAddUser = onAddUser,
