@@ -58,7 +58,8 @@ fun AnankeNavHost(
                 onOutOfGame = {
                     navController.navigateUp()
                 },
-                onShowSnackbar = onShowSnackbar
+                onShowSnackbar = onShowSnackbar,
+                searchText = searchText,
             )
         }
         composable(route = AnankeDestination.YOU.toString()) {
