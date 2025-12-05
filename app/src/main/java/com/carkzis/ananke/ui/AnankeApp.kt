@@ -34,6 +34,7 @@ import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeBackground
 import com.carkzis.ananke.ui.components.AnankeBottomBar
 import com.carkzis.ananke.ui.components.AnankeTopBar
+import com.carkzis.ananke.ui.screens.game.GamingState
 import com.carkzis.ananke.utils.GameStateUseCase
 
 @Composable
@@ -47,7 +48,7 @@ fun AnankeApp(
         val snackbarHostState = remember { SnackbarHostState() }
         val searchBarLaunched by appState.launchSearchBar.collectAsStateWithLifecycle()
         val currentDestination by appState.navController.currentBackStackEntryAsState()
-        var inGame by remember { mutableStateOf(false) }
+        val gameState by appState.gameState.collectAsStateWithLifecycle()
         var searchText by remember { mutableStateOf("") }
 
         Scaffold(
@@ -55,7 +56,7 @@ fun AnankeApp(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = {
                 AnankeTopBar(
-                    searchEnabled = searchIsEnabledForDestination(currentDestination, inGame),
+                    searchEnabled = searchIsEnabledForDestination(currentDestination, gameState is GamingState.InGame),
                     onSearchClicked = {
                         appState.openSearchBar(
                             currentDestination?.destination?.route
@@ -90,9 +91,6 @@ fun AnankeApp(
                         snackbarHostState.showSnackbar(
                             message = message, duration = SnackbarDuration.Short
                         ) == SnackbarResult.Dismissed
-                    },
-                    onInGame = {
-                        inGame = it
                     },
                     searchText = searchText,
                 )

@@ -60,7 +60,6 @@ fun GameScreen(
     onDeleteGameClick: (Game) -> Unit = {},
     onEnterGame: (CurrentGame) -> Unit = {},
     onExitGame: () -> Unit = {},
-    onInGame: (Boolean) -> Unit = {},
     games: List<Game>,
     deletableGames: List<Game>,
     playerCounts: List<GameWithPlayerCount>,
@@ -71,11 +70,8 @@ fun GameScreen(
     GameScreenLaunchedEffects(onShowSnackbar)
     val lazyListState = rememberLazyListState()
     when (gamingState) {
-        is GamingState.Loading -> {
-            onInGame(false)
-        }
+        is GamingState.Loading -> {}
         is GamingState.OutOfGame -> {
-            onInGame(false)
             OutOfGameScreen(
                 modifier,
                 lazyListState,
@@ -89,7 +85,6 @@ fun GameScreen(
             )
         }
         is GamingState.InGame -> {
-            onInGame(true)
             InGameScreen(modifier, gamingState, onExitGame)
         }
     }

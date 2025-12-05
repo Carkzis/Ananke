@@ -16,7 +16,6 @@ fun AnankeNavHost(
     modifier: Modifier = Modifier,
     appState: AnankeAppState,
     onShowSnackbar: suspend (String) -> Boolean,
-    onInGame: (Boolean) -> Unit = {},
     searchText: String,
     startDestination: String = AnankeDestination.GAME.toString()
 ) {
@@ -38,7 +37,6 @@ fun AnankeNavHost(
                         }
                     },
                     onShowSnackbar = onShowSnackbar,
-                    onInGame = onInGame,
                     searchText = searchText,
                 )
             }
