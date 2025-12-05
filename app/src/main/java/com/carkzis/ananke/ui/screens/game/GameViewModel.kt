@@ -38,7 +38,8 @@ class GameViewModel @Inject constructor(
         listOf()
     )
 
-    val playerCountForGames = MutableStateFlow<List<GameWithPlayerCount>>(listOf())
+    private val _playerCountForGames = MutableStateFlow<List<GameWithPlayerCount>>(listOf())
+    val playerCountForGames: StateFlow<List<GameWithPlayerCount>> = _playerCountForGames
 
     val deletableGames = gameList.map {
         it.filter { game ->
@@ -92,7 +93,7 @@ class GameViewModel @Inject constructor(
                     playerCount = playerCount
                 )
             }
-            playerCountForGames.emit(gamesWithPlayerCounts)
+            _playerCountForGames.emit(gamesWithPlayerCounts)
         }
     }
 

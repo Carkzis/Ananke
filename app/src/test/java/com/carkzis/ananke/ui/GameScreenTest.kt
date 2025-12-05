@@ -372,6 +372,28 @@ class GameScreenTest {
         }
     }
 
+    @Test
+    fun `game shows correct number of players`() {
+        composeTestRule.apply {
+            val playerCount = 4
+            initialiseGameScreenWithPlayerCounts(gamingState = GamingState.OutOfGame, playerCount = playerCount)
+
+            onAllNodesWithTag("${GameDestination.HOME}-gamecard").apply {
+                fetchSemanticsNodes().forEachIndexed { index, _ ->
+                    val currentCard = get(index)
+                    currentCard.apply {
+                        hasAnyChild(
+                            hasText(
+                                "${dummyGames()[index].name} - $playerCount players",
+                                substring = true
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     private fun initialiseGameScreenViaGameRoute(
         viewModel: GameViewModel
     ) {
@@ -409,6 +431,25 @@ class GameScreenTest {
                     GameWithPlayerCount(
                         game = it,
                         playerCount = 0
+                    )
+                }
+            )
+        }
+    }
+
+    private fun initialiseGameScreenWithPlayerCounts(
+        gamingState: GamingState,
+        playerCount: Int
+    ) {
+        composeTestRule.setContent {
+            GameScreen(
+                games = dummyGames(),
+                deletableGames = listOf(),
+                gamingState = gamingState,
+                playerCounts = dummyGames().map {
+                    GameWithPlayerCount(
+                        game = it,
+                        playerCount = playerCount
                     )
                 }
             )
