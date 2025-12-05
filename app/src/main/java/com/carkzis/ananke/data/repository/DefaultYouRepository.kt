@@ -56,7 +56,7 @@ class DefaultYouRepository @Inject constructor(
 
         if (currentUserId == null) {
             val userId = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
-            val userName = "User-10000"
+            val userName = "User-${UUID.randomUUID().mostSignificantBits.toString().take(5)}"
 
             val newUser = UserEntity(userId, userName)
 
