@@ -12,6 +12,7 @@ fun GameRoute(
     onNewGameClick: () -> Unit = {},
     onShowSnackbar: suspend (String) -> Boolean,
     onInGame: (Boolean) -> Unit = {},
+    searchText: String = "",
     viewModel: GameViewModel = hiltViewModel(),
 ) {
     val games by viewModel.gameList.collectAsStateWithLifecycle()
@@ -44,6 +45,7 @@ fun GameRoute(
         onDeleteGameClick = {
             viewModel.deleteGame(it)
         },
-        onInGame = onInGame
+        onInGame = onInGame,
+        searchText = searchText
     )
 }

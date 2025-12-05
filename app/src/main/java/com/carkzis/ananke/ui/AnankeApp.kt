@@ -48,6 +48,7 @@ fun AnankeApp(
         val searchBarLaunched by appState.launchSearchBar.collectAsStateWithLifecycle()
         val currentDestination by appState.navController.currentBackStackEntryAsState()
         var inGame by remember { mutableStateOf(false) }
+        var searchText by remember { mutableStateOf("") }
 
         Scaffold(
             modifier = Modifier,
@@ -73,50 +74,12 @@ fun AnankeApp(
             }
         ) { padding ->
             if (searchBarLaunched.isOpen) {
-                AlertDialog(
-                    modifier = Modifier
-                        .testTag( "global-search-dialogue"),
-                    onDismissRequest = {
-                        appState.closeSearchBar(currentDestination?.id ?: "${AnankeDestination.GAME}/${GameDestination.HOME}")
-                    },
-                    title = { Text("Perform a search") },
-                    text = {
-                        TextField(
-                            value = "",
-                            onValueChange = { /* Handle search query change */ },
-                            label = { Text("Perform a search") }
-                        )
-                    },
-                    confirmButton = {
-                        Icon(
-                            imageVector = Icons.Rounded.Done,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .clickable {
-                                    appState.closeSearchBar(
-                                        currentDestination?.id
-                                            ?: "${AnankeDestination.GAME}/${GameDestination.HOME}"
-                                    )
-                                }
-                                .testTag("global-search-bar-confirm-button")
-                        )
-                    },
-                    dismissButton = {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .clickable {
-                                    appState.closeSearchBar(
-                                        currentDestination?.id
-                                            ?: "${AnankeDestination.GAME}/${GameDestination.HOME}"
-                                    )
-                                }
-                                .testTag("global-search-bar-close-button")
-                        )
-                    },
+                SearchBarDialogue(
+                    appState = appState,
+                    currentDestination = currentDestination,
+                    onConfirmSearch = {
+                        searchText = it
+                    }
                 )
             }
 
@@ -130,11 +93,69 @@ fun AnankeApp(
                     },
                     onInGame = {
                         inGame = it
-                    }
+                    },
+                    searchText = searchText,
                 )
             }
         }
     }
+}
+
+@Composable
+private fun SearchBarDialogue(
+    appState: AnankeAppState,
+    currentDestination: NavBackStackEntry?,
+    onConfirmSearch: (String) -> Unit = { _ -> }
+) {
+    var searchValue by remember { mutableStateOf("") }
+    AlertDialog(
+        modifier = Modifier
+            .testTag("global-search-dialogue"),
+        onDismissRequest = {
+            appState.closeSearchBar(
+                currentDestination?.id ?: "${AnankeDestination.GAME}/${GameDestination.HOME}"
+            )
+        },
+        title = { Text("Perform a search") },
+        text = {
+            TextField(
+                value = searchValue,
+                onValueChange = { searchValue = it },
+                label = { Text("Perform a search") }
+            )
+        },
+        confirmButton = {
+            Icon(
+                imageVector = Icons.Rounded.Done,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable {
+                        onConfirmSearch(searchValue)
+                        appState.closeSearchBar(
+                            currentDestination?.id
+                                ?: "${AnankeDestination.GAME}/${GameDestination.HOME}"
+                        )
+                    }
+                    .testTag("global-search-bar-confirm-button")
+            )
+        },
+        dismissButton = {
+            Icon(
+                imageVector = Icons.Rounded.Close,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable {
+                        appState.closeSearchBar(
+                            currentDestination?.id
+                                ?: "${AnankeDestination.GAME}/${GameDestination.HOME}"
+                        )
+                    }
+                    .testTag("global-search-bar-close-button")
+            )
+        },
+    )
 }
 
 @Composable

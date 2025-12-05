@@ -17,6 +17,7 @@ fun AnankeNavHost(
     appState: AnankeAppState,
     onShowSnackbar: suspend (String) -> Boolean,
     onInGame: (Boolean) -> Unit = {},
+    searchText: String,
     startDestination: String = AnankeDestination.GAME.toString()
 ) {
     val navController = appState.navController
@@ -37,7 +38,8 @@ fun AnankeNavHost(
                         }
                     },
                     onShowSnackbar = onShowSnackbar,
-                    onInGame = onInGame
+                    onInGame = onInGame,
+                    searchText = searchText,
                 )
             }
             composable(
