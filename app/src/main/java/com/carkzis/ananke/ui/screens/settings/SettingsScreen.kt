@@ -1,0 +1,9 @@
+package com.carkzis.ananke.ui.screens.settings
+
+import androidx.compose.runtime.Composable
+import com.carkzis.ananke.ui.components.AnankeText
+
+@Composable
+fun SettingsScreen() {
+    AnankeText(text = "Settings Screen")
+}

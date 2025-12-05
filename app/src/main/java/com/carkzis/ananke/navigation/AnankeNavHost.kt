@@ -6,9 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.carkzis.ananke.ui.AnankeAppState
+import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.screens.game.GameRoute
 import com.carkzis.ananke.ui.screens.team.TeamRoute
 import com.carkzis.ananke.ui.screens.nugame.NewGameRoute
+import com.carkzis.ananke.ui.screens.settings.SettingsRoute
 import com.carkzis.ananke.ui.screens.you.YouRoute
 
 @Composable
@@ -68,6 +70,9 @@ fun AnankeNavHost(
                 },
                 onShowSnackbar = onShowSnackbar
             )
+        }
+        composable(route = AnankeDestination.SETTINGS.toString()) {
+            SettingsRoute()
         }
     }
 }
