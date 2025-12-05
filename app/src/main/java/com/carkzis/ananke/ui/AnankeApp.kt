@@ -70,7 +70,10 @@ fun AnankeApp(
                     destinations = appState.destinations,
                     availabilities = appState.availabilityMap.collectAsState(initial = mapOf()).value,
                     currentDestination = appState.currentDestination,
-                    onNavigate = appState::navigateToDestination
+                    onNavigate = {
+                        searchText = ""
+                        appState::navigateToDestination
+                    }
                 )
             }
         ) { padding ->
