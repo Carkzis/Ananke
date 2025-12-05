@@ -1,6 +1,8 @@
 package com.carkzis.ananke.navigation
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
@@ -60,6 +62,76 @@ class NavigationTest {
     fun `first screen is the game screen`() {
         composeTestRule.apply {
             assertScreenSelected(AnankeDestination.GAME)
+        }
+    }
+
+    @Test
+    fun `game screen has search button enabled when not in game`() {
+        composeTestRule.apply {
+            assertScreenSelected(AnankeDestination.GAME)
+            onNodeWithTag("global-search-button")
+                .assertIsDisplayed()
+                .assertIsEnabled()
+        }
+    }
+
+    @Test
+    fun `game screen has search button disabled when in game`() = runTest {
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
+        composeTestRule.apply {
+            assertScreenSelected(AnankeDestination.GAME, inGame = true)
+
+            onNodeWithTag("global-search-button")
+                .assertIsDisplayed()
+                .assertIsNotEnabled()
+        }
+    }
+
+    @Test
+    fun `team screen has search button enabled`() = runTest {
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
+        composeTestRule.apply {
+            assertScreenSelected(AnankeDestination.GAME, inGame = true)
+
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
+                .performClick()
+
+            assertScreenSelected(AnankeDestination.TEAM, inGame = true)
+
+            onNodeWithTag("global-search-button")
+                .assertIsDisplayed()
+                .assertIsEnabled()
+        }
+    }
+
+    @Test
+    fun `you screen has search button disabled`() = runTest {
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
+        composeTestRule.apply {
+            assertScreenSelected(AnankeDestination.GAME, inGame = true)
+
+            onNodeWithTag("${AnankeDestination.YOU}-navigation-item")
+                .performClick()
+
+            assertScreenSelected(AnankeDestination.YOU, inGame = true)
+
+            onNodeWithTag("global-search-button")
+                .assertIsDisplayed()
+                .assertIsNotEnabled()
+        }
+    }
+
+    @Test
+    fun `new game screen has search button disabled`() = runTest {
+        composeTestRule.apply {
+            assertScreenSelected(AnankeDestination.GAME)
+
+            onNodeWithTag("${GameDestination.HOME}-to-${GameDestination.NEW}-button", useUnmergedTree = true)
+                .performClick()
+
+            onNodeWithTag("global-search-button")
+                .assertIsDisplayed()
+                .assertIsNotEnabled()
         }
     }
 
