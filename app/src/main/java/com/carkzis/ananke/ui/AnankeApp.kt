@@ -49,7 +49,7 @@ fun AnankeApp(
         val searchBarLaunched by appState.launchSearchBar.collectAsStateWithLifecycle()
         val currentDestination by appState.navController.currentBackStackEntryAsState()
         val gameState by appState.gameState.collectAsStateWithLifecycle()
-        var searchText by remember { mutableStateOf("") }
+        val searchText by appState.searchText.collectAsStateWithLifecycle()
 
         Scaffold(
             modifier = Modifier,
@@ -71,7 +71,6 @@ fun AnankeApp(
                     availabilities = appState.availabilityMap.collectAsState(initial = mapOf()).value,
                     currentDestination = appState.currentDestination,
                     onNavigate = {
-                        searchText = ""
                         appState::navigateToDestination
                     }
                 )
@@ -82,7 +81,7 @@ fun AnankeApp(
                     appState = appState,
                     currentDestination = currentDestination,
                     onConfirmSearch = {
-                        searchText = it
+                        appState.updateSearchText(it)
                     }
                 )
             }

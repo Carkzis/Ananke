@@ -40,6 +40,9 @@ class AnankeAppState(
     )
     val launchSearchBar: StateFlow<SearchDialogueState> = _launchSearchBar
 
+    private val _searchText: MutableStateFlow<String> = MutableStateFlow("")
+    val searchText: StateFlow<String> = _searchText
+
     val gameState = gameStateUseCase().stateIn(
         coroutineScope,
         SharingStarted.WhileSubscribed(5000L),
@@ -62,6 +65,7 @@ class AnankeAppState(
         }
 
     fun navigateToDestination(destination: AnankeDestination) {
+        _searchText.value = ""
         navController.navigate(destination.toString(), navigationOptions())
     }
 
@@ -77,6 +81,10 @@ class AnankeAppState(
             isOpen = false,
             currentDestination = destination
         )
+    }
+
+    fun updateSearchText(newText: String) {
+        _searchText.value = newText
     }
 
     private fun navigationOptions(): NavOptionsBuilder.() -> Unit = {

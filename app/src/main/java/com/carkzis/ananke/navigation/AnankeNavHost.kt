@@ -32,6 +32,7 @@ fun AnankeNavHost(
             composable(route = "${AnankeDestination.GAME}/${GameDestination.HOME}") {
                 GameRoute(
                     onNewGameClick = {
+                        appState.updateSearchText("")
                         navController.navigate("${AnankeDestination.GAME}/${GameDestination.NEW}") {
                             launchSingleTop = true
                         }
