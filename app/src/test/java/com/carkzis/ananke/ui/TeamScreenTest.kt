@@ -310,6 +310,72 @@ class TeamScreenTest {
         }
     }
 
+    @Test
+    fun `open and dismiss remove team member dialogue`() = runTest {
+        composeTestRule.apply {
+            val viewModel = teamViewModel()
+
+            val game = CurrentGame("123")
+            gameRepository.emitCurrentGame(game)
+            teamRepository.emitUsers(dummyUsers())
+
+            initialiseTeamScreenViaTeamRoute(viewModel)
+
+            addHighestUserInListToTeam(
+                onCompletion = {
+                    gameRepository.emitGames(listOf(game.toGame()))
+                }
+            )
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-remove-team-member-icon")
+                .onFirst()
+                .assertHasClickAction()
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue")
+                .assertIsDisplayed()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-cancel-remove-team-member-button")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue")
+                .assertIsNotDisplayed()
+        }
+    }
+
+    @Test
+    fun `open and accept remove team member dialogue`() = runTest {
+        composeTestRule.apply {
+            val viewModel = teamViewModel()
+
+            val game = CurrentGame("123")
+            gameRepository.emitCurrentGame(game)
+            teamRepository.emitUsers(dummyUsers())
+
+            initialiseTeamScreenViaTeamRoute(viewModel)
+
+            addHighestUserInListToTeam(
+                onCompletion = {
+                    gameRepository.emitGames(listOf(game.toGame()))
+                }
+            )
+
+            onAllNodesWithTag("${AnankeDestination.TEAM}-remove-team-member-icon")
+                .onFirst()
+                .assertHasClickAction()
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue")
+                .assertIsDisplayed()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-confirm-remove-team-member-button")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-delete-team-member-confirmation-dialogue")
+                .assertIsNotDisplayed()
+        }
+    }
+
     private fun SemanticsNodeInteractionCollection.assertUsersInListHaveExpectedData(expectedUsers: List<User>) {
         fetchSemanticsNodes().forEachIndexed { index, _ ->
             val currentCard = get(index)
