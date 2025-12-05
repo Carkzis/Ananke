@@ -117,6 +117,7 @@ private fun SearchBarDialogue(
         title = { Text("Perform a search") },
         text = {
             TextField(
+                modifier = Modifier.testTag("global-search-text-field"),
                 value = searchValue,
                 onValueChange = { searchValue = it },
                 label = { Text("Perform a search") }

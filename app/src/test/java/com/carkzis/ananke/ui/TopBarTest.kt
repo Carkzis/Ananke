@@ -3,11 +3,15 @@ package com.carkzis.ananke.ui
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.carkzis.ananke.MainActivity
 import com.carkzis.ananke.data.model.CurrentGame
+import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.repository.YouRepository
@@ -28,13 +32,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import kotlin.apply
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltTestApplication::class)
 @UninstallModules(DataModule::class)
 class TopBarTest {
-    
+
     @BindValue
     @JvmField
     val gameRepository: GameRepository = ControllableGameRepository()
@@ -108,6 +113,127 @@ class TopBarTest {
             onNodeWithTag("global-search-button")
                 .assertIsDisplayed()
                 .assertIsNotEnabled()
+        }
+    }
+
+    @Test
+    fun `search dialog appears when search button is clicked`() = runTest {
+        composeTestRule.apply {
+            onNodeWithTag("global-search-button")
+                .performClick()
+
+            onNodeWithTag("global-search-dialogue")
+                .assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `search dialogue allows text input and confirmation dismisses dialogue`() = runTest {
+        composeTestRule.apply {
+            onNodeWithTag("global-search-button")
+                .performClick()
+
+            val inputText = "Test Search Query"
+
+            onNodeWithTag("global-search-text-field")
+                .performTextInput(inputText)
+
+            onNodeWithTag("global-search-text-field")
+                .assertTextContains(inputText)
+
+            onNodeWithTag("global-search-bar-confirm-button")
+                .performClick()
+
+            onNodeWithTag("global-search-dialogue")
+                .assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `search dialogue can be dismissed with close button`() = runTest {
+        composeTestRule.apply {
+            onNodeWithTag("global-search-button")
+                .performClick()
+
+            onNodeWithTag("global-search-dialogue")
+                .assertIsDisplayed()
+
+            onNodeWithTag("global-search-bar-close-button")
+                .performClick()
+
+            onNodeWithTag("global-search-dialogue")
+                .assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `search causes games to be filtered`() = runTest {
+        val controllableGameRepository = gameRepository as ControllableGameRepository
+        controllableGameRepository.emitGames(
+            listOf(
+                Game("1", "Chess", "Strategy", creatorId = "1"),
+                Game("2", "Monopoly", "Family", creatorId = "1"),
+            )
+        )
+
+        composeTestRule.apply {
+            onNodeWithTag("global-search-button")
+                .performClick()
+
+            val searchText = "Chess"
+
+            onNodeWithTag("global-search-text-field")
+                .performTextInput(searchText)
+
+            onNodeWithTag("global-search-bar-confirm-button")
+                .performClick()
+
+            onNodeWithText("Chess")
+                .assertIsDisplayed()
+            onNodeWithText("Monopoly")
+                .assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `moving between screens causes filter to be reset`() = runTest {
+        val controllableGameRepository = gameRepository as ControllableGameRepository
+        controllableGameRepository.emitGames(
+            listOf(
+                Game("1", "Chess", "Strategy", creatorId = "1"),
+                Game("2", "Monopoly", "Family", creatorId = "1"),
+            )
+        )
+
+        composeTestRule.apply {
+            onNodeWithTag("global-search-button")
+                .performClick()
+
+            val searchText = "Chess"
+
+            onNodeWithTag("global-search-text-field")
+                .performTextInput(searchText)
+
+            onNodeWithTag("global-search-bar-confirm-button")
+                .performClick()
+
+            onNodeWithText("Chess")
+                .assertIsDisplayed()
+            onNodeWithText("Monopoly")
+                .assertDoesNotExist()
+
+            // Move to Team screen and back to reset filter.
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.GAME}-navigation-item")
+                .performClick()
+
+            // All games should be visible again.
+            onNodeWithText("Chess")
+                .assertIsDisplayed()
+            onNodeWithText("Monopoly")
+                .assertIsDisplayed()
         }
     }
 }
