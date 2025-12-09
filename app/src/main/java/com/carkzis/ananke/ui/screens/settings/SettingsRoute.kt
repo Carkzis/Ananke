@@ -12,6 +12,9 @@ fun SettingsRoute(
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
 
     SettingsScreen(
-        currentUser = currentUser
+        currentUser = currentUser,
+        onConfirmUsername = { newName ->
+            viewModel.updateCurrentUsersName(newName)
+        }
     )
 }
