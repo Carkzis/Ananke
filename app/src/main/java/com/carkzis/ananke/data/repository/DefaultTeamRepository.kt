@@ -12,6 +12,8 @@ import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.toEntity
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -20,8 +22,10 @@ import javax.inject.Inject
 class DefaultTeamRepository @Inject constructor(
     private val teamDao: TeamDao,
     private val networkDataSource: NetworkDataSource,
-    private val configuration: TeamConfiguration
 ) : TeamRepository {
+    private val _teamConfiguration = MutableStateFlow(TeamConfiguration())
+    override val teamConfiguration: StateFlow<TeamConfiguration> = _teamConfiguration
+
     override fun getUsers() = flow {
         emit(networkDataSource.getUsers().map { it.toDomainUser() })
     }
@@ -30,10 +34,14 @@ class DefaultTeamRepository @Inject constructor(
         it.map(UserEntityWithGames::toDomain)
     }
 
+    override fun updateTeamConfiguration(config: TeamConfiguration) {
+        _teamConfiguration.value = config
+    }
+
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         val teamMembersForGame = teamDao.getTeamMembersForGame(gameId).first()
-        if (teamMembersForGame.size >= configuration.teamMemberLimit) {
-            throw TooManyUsersInTeamException(configuration.teamMemberLimit)
+        if (teamMembersForGame.size >= _teamConfiguration.value.teamMemberLimit) {
+            throw TooManyUsersInTeamException(_teamConfiguration.value.teamMemberLimit)
         }
 
         try {

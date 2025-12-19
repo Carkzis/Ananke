@@ -4,7 +4,8 @@ data class Game(
     val id: String,
     val name: String,
     val description: String,
-    val creatorId: String
+    val creatorId: String,
+    val teamSize: Int,
 )
 
 data class GameWithPlayerCount(
@@ -16,5 +17,6 @@ fun Game.toCurrentGame() = CurrentGame(
     id = id,
     name = name,
     description = description,
-    creatorId = creatorId
+    creatorId = creatorId,
+    teamSize = teamSize
 )

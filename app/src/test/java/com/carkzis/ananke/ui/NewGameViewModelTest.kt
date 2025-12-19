@@ -246,4 +246,16 @@ class NewGameViewModelTest {
 
         collection.cancel()
     }
+
+    @Test
+    fun `view model holds default team size`() = runTest {
+        assertEquals(4, viewModel.teamSize.value)
+    }
+
+    @Test
+    fun `view model sets new team size`() = runTest {
+        val expectedTeamSize = 6
+        viewModel.updateTeamSize(expectedTeamSize)
+        assertEquals(expectedTeamSize, viewModel.teamSize.value)
+    }
 }

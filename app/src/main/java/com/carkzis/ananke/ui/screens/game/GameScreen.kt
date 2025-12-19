@@ -43,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.GameWithPlayerCount
@@ -584,6 +585,7 @@ private fun GameCardPreview() {
                 name = "The Game",
                 description = "This is a game.",
                 creatorId = "",
+                teamSize = DEFAULT_TEAM_SIZE
             )
         )
     }
@@ -623,6 +625,7 @@ private fun GameEnterDialogPreview() {
                 name = "The Game",
                 description = "This is a game.",
                 creatorId = "",
+                teamSize = DEFAULT_TEAM_SIZE
             )
         )
     }
@@ -640,12 +643,14 @@ private fun DeleteGameDialogPreview() {
                     name = "Game 1",
                     description = "This is a game.",
                     creatorId = "",
+                    teamSize = DEFAULT_TEAM_SIZE
                 ),
                 Game(
                     id = "2",
                     name = "Game 2",
                     description = "This is another game.",
                     creatorId = "",
+                    teamSize = DEFAULT_TEAM_SIZE
                 )
             ),
             onDismissRequest = {},
@@ -665,6 +670,7 @@ private fun DeleteGameDoubleCheckDialogPreview() {
                 name = "Game 1",
                 description = "This is a game.",
                 creatorId = "",
+                teamSize = DEFAULT_TEAM_SIZE
             ),
             onDismissRequest = {},
             onConfirmRequest = {}
@@ -683,12 +689,14 @@ private fun OutOfGameScreenPreview() {
                     name = "Game 1",
                     description = "This is a game.",
                     creatorId = "",
+                    teamSize = DEFAULT_TEAM_SIZE
                 ),
                 Game(
                     id = "2",
                     name = "Game 2",
                     description = "This is another game.",
                     creatorId = "",
+                    teamSize = DEFAULT_TEAM_SIZE
                 )
             ),
             deletableGames = listOf(),

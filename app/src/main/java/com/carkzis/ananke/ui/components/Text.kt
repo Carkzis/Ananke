@@ -37,6 +37,7 @@ fun AnankeTextField(
     lines: Int = 1,
     value: String,
     readOnly: Boolean = false,
+    hasDisabledColour: Boolean = true,
     onValueChange: (String) -> Unit,
 ) {
     TextField(
@@ -46,6 +47,7 @@ fun AnankeTextField(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Green,
             unfocusedContainerColor = Color.Green,
+            disabledContainerColor = if (hasDisabledColour) Color.Transparent else Color.Green,
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
@@ -54,7 +56,8 @@ fun AnankeTextField(
         maxLines = lines,
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(16.dp),
+        enabled = !readOnly
     )
 }
 

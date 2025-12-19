@@ -131,6 +131,7 @@ private fun InGameTeamScreen(
     ) {
         teamScreenTitle(modifier)
         currentGameTitle(currentGame, modifier)
+        teamSizeTitle(currentGame, modifier)
         teamMembers(
             modifier,
             teamMembers,
@@ -140,6 +141,21 @@ private fun InGameTeamScreen(
 
         )
         availableUsers(modifier, users, onAddUser, onViewUser, searchText)
+    }
+}
+
+private fun LazyListScope.teamSizeTitle(
+    currentGame: CurrentGame,
+    modifier: Modifier
+) {
+    item {
+        AnankeText(
+            text = "Team Size: ${currentGame.teamSize}",
+            modifier = modifier
+                .padding(8.dp)
+                .testTag("${AnankeDestination.TEAM}-team-size"),
+            textStyle = MaterialTheme.typography.titleMedium
+        )
     }
 }
 
