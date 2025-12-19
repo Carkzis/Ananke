@@ -62,7 +62,7 @@ fun AnankeTopBar(
                     .testTag("${AnankeDestination.SETTINGS}-navigation-item")
             )
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Cyan),
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color(0xFFB7FFFA)),
         modifier = Modifier
     )
 }

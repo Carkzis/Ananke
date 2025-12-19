@@ -45,9 +45,9 @@ fun AnankeTextField(
         onValueChange = onValueChange,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Green,
-            unfocusedContainerColor = Color.Green,
-            disabledContainerColor = if (hasDisabledColour) Color.Transparent else Color.Green,
+            focusedContainerColor = Color(color = 0xFF77DD77),
+            unfocusedContainerColor = Color(color = 0xFF77DD77),
+            disabledContainerColor = if (hasDisabledColour) Color.Transparent else Color(color = 0xFF77DD77),
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent

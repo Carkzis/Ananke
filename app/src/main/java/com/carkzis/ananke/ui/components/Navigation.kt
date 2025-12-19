@@ -27,7 +27,7 @@ fun AnankeBottomBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.Green
+        containerColor = Color(color = 0xFF77DD77)
     ) {
         destinations.forEach { destination ->
             val isCurrentlySelected =
@@ -89,7 +89,7 @@ fun BottomBar() {
 fun NavigationItemSelected() {
     Row(modifier = Modifier
         .wrapContentSize()
-        .background(Color.Green)) {
+        .background(Color(color = 0xFF77DD77))) {
         AnankeNavigationItem(
             selected = true,
             onClick = {},
@@ -104,7 +104,7 @@ fun NavigationItemSelected() {
 fun NavigationItemUnselected() {
     Row(modifier = Modifier
         .wrapContentSize()
-        .background(Color.Green)) {
+        .background(Color(color = 0xFF77DD77))) {
         AnankeNavigationItem(
             selected = false,
             onClick = {},
