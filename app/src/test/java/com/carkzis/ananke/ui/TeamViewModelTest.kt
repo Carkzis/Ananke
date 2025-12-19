@@ -23,6 +23,7 @@ import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.RemoveTeamMemberUseCase
 import com.carkzis.ananke.utils.UserCharacterUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -563,6 +564,20 @@ class TeamViewModelTest {
         assertFalse(deletableTeamMembers.last().contains(creatorUser.toDomain()))
 
         collection.cancel()
+    }
+
+    @Test
+    fun `viewmodel shows correct initial team member count`() = runTest {
+        val teamMemberCount = 7
+        val currentGame = CurrentGame(
+            id = "1",
+            name = "A Title",
+            description = "A Description",
+            teamSize = teamMemberCount
+        )
+        gameRepository.emitCurrentGame(currentGame)
+
+        assertEquals(teamMemberCount, viewModel.currentGame.first().teamSize)
     }
 
     private fun CurrentGame.toGame() = Game(this.id, this.name, this.description, this.creatorId, this.teamSize)
