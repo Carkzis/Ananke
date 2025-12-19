@@ -49,10 +49,11 @@ class AnankeAppStateTest {
             appState = rememberAnankeAppState(gameState = gameStateUseCase)
         }
 
-        assertEquals(3, appState.destinations.size)
+        assertEquals(4, appState.destinations.size)
         assertTrue(appState.destinations.contains(expectedDestinations[0]))
         assertTrue(appState.destinations.contains(expectedDestinations[1]))
         assertTrue(appState.destinations.contains(expectedDestinations[2]))
+        assertTrue(appState.destinations.contains(expectedDestinations[3]))
     }
 
     @Test
@@ -90,7 +91,7 @@ class AnankeAppStateTest {
     @Test
     fun `anankeAppState has the expected availabilities of destinations on initialisation`() = runTest {
         val expectedAvailabilityMap = AnankeDestination.values().associateWith {
-            it == AnankeDestination.GAME
+            it == AnankeDestination.GAME || it == AnankeDestination.SETTINGS
         }
 
         composeTestRule.setContent {

@@ -11,7 +11,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.testdoubles.ControllableGameRepository
 import com.carkzis.ananke.testdoubles.ControllableYouRepository
@@ -55,12 +58,14 @@ class NewGameScreenTest {
             NewGameScreen(
                 gameTitle = viewModel.gameTitle.collectAsStateWithLifecycle().value,
                 gameDescription = "",
+                teamSize = DEFAULT_TEAM_SIZE,
                 onTitleValueChanged = viewModel::updateGameTitle,
                 onDescriptionValueChanged = {},
                 onAttemptAddGameClick = {},
                 onAddDummyGameClick = {},
                 onAddGameSucceeds = {},
-                onShowSnackbar = {}
+                onShowSnackbar = {},
+                onTeamSizeChanged = {}
             )
         }
 
@@ -79,12 +84,14 @@ class NewGameScreenTest {
             NewGameScreen(
                 gameTitle = "",
                 gameDescription = viewModel.gameDescription.collectAsStateWithLifecycle().value,
+                teamSize = DEFAULT_TEAM_SIZE,
                 onTitleValueChanged = {},
                 onDescriptionValueChanged = viewModel::updateGameDescription,
                 onAttemptAddGameClick = {},
                 onAddDummyGameClick = {},
                 onAddGameSucceeds = {},
-                onShowSnackbar = {}
+                onShowSnackbar = {},
+                onTeamSizeChanged = {}
             )
         }
 
@@ -115,6 +122,10 @@ class NewGameScreenTest {
             onNodeWithTag("${GameDestination.NEW}-game-description")
                 .performClick()
                 .performTextInput("A Game Description")
+            onNodeWithTag("${GameDestination.NEW}-addnewgame-lazycolumn")
+                .performTouchInput {
+                    swipeUp()
+                }
             onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
                 .performClick()
             assertTrue(redirected)
@@ -133,11 +144,17 @@ class NewGameScreenTest {
         }
 
         composeTestRule.apply {
+            onNodeWithTag("${GameDestination.NEW}-addnewgame-lazycolumn")
+                .performTouchInput {
+                    swipeUp()
+                }
             onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
                 .performClick()
             assertFalse(redirected)
         }
     }
+
+    private fun onNodeWithTag(testTag: String) {}
 
     @Test
     fun `snackbar displays when try to add game with invalid input`() {
@@ -156,6 +173,10 @@ class NewGameScreenTest {
         }
 
         composeTestRule.apply {
+            onNodeWithTag("${GameDestination.NEW}-addnewgame-lazycolumn")
+                .performTouchInput {
+                    swipeUp()
+                }
             onNodeWithTag("${GameDestination.NEW}-addnewgame-button", useUnmergedTree = true)
                 .performClick()
             runBlocking {

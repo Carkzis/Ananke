@@ -321,9 +321,9 @@ class GameViewModelTest {
     }
 
     fun dummyGames() = listOf(
-        Game("1", "My First Game", "It is the first one.", "1"),
-        Game("2", "My Second Game", "It is the second one.", "1"),
-        Game("3", "My Third Game", "It is the third one.", "1"),
-        Game("4", "Someone else's game", "It belongs to someone else", "2")
+        Game("1", "My First Game", "It is the first one.", "1", 2),
+        Game("2", "My Second Game", "It is the second one.", "1", 3),
+        Game("3", "My Third Game", "It is the third one.", "1", 4),
+        Game("4", "Someone else's game", "It belongs to someone else", "2", 5)
     )
 }

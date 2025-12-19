@@ -7,13 +7,17 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.pressKey
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.navigation.AnankeDestination
@@ -208,6 +212,7 @@ class YouScreenTest {
         }
     }
 
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun `text boxes cannot be edited when edit mode disabled`() {
         composeTestRule.apply {
@@ -224,7 +229,10 @@ class YouScreenTest {
             val attributeType = "name"
 
             onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType")
-                .performTextInput("Something")
+                .performClick()
+                .performKeyInput {
+                    pressKey(Key.A)
+                }
 
             onNodeWithTag("${AnankeDestination.YOU}-character-$attributeType", useUnmergedTree = true)
                 .assertTextEquals("")

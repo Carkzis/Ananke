@@ -1,5 +1,6 @@
 package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
@@ -97,7 +98,7 @@ class TeamViewModelTest {
     @Test
     fun `view model adds new team mate to game along with their associated character`() = runTest {
         val expectedTeamMember = User(42, "Zidun")
-        val expectedGame = Game("1", "A Game", "A Description", "1")
+        val expectedGame = Game("1", "A Game", "A Description", "1", DEFAULT_TEAM_SIZE)
         gameRepository.emitGames(listOf(expectedGame))
 
         val users = mutableListOf<User>()
@@ -231,7 +232,7 @@ class TeamViewModelTest {
     @Test
     fun `view model does not add users to non-existent game with message`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
-        val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.", "1")
+        val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.", "1", DEFAULT_TEAM_SIZE)
 
         var message = ""
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -239,7 +240,7 @@ class TeamViewModelTest {
         }
 
         viewModel.addTeamMember(expectedTeamMember, nonExistentGame)
-        gameRepository.emitGames(listOf(Game("1", "A Game", "A Description", "1")))
+        gameRepository.emitGames(listOf(Game("1", "A Game", "A Description", "1", DEFAULT_TEAM_SIZE)))
 
         assertEquals(UserAddedToNonExistentGameException(nonExistentGame.name).message, message)
 
@@ -282,7 +283,7 @@ class TeamViewModelTest {
     fun `view model sends message if attempt to add user to game user with id that already exists`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
         val teamMemberWithIdenticalId = User(1, "Zudin")
-        val expectedGame = Game("1", "A Game", "A Description", "1")
+        val expectedGame = Game("1", "A Game", "A Description", "1", DEFAULT_TEAM_SIZE)
         teamRepository.addTeamMember(expectedTeamMember, expectedGame.id.toLong())
         gameRepository.emitGames(listOf(expectedGame))
 
@@ -564,6 +565,6 @@ class TeamViewModelTest {
         collection.cancel()
     }
 
-    private fun CurrentGame.toGame() = Game(this.id, this.name, this.description, this.creatorId)
+    private fun CurrentGame.toGame() = Game(this.id, this.name, this.description, this.creatorId, this.teamSize)
 
 }

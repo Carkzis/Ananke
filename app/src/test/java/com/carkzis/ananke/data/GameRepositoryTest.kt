@@ -190,7 +190,8 @@ class GameRepositoryTest {
             "9999",
             "NonExistentGame",
             "This game does not exist",
-            creatorId
+            creatorId,
+            DEFAULT_TEAM_SIZE
         )
         anankeDataStore.setCurrentUserId(creatorId)
 

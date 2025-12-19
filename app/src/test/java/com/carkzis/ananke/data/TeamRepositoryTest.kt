@@ -37,7 +37,7 @@ class TeamRepositoryTest {
         teamDao = ControllableTeamDao()
         networkDataSource = DefaultNetworkDataSource()
         teamConfiguration = TeamConfiguration(teamMemberLimit = Int.MAX_VALUE)
-        teamRepository = DefaultTeamRepository(teamDao, networkDataSource, teamConfiguration)
+        teamRepository = DefaultTeamRepository(teamDao, networkDataSource)
     }
 
     @Test

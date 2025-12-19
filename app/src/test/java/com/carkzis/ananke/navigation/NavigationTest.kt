@@ -211,7 +211,9 @@ class NavigationTest {
         }
 
         expectedUnselectedNavigationItems.forEach {
-            assertNavigationItemNotSelected("$it-navigation-item")
+            if (it != AnankeDestination.SETTINGS) {
+                assertNavigationItemNotSelected("$it-navigation-item")
+            }
         }
     }
 
