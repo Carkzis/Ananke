@@ -2,10 +2,10 @@ package com.carkzis.ananke.ui.screens.nugame
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.carkzis.ananke.data.repository.GameRepository
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.data.model.NewGame
 import com.carkzis.ananke.data.model.User
-import com.carkzis.ananke.ui.screens.game.GamingState
+import com.carkzis.ananke.data.repository.GameRepository
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.descriptionValidator
 import com.carkzis.ananke.ui.screens.nugame.NewGameTextValidator.Companion.titleValidator
 import com.carkzis.ananke.utils.CurrentUserUseCase
@@ -38,6 +38,9 @@ class NewGameViewModel @Inject constructor(
     private val _gameDescription = MutableStateFlow("")
     val gameDescription = _gameDescription.asStateFlow()
 
+    private val _teamSize = MutableStateFlow(DEFAULT_TEAM_SIZE)
+    val teamSize = _teamSize.asStateFlow()
+
     private val _message = MutableSharedFlow<String>()
     val message = _message.asSharedFlow()
 
@@ -58,6 +61,10 @@ class NewGameViewModel @Inject constructor(
             { _gameDescription.value = it },
             descriptionValidator()
         )
+    }
+
+    fun updateTeamSize(teamSize: Int) {
+        _teamSize.value = teamSize
     }
 
     fun addNewGame(newGame: NewGame) {

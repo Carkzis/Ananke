@@ -1,3 +1,5 @@
 package com.carkzis.ananke.data
 
-data class TeamConfiguration(var teamMemberLimit: Int = 4)
+const val DEFAULT_TEAM_SIZE = 4
+
+data class TeamConfiguration(var teamMemberLimit: Int = DEFAULT_TEAM_SIZE)

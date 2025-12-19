@@ -7,5 +7,6 @@ fun NewGame.asGame(id: Long = 0L) = Game(
     id = id.toString(),
     name = name,
     description = description,
-    creatorId = creatorId.toString()
+    creatorId = creatorId.toString(),
+    teamSize = teamSize
 )

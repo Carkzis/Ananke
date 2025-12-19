@@ -1,5 +1,6 @@
 package com.carkzis.ananke.ui
 
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
@@ -22,6 +23,7 @@ import com.carkzis.ananke.utils.MainDispatcherRule
 import com.carkzis.ananke.utils.RemoveTeamMemberUseCase
 import com.carkzis.ananke.utils.UserCharacterUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -97,7 +99,7 @@ class TeamViewModelTest {
     @Test
     fun `view model adds new team mate to game along with their associated character`() = runTest {
         val expectedTeamMember = User(42, "Zidun")
-        val expectedGame = Game("1", "A Game", "A Description", "1")
+        val expectedGame = Game("1", "A Game", "A Description", "1", DEFAULT_TEAM_SIZE)
         gameRepository.emitGames(listOf(expectedGame))
 
         val users = mutableListOf<User>()
@@ -231,7 +233,7 @@ class TeamViewModelTest {
     @Test
     fun `view model does not add users to non-existent game with message`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
-        val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.", "1")
+        val nonExistentGame = Game("999", "Non-Existent Game", "It does not exist.", "1", DEFAULT_TEAM_SIZE)
 
         var message = ""
         val collection = launch(UnconfinedTestDispatcher()) {
@@ -239,7 +241,7 @@ class TeamViewModelTest {
         }
 
         viewModel.addTeamMember(expectedTeamMember, nonExistentGame)
-        gameRepository.emitGames(listOf(Game("1", "A Game", "A Description", "1")))
+        gameRepository.emitGames(listOf(Game("1", "A Game", "A Description", "1", DEFAULT_TEAM_SIZE)))
 
         assertEquals(UserAddedToNonExistentGameException(nonExistentGame.name).message, message)
 
@@ -282,7 +284,7 @@ class TeamViewModelTest {
     fun `view model sends message if attempt to add user to game user with id that already exists`() = runTest {
         val expectedTeamMember = User(1, "Zidun")
         val teamMemberWithIdenticalId = User(1, "Zudin")
-        val expectedGame = Game("1", "A Game", "A Description", "1")
+        val expectedGame = Game("1", "A Game", "A Description", "1", DEFAULT_TEAM_SIZE)
         teamRepository.addTeamMember(expectedTeamMember, expectedGame.id.toLong())
         gameRepository.emitGames(listOf(expectedGame))
 
@@ -564,6 +566,20 @@ class TeamViewModelTest {
         collection.cancel()
     }
 
-    private fun CurrentGame.toGame() = Game(this.id, this.name, this.description, this.creatorId)
+    @Test
+    fun `viewmodel shows correct initial team member count`() = runTest {
+        val teamMemberCount = 7
+        val currentGame = CurrentGame(
+            id = "1",
+            name = "A Title",
+            description = "A Description",
+            teamSize = teamMemberCount
+        )
+        gameRepository.emitCurrentGame(currentGame)
+
+        assertEquals(teamMemberCount, viewModel.currentGame.first().teamSize)
+    }
+
+    private fun CurrentGame.toGame() = Game(this.id, this.name, this.description, this.creatorId, this.teamSize)
 
 }

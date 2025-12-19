@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carkzis.ananke.ui.theme.Typography
+import com.carkzis.ananke.ui.theme.pastelGreen
 
 @Composable
 fun AnankeText(
@@ -37,6 +38,7 @@ fun AnankeTextField(
     lines: Int = 1,
     value: String,
     readOnly: Boolean = false,
+    hasDisabledColour: Boolean = true,
     onValueChange: (String) -> Unit,
 ) {
     TextField(
@@ -44,8 +46,9 @@ fun AnankeTextField(
         onValueChange = onValueChange,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Green,
-            unfocusedContainerColor = Color.Green,
+            focusedContainerColor = pastelGreen,
+            unfocusedContainerColor = pastelGreen,
+            disabledContainerColor = if (hasDisabledColour) Color.Transparent else pastelGreen,
             focusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
@@ -54,7 +57,8 @@ fun AnankeTextField(
         maxLines = lines,
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(16.dp),
+        enabled = !readOnly
     )
 }
 

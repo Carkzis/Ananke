@@ -37,7 +37,7 @@ class TeamRepositoryTest {
         teamDao = ControllableTeamDao()
         networkDataSource = DefaultNetworkDataSource()
         teamConfiguration = TeamConfiguration(teamMemberLimit = Int.MAX_VALUE)
-        teamRepository = DefaultTeamRepository(teamDao, networkDataSource, teamConfiguration)
+        teamRepository = DefaultTeamRepository(teamDao, networkDataSource)
     }
 
     @Test
@@ -159,6 +159,21 @@ class TeamRepositoryTest {
         val remainingTeamMembers = teamRepository.getTeamMembers(expectedGameId).first()
 
         assertEquals(listOf(secondTeamMember), remainingTeamMembers)
+    }
+
+    @Test
+    fun `repository has default team member limit`() = runTest {
+        val actualTeamConfiguration = teamRepository.teamConfiguration.first()
+        assertEquals(DEFAULT_TEAM_SIZE, actualTeamConfiguration.teamMemberLimit)
+    }
+
+    @Test
+    fun `repository allows updating team configuration`() = runTest {
+        val newTeamMemberLimit = 7
+        teamRepository.updateTeamConfiguration(TeamConfiguration(newTeamMemberLimit))
+
+        val actualTeamConfiguration = teamRepository.teamConfiguration.first()
+        assertEquals(newTeamMemberLimit, actualTeamConfiguration.teamMemberLimit)
     }
 
     private suspend fun getUserEntitiesAsDomainObjects(id: Long) =

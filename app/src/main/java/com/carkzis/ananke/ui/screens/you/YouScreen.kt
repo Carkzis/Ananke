@@ -152,7 +152,7 @@ private fun YouAttribute(
         onValueChange = {
             onValueChanged(it, characterAttributeIsEditable)
         },
-        readOnly = characterAttributeIsEditable,
+        hasDisabledColour = false,
         modifier = Modifier
             .testTag("${AnankeDestination.YOU}-character-$attributeType")
     )

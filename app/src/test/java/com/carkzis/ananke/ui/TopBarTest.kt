@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.carkzis.ananke.MainActivity
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.repository.GameRepository
@@ -171,8 +172,8 @@ class TopBarTest {
         val controllableGameRepository = gameRepository as ControllableGameRepository
         controllableGameRepository.emitGames(
             listOf(
-                Game("1", "Chess", "Strategy", creatorId = "1"),
-                Game("2", "Monopoly", "Family", creatorId = "1"),
+                Game("1", "Chess", "Strategy", creatorId = "1", DEFAULT_TEAM_SIZE),
+                Game("2", "Monopoly", "Family", creatorId = "1", DEFAULT_TEAM_SIZE),
             )
         )
 
@@ -200,8 +201,8 @@ class TopBarTest {
         val controllableGameRepository = gameRepository as ControllableGameRepository
         controllableGameRepository.emitGames(
             listOf(
-                Game("1", "Chess", "Strategy", creatorId = "1"),
-                Game("2", "Monopoly", "Family", creatorId = "1"),
+                Game("1", "Chess", "Strategy", creatorId = "1", DEFAULT_TEAM_SIZE),
+                Game("2", "Monopoly", "Family", creatorId = "1", DEFAULT_TEAM_SIZE),
             )
         )
 

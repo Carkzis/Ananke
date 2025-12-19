@@ -621,9 +621,9 @@ class GameScreenTest {
     }
 
     private fun dummyGames() = listOf(
-        Game("1", "My First Game", "It is the first one.", "1"),
-        Game("2", "My Second Game", "It is the second one.", "2"),
-        Game("3", "My Third Game", "It is the third one.", "3")
+        Game("1", "My First Game", "It is the first one.", "1", 2),
+        Game("2", "My Second Game", "It is the second one.", "2", 4),
+        Game("3", "My Third Game", "It is the third one.", "3", 8)
     )
 
 }

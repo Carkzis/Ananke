@@ -1,6 +1,8 @@
 package com.carkzis.ananke.data.repository
 
+import android.R.attr.value
 import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import com.carkzis.ananke.data.TeamConfiguration
 import com.carkzis.ananke.data.database.TeamDao
 import com.carkzis.ananke.data.model.User
@@ -12,16 +14,22 @@ import com.carkzis.ananke.data.database.toDomain
 import com.carkzis.ananke.data.model.toEntity
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class DefaultTeamRepository @Inject constructor(
     private val teamDao: TeamDao,
     private val networkDataSource: NetworkDataSource,
-    private val configuration: TeamConfiguration
 ) : TeamRepository {
+    private val _teamConfiguration = MutableStateFlow(TeamConfiguration())
+    override val teamConfiguration: StateFlow<TeamConfiguration> = _teamConfiguration
+
     override fun getUsers() = flow {
         emit(networkDataSource.getUsers().map { it.toDomainUser() })
     }
@@ -30,10 +38,14 @@ class DefaultTeamRepository @Inject constructor(
         it.map(UserEntityWithGames::toDomain)
     }
 
+    override fun updateTeamConfiguration(config: TeamConfiguration) {
+        _teamConfiguration.update { config }
+    }
+
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
         val teamMembersForGame = teamDao.getTeamMembersForGame(gameId).first()
-        if (teamMembersForGame.size >= configuration.teamMemberLimit) {
-            throw TooManyUsersInTeamException(configuration.teamMemberLimit)
+        if (teamMembersForGame.size >= _teamConfiguration.value.teamMemberLimit) {
+            throw TooManyUsersInTeamException(_teamConfiguration.value.teamMemberLimit)
         }
 
         try {

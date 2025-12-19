@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.ui.theme.pastelBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,9 +60,10 @@ fun AnankeTopBar(
                     .clickable {
                         onNavigate(AnankeDestination.SETTINGS)
                     }
+                    .testTag("${AnankeDestination.SETTINGS}-navigation-item")
             )
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Cyan),
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = pastelBlue),
         modifier = Modifier
     )
 }

@@ -81,6 +81,17 @@ class GameRepositoryTest {
         assertTrue(getGamesEntitiesAsDomainObjects().contains(newGame.asGame()))
     }
 
+    @Test
+    fun `repository adds game with expected team size`() = runTest {
+        val expectedTeamSize = 5
+
+        val newGame = NewGame("aName", "aDescription", dummyUserEntities.first().userId, teamSize = expectedTeamSize)
+        gameRepository.addNewGame(newGame)
+
+        val addedGame = getGamesEntitiesAsDomainObjects().first { it.name == newGame.name }
+        assertEquals(expectedTeamSize, addedGame.teamSize)
+    }
+
     @Test(expected = GameAlreadyExistsException::class)
     fun `repository does not add duplicate game with exception`() = runTest {
         val newGame = NewGame("aName", "aDescription", dummyUserEntities.first().userId)
@@ -190,7 +201,8 @@ class GameRepositoryTest {
             "9999",
             "NonExistentGame",
             "This game does not exist",
-            creatorId
+            creatorId,
+            DEFAULT_TEAM_SIZE
         )
         anankeDataStore.setCurrentUserId(creatorId)
 

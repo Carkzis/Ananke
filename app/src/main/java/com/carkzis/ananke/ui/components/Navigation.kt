@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
 import com.carkzis.ananke.navigation.AnankeDestination
+import com.carkzis.ananke.ui.theme.pastelGreen
 
 @Composable
 fun AnankeBottomBar(
@@ -27,7 +28,7 @@ fun AnankeBottomBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.Green
+        containerColor = pastelGreen
     ) {
         destinations.forEach { destination ->
             val isCurrentlySelected =
@@ -89,7 +90,7 @@ fun BottomBar() {
 fun NavigationItemSelected() {
     Row(modifier = Modifier
         .wrapContentSize()
-        .background(Color.Green)) {
+        .background(pastelGreen)) {
         AnankeNavigationItem(
             selected = true,
             onClick = {},
@@ -104,7 +105,7 @@ fun NavigationItemSelected() {
 fun NavigationItemUnselected() {
     Row(modifier = Modifier
         .wrapContentSize()
-        .background(Color.Green)) {
+        .background(pastelGreen)) {
         AnankeNavigationItem(
             selected = false,
             onClick = {},

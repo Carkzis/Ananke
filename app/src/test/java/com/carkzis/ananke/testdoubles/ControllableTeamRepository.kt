@@ -1,17 +1,22 @@
 package com.carkzis.ananke.testdoubles
 
+import com.carkzis.ananke.data.TeamConfiguration
 import com.carkzis.ananke.data.repository.TeamRepository
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.ui.screens.team.TooManyUsersInTeamException
 import com.carkzis.ananke.ui.screens.team.UserAlreadyExistsException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 
 class ControllableTeamRepository(
-    initialUsers: List<User> = listOf()
+    initialUsers: List<User> = listOf(),
 ) : TeamRepository {
 
+    override val teamConfiguration = MutableStateFlow(
+        TeamConfiguration())
     private val _users = MutableSharedFlow<List<User>>(replay = 1)
     private val users get() = _users.replayCache.firstOrNull() ?: listOf()
 
@@ -29,6 +34,10 @@ class ControllableTeamRepository(
 
     override fun getTeamMembers(gameId: Long): Flow<List<User>> = _users.map { users ->
         users.filter { gameToUserMap.getOrDefault(gameId, listOf()).contains(it) }
+    }
+
+    override fun updateTeamConfiguration(config: TeamConfiguration) {
+        teamConfiguration.value = config
     }
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {

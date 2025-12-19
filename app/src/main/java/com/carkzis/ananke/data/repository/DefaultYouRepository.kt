@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.math.abs
 
 class DefaultYouRepository @Inject constructor(
     private val youDao: YouDao,
@@ -56,7 +57,7 @@ class DefaultYouRepository @Inject constructor(
 
         if (currentUserId == null) {
             val userId = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
-            val userName = "User-${UUID.randomUUID().mostSignificantBits.toString().take(5)}"
+            val userName = "User-${abs(UUID.randomUUID().mostSignificantBits).toString().take(5)}"
 
             val newUser = UserEntity(userId, userName)
 

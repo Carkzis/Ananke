@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.data.model.NewGame
 import java.util.UUID
 
@@ -22,19 +23,23 @@ fun NewGameRoute(
     val gameTitle by viewModel.gameTitle.collectAsStateWithLifecycle()
     val gameDescription by viewModel.gameDescription.collectAsStateWithLifecycle()
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
+    val teamSize by viewModel.teamSize.collectAsStateWithLifecycle()
 
     NewGameScreen(
         modifier = modifier,
         gameTitle = gameTitle,
         gameDescription = gameDescription,
+        teamSize = teamSize,
         onTitleValueChanged = viewModel::updateGameTitle,
         onDescriptionValueChanged = viewModel::updateGameDescription,
+        onTeamSizeChanged = viewModel::updateTeamSize,
         onAttemptAddGameClick = {
             viewModel.addNewGame(
                 NewGame(
                     gameTitle,
                     gameDescription,
-                    currentUser.id
+                    currentUser.id,
+                    teamSize
                 )
             )
         },
@@ -44,7 +49,8 @@ fun NewGameRoute(
                 NewGame(
                     "Marc's Game #$shortDummyGameUUID",
                     "It is indescribable.",
-                    currentUser.id
+                    currentUser.id,
+                    DEFAULT_TEAM_SIZE
                 )
             )
         },

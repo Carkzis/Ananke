@@ -2,6 +2,7 @@ package com.carkzis.ananke.ui.screens.team
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.carkzis.ananke.data.TeamConfiguration
 import com.carkzis.ananke.data.model.CurrentGame
 import com.carkzis.ananke.data.model.Game
 import com.carkzis.ananke.data.model.User
@@ -91,6 +92,7 @@ class TeamViewModel @Inject constructor(
             currentGame.collect {
                 if (it != CurrentGame.EMPTY) {
                     addCurrentUserToTheirEmptyGameUseCase(it)
+                    teamRepository.updateTeamConfiguration(TeamConfiguration(it.teamSize))
                 }
             }
         }

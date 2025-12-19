@@ -28,6 +28,7 @@ internal fun assertUserHasExpectedFormat(actualUserName: String) {
     )
 
     assertTrue(
-        numberSuffix.toInt() in 10_000 until 100_000
+        "Number suffix $numberSuffix is not in expected range.",
+        numberSuffix.toInt() in 10_000 until 100_000,
     )
 }

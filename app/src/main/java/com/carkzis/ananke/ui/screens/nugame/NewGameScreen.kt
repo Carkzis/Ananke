@@ -1,22 +1,38 @@
 package com.carkzis.ananke.ui.screens.nugame
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import com.carkzis.ananke.data.DEFAULT_TEAM_SIZE
 import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeMediumTitleText
@@ -29,8 +45,10 @@ fun NewGameScreen(
     modifier: Modifier = Modifier,
     gameTitle: String,
     gameDescription: String,
+    teamSize: Int,
     onTitleValueChanged: (String) -> Unit,
     onDescriptionValueChanged: (String) -> Unit,
+    onTeamSizeChanged: (Int) -> Unit,
     onAttemptAddGameClick: () -> Unit,
     onAddDummyGameClick: () -> Unit,
     onAddGameSucceeds: suspend () -> Unit,
@@ -42,6 +60,7 @@ fun NewGameScreen(
         newGameTitle(modifier)
         gameTitleTextField(modifier, gameTitle, onTitleValueChanged)
         gameDescriptionTextField(modifier, gameDescription, onDescriptionValueChanged)
+        teamSizeChanger(modifier, teamSize, onTeamSizeChanged)
         addGameButtonRow(modifier, onAttemptAddGameClick, onAddDummyGameClick)
     }
 }
@@ -86,6 +105,54 @@ private fun LazyListScope.gameDescriptionTextField(
             value = gameDescription,
             onValueChange = onDescriptionValueChanged
         )
+    }
+}
+
+private fun LazyListScope.teamSizeChanger(
+    modifier: Modifier,
+    teamSize: Int,
+    onTeamSizeChanged: (Int) -> Unit
+) {
+    item {
+        var expanded by remember { mutableStateOf(false) }
+
+        AnankeMediumTitleText(modifier = modifier, text = "Team Size")
+
+            AnankeTextField(
+                value = "$teamSize",
+                modifier = Modifier
+                    .clickable {
+                        expanded = !expanded
+                    }
+                    .testTag("${GameDestination.NEW}-team-size-button"),
+                onValueChange = {},
+                readOnly = true,
+                hasDisabledColour = false
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                DropdownMenu(
+                    modifier = Modifier.wrapContentSize(),
+                    expanded = expanded,
+                    offset = DpOffset(200.dp, 200.dp),
+                    onDismissRequest = { expanded = false }
+                ) {
+                    (2..8).forEach { size ->
+                        DropdownMenuItem(
+                            modifier = Modifier,
+                            text = { Text("$size") },
+                            onClick = {
+                                onTeamSizeChanged(size)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
     }
 }
 
@@ -224,12 +291,14 @@ private fun NewGameScreenPreview() {
         NewGameScreen(
             gameTitle = "A Title",
             gameDescription = "A Description",
+            teamSize = DEFAULT_TEAM_SIZE,
             onTitleValueChanged = {},
             onDescriptionValueChanged = {},
             onAttemptAddGameClick = {},
             onAddDummyGameClick = {},
             onAddGameSucceeds = {},
-            onShowSnackbar = {}
+            onShowSnackbar = {},
+            onTeamSizeChanged = {}
         )
     }
 }
