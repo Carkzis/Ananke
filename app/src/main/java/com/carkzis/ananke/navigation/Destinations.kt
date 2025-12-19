@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class AnankeDestination(
@@ -12,7 +13,8 @@ enum class AnankeDestination(
 ) {
     GAME(unselectedIcon = Icons.Filled.Games, selectedIcon = Icons.Filled.Games),
     TEAM(unselectedIcon = Icons.Filled.Groups, selectedIcon = Icons.Filled.Groups),
-    YOU(unselectedIcon = Icons.Filled.Person, selectedIcon = Icons.Filled.Person)
+    YOU(unselectedIcon = Icons.Filled.Person, selectedIcon = Icons.Filled.Person),
+    SETTINGS(unselectedIcon = Icons.Filled.Settings, selectedIcon = Icons.Filled.Settings)
 }
 
 enum class GameDestination {

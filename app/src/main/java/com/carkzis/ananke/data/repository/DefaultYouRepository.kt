@@ -56,7 +56,7 @@ class DefaultYouRepository @Inject constructor(
 
         if (currentUserId == null) {
             val userId = UUID.randomUUID().mostSignificantBits and Long.MAX_VALUE
-            val userName = "User-10000"
+            val userName = "User-${UUID.randomUUID().mostSignificantBits.toString().take(5)}"
 
             val newUser = UserEntity(userId, userName)
 
@@ -69,6 +69,14 @@ class DefaultYouRepository @Inject constructor(
             val user = youDao.getUserForUserId(currentUserId.toLong()).first()
             user?.let { emit(it.toDomain()) }
         }
+    }
+
+    override suspend fun updateUsername(user: User, newName: String) {
+        val updatedUser = UserEntity(
+            userId = user.id,
+            username = newName
+        )
+        youDao.insertUser(updatedUser)
     }
 
     override suspend fun addNewCharacter(newCharacter: NewCharacter) {

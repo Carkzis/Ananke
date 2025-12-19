@@ -286,4 +286,18 @@ class YouRepositoryTest {
         assertEquals(1, remainingCharacters.size)
         assertEquals(secondTeamMember.userId, remainingCharacters.first().userOwnerId)
     }
+
+    @Test
+    fun `repository updates username for current user`() = runTest {
+        val initialUser = dummyUserEntities.first()
+        anankeDataStore.setCurrentUserId(initialUser.userId.toString())
+        youDao.insertUser(initialUser)
+
+        val newUsername = "New Username"
+        youRepository.updateUsername(initialUser.toDomain(), newUsername)
+
+        val updatedUser = youRepository.getCurrentUser().first()
+
+        assertEquals(newUsername, updatedUser.name)
+    }
 }

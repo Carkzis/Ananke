@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -58,7 +59,7 @@ class AnankeAppState(
             val screenIsAvailable = gamingState is GamingState.InGame
             destinations.associateWith { destination ->
                 when (destination) {
-                    AnankeDestination.GAME -> true
+                    AnankeDestination.GAME, AnankeDestination.SETTINGS -> true
                     else -> screenIsAvailable
                 }
             }

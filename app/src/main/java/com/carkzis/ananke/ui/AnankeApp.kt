@@ -62,12 +62,15 @@ fun AnankeApp(
                             currentDestination?.destination?.route
                                 ?: "${AnankeDestination.GAME}/${GameDestination.HOME}"
                         )
-                    }
+                    },
+                    onNavigate = appState::navigateToDestination
                 )
             },
             bottomBar = {
                 AnankeBottomBar(modifier = Modifier,
-                    destinations = appState.destinations,
+                    destinations = appState.destinations.filter {
+                        it != AnankeDestination.SETTINGS
+                    },
                     availabilities = appState.availabilityMap.collectAsState(initial = mapOf()).value,
                     currentDestination = appState.currentDestination,
                     onNavigate = appState::navigateToDestination
