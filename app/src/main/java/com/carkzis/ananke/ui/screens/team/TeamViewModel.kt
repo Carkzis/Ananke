@@ -92,8 +92,8 @@ class TeamViewModel @Inject constructor(
             currentGame.collect {
                 if (it != CurrentGame.EMPTY) {
                     addCurrentUserToTheirEmptyGameUseCase(it)
+                    teamRepository.updateTeamConfiguration(TeamConfiguration(it.teamSize))
                 }
-                teamRepository.updateTeamConfiguration(TeamConfiguration(it.teamSize))
             }
         }
     }

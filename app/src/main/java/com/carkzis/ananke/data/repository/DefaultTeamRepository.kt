@@ -1,6 +1,8 @@
 package com.carkzis.ananke.data.repository
 
+import android.R.attr.value
 import android.database.sqlite.SQLiteConstraintException
+import android.util.Log
 import com.carkzis.ananke.data.TeamConfiguration
 import com.carkzis.ananke.data.database.TeamDao
 import com.carkzis.ananke.data.model.User
@@ -16,7 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class DefaultTeamRepository @Inject constructor(
@@ -35,7 +39,7 @@ class DefaultTeamRepository @Inject constructor(
     }
 
     override fun updateTeamConfiguration(config: TeamConfiguration) {
-        _teamConfiguration.value = config
+        _teamConfiguration.update { config }
     }
 
     override suspend fun addTeamMember(teamMember: User, gameId: Long) {
