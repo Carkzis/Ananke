@@ -404,6 +404,27 @@ class TeamScreenTest {
         }
     }
 
+    @Test
+    fun `team screen shows max team size`() = runTest {
+        val expectedTeamSize = 8
+
+        composeTestRule.apply {
+            val viewModel = teamViewModel()
+
+            val game = CurrentGame("123", teamSize = expectedTeamSize)
+            gameRepository.emitCurrentGame(game)
+
+            initialiseTeamScreenViaTeamRoute(viewModel)
+
+            val gamingState = viewModel.gamingState.first() as GamingState.InGame
+            assertEquals(expectedTeamSize, gamingState.currentGame.teamSize)
+
+            onNodeWithTag("${AnankeDestination.TEAM}-team-size")
+                .assertIsDisplayed()
+                .assertTextContains(expectedTeamSize.toString(), substring = true)
+        }
+    }
+
     private fun SemanticsNodeInteractionCollection.assertUsersInListHaveExpectedData(expectedUsers: List<User>) {
         fetchSemanticsNodes().forEachIndexed { index, _ ->
             val currentCard = get(index)

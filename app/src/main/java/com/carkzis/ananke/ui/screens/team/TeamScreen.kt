@@ -150,7 +150,7 @@ private fun LazyListScope.teamSizeTitle(
 ) {
     item {
         AnankeText(
-            text = "Team Size: ${currentGame.teamSize}",
+            text = "Max Team Size: ${currentGame.teamSize}",
             modifier = modifier
                 .padding(8.dp)
                 .testTag("${AnankeDestination.TEAM}-team-size"),
