@@ -191,6 +191,39 @@ class NavigationTest {
         }
     }
 
+    @Test
+    fun `can navigate to settings from any screen`() = runTest {
+        gameRepository.updateCurrentGame(CurrentGame("42", "No", "MaYbE"))
+
+        composeTestRule.apply {
+            assertScreenSelected(AnankeDestination.GAME, inGame = true)
+
+            onNodeWithTag("${AnankeDestination.SETTINGS}-navigation-item")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.SETTINGS}-title")
+                .assertIsDisplayed()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.SETTINGS}-navigation-item")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.SETTINGS}-title")
+                .assertIsDisplayed()
+
+            onNodeWithTag("${AnankeDestination.TEAM}-navigation-item")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.SETTINGS}-navigation-item")
+                .performClick()
+
+            onNodeWithTag("${AnankeDestination.SETTINGS}-title")
+                .assertIsDisplayed()
+        }
+    }
+
     private fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.assertScreenSelected(destination: AnankeDestination, inGame: Boolean = false) {
         val expectedTitle = when {
             destination == AnankeDestination.GAME && inGame -> "${GameDestination.HOME}-current-game-title"
