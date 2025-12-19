@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.carkzis.ananke.data.model.User
 import com.carkzis.ananke.navigation.AnankeDestination
-import com.carkzis.ananke.navigation.GameDestination
 import com.carkzis.ananke.ui.components.AnankeButton
 import com.carkzis.ananke.ui.components.AnankeText
 import com.carkzis.ananke.ui.theme.AnankeTheme
@@ -88,6 +87,7 @@ private fun ChangeUsernameOption(
     }
 
     AnankeButton(
+        modifier = Modifier.testTag("${AnankeDestination.SETTINGS}-change-username-button"),
         onClick = {
             changeUserDialogue = true
         }
@@ -110,7 +110,7 @@ fun ChangeUsernameDialogue(
     ) {
         Card(
             modifier = modifier
-                .testTag("${GameDestination.HOME}-change-username-dialog"),
+                .testTag("${AnankeDestination.SETTINGS}-change-username-dialog"),
         ) {
             var newName by remember { mutableStateOf(currentUser.name) }
 
@@ -123,6 +123,8 @@ fun ChangeUsernameDialogue(
                 )
 
                 TextField(
+                    modifier = Modifier
+                        .testTag("${AnankeDestination.SETTINGS}-change-username-textfield"),
                     value = newName,
                     onValueChange = {
                         newName = it
@@ -132,7 +134,7 @@ fun ChangeUsernameDialogue(
                 Row {
                     AnankeButton(
                         modifier = Modifier.weight(1f)
-                            .testTag("${GameDestination.HOME}-change-username-confirm-button"),
+                            .testTag("${AnankeDestination.SETTINGS}-change-username-confirm-button"),
                         onClick = {
                             onConfirmUsername(newName)
                         }
@@ -144,7 +146,7 @@ fun ChangeUsernameDialogue(
 
                     AnankeButton(
                         modifier = Modifier.weight(1f)
-                            .testTag("${GameDestination.HOME}-change-username-dismiss-button"),
+                            .testTag("${AnankeDestination.SETTINGS}-change-username-dismiss-button"),
                         onClick = onDismiss,
                     ) {
                         AnankeText(
